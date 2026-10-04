@@ -1,0 +1,4 @@
+2026-10-02 · Rust Docker toolchain 1.99.0
+cargo test --locked --quiet
+21 passed; 0 failed; 0 ignored.
+Frontend strict TypeScript + Vite production build passed.

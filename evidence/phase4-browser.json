@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-02",
+  "scope": "real local main UI; no user account creation, bots or trades",
+  "checks": [
+    "four linked charts rendered from real OKX data",
+    "Monaco Pine preview successful:299closed bars,ASTinputs9and21",
+    "Bot Studio graph validation success; mandatory risk gate visible",
+    "honest empty news and missing Jev-key status",
+    "no error/warning console messages at final observation"
+  ],
+  "screenshot": "/Users/wp/.codex/visualizations/2026/10/02/01a0fb78-99cb-7bd1-8f83-1fbea06596d0/okx-terminal-04.png",
+  "not_tested": [
+    "physicalmobile",
+    "actualJevcalls",
+    "Demo/privateaccount",
+    "LIVE"
+  ]
+}

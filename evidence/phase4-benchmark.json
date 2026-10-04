@@ -1,0 +1,109 @@
+{
+  "at_ms": 1790945848511,
+  "hardware": "Apple M1 Pro",
+  "host": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "container_arch": "linux/arm64",
+  "instruments": 12,
+  "active_bots": 0,
+  "indicator_load": "10 native indicators per requested candle series; no continuously active indicator bots",
+  "scope": "30s public feed observation; HTTP status query normal/burst. Not event-to-intent or exchange latency, not long soak. No orders or Jev calls. Other local containers active.",
+  "duration_s": 30.40321366698481,
+  "validated_ws_messages": 4651,
+  "validated_ws_messages_per_s": 152.97724941000473,
+  "ws_processing_ms": {
+    "p50": 0.229167,
+    "p95": 0.754375,
+    "p99": 2.1825,
+    "samples": 2048,
+    "scope": "WS validation + in-memory update; no order route"
+  },
+  "http_ms": {
+    "p50": 5.8955419808626175,
+    "p95": 28.25924998614937,
+    "p99": 33.350624958984554
+  },
+  "http_samples": 30,
+  "http_errors": 0,
+  "burst_test_database": {
+    "requests": 120,
+    "concurrency": 12,
+    "duration_s": 0.3961331250029616,
+    "errors": 0,
+    "http_ms": {
+      "p50": 7.817375008016825,
+      "p95": 16.703333996701986,
+      "p99": 26.248459005728364
+    }
+  },
+  "container_stats_before": [
+    {
+      "BlockIO": "0B / 0B",
+      "CPUPerc": "7.91%",
+      "Container": "okx-tradingterminal-terminal-1",
+      "ID": "7a20220dd4b2",
+      "MemPerc": "1.64%",
+      "MemUsage": "8.398MiB / 512MiB",
+      "Name": "okx-tradingterminal-terminal-1",
+      "NetIO": "35.9MB / 218MB",
+      "PIDs": "3"
+    },
+    {
+      "BlockIO": "49.2kB / 0B",
+      "CPUPerc": "0.47%",
+      "Container": "okx-tradingterminal-pine-1",
+      "ID": "300d009450ad",
+      "MemPerc": "4.72%",
+      "MemUsage": "12.09MiB / 256MiB",
+      "Name": "okx-tradingterminal-pine-1",
+      "NetIO": "0B / 0B",
+      "PIDs": "11"
+    },
+    {
+      "BlockIO": "4.63MB / 31MB",
+      "CPUPerc": "4.09%",
+      "Container": "okx-tradingterminal-db-1",
+      "ID": "92184c288a6e",
+      "MemPerc": "12.99%",
+      "MemUsage": "66.53MiB / 512MiB",
+      "Name": "okx-tradingterminal-db-1",
+      "NetIO": "17.1MB / 21.9MB",
+      "PIDs": "17"
+    }
+  ],
+  "container_stats_after": [
+    {
+      "BlockIO": "0B / 0B",
+      "CPUPerc": "10.14%",
+      "Container": "okx-tradingterminal-terminal-1",
+      "ID": "7a20220dd4b2",
+      "MemPerc": "1.67%",
+      "MemUsage": "8.551MiB / 512MiB",
+      "Name": "okx-tradingterminal-terminal-1",
+      "NetIO": "40.4MB / 256MB",
+      "PIDs": "3"
+    },
+    {
+      "BlockIO": "49.2kB / 0B",
+      "CPUPerc": "0.48%",
+      "Container": "okx-tradingterminal-pine-1",
+      "ID": "300d009450ad",
+      "MemPerc": "4.81%",
+      "MemUsage": "12.31MiB / 256MiB",
+      "Name": "okx-tradingterminal-pine-1",
+      "NetIO": "0B / 0B",
+      "PIDs": "11"
+    },
+    {
+      "BlockIO": "4.63MB / 33.8MB",
+      "CPUPerc": "2.17%",
+      "Container": "okx-tradingterminal-db-1",
+      "ID": "92184c288a6e",
+      "MemPerc": "12.98%",
+      "MemUsage": "66.48MiB / 512MiB",
+      "Name": "okx-tradingterminal-db-1",
+      "NetIO": "19.6MB / 24.9MB",
+      "PIDs": "17"
+    }
+  ],
+  "paid_jev_calls": 0
+}

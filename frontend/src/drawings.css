@@ -1,0 +1,394 @@
+.chart-with-tools {
+  min-height: 0;
+}
+.chart-with-tools .chart-canvas {
+  inset: 40px 0 28px 44px;
+  height: auto;
+}
+.drawing-layer {
+  position: absolute;
+  pointer-events: none;
+  z-index: 2;
+  inset: 40px 0 28px 44px;
+  outline: none;
+}
+.drawing-rail {
+  position: absolute;
+  left: -44px;
+  top: -40px;
+  bottom: -28px;
+  width: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  pointer-events: auto;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+}
+.drawing-rail button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  min-height: 28px;
+  border-radius: 5px;
+  color: var(--muted);
+}
+.drawing-rail button:first-child {
+  margin-bottom: 5px;
+}
+.drawing-rail button.active,
+.drawing-toolbar button[aria-pressed="true"] {
+  color: var(--green);
+  background: color-mix(in srgb, var(--green) 13%, transparent);
+}
+.drawing-rail button:hover,
+.drawing-toolbar button:hover,
+.drawing-selection button:hover {
+  color: var(--text);
+  background: var(--raised);
+}
+.drawing-toolbar {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  pointer-events: auto;
+  top: -40px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  padding: 4px 6px;
+  flex-wrap: nowrap;
+  gap: 2px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+}
+.drawing-toolbar button,
+.drawing-selection button,
+.drawing-properties button,
+.drawing-catalog header button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  min-width: 30px;
+  padding: 5px;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+  border-radius: 4px;
+  font-size: 11px;
+}
+.drawing-toolbar button:disabled {
+  opacity: 0.3;
+}
+.drawing-toolbar .drawing-picker {
+  color: var(--text);
+  min-width: 72px;
+  max-width: 158px;
+  gap: 6px;
+  text-align: left;
+  justify-content: space-between;
+}
+.drawing-picker span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.drawing-divider {
+  height: 17px;
+  width: 1px;
+  background: var(--line);
+  margin: 0 5px;
+}
+.drawing-spacer {
+  flex: 1;
+}
+.drawing-svg {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+.drawing-object {
+  pointer-events: visiblePainted;
+}
+.drawing-svg.is-drawing .drawing-object,
+.drawing-object.is-preview {
+  pointer-events: none;
+}
+.drawing-object.is-preview {
+  opacity: 0.7;
+}
+.drawing-hit {
+  stroke: transparent;
+  stroke-width: 14px;
+  fill: none;
+}
+.drawing-svg text {
+  font:
+    10px ui-monospace,
+    monospace;
+  fill: var(--text);
+  paint-order: stroke;
+  stroke: var(--panel);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  user-select: none;
+}
+.drawing-svg .drawing-note {
+  font:
+    13px Inter,
+    sans-serif;
+}
+.drawing-handle {
+  cursor: grab;
+  pointer-events: all;
+}
+.drawing-capture {
+  pointer-events: all;
+  cursor: crosshair;
+  touch-action: none;
+}
+.drawing-status {
+  position: absolute;
+  bottom: -28px;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 9px;
+  font-size: 10px;
+  color: var(--muted);
+  pointer-events: auto;
+}
+.drawing-status > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.drawing-status b {
+  color: var(--green);
+  margin-right: 5px;
+}
+.drawing-status button,
+.drawing-status small {
+  white-space: nowrap;
+}
+.drawing-status kbd {
+  margin-left: 5px;
+  padding: 1px 4px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+.drawing-tooltip {
+  position: absolute;
+  z-index: 12;
+  top: 5px;
+  left: 8px;
+  width: min(275px, calc(100% - 16px));
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--raised);
+  box-shadow: 0 6px 25px #0005;
+  padding: 10px 12px;
+  color: var(--text);
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+}
+.drawing-tooltip span {
+  color: var(--muted);
+  line-height: 1.5;
+}
+.drawing-catalog,
+.drawing-properties {
+  position: absolute;
+  top: 6px;
+  left: 7px;
+  z-index: 10;
+  width: min(420px, calc(100% - 14px));
+  max-height: calc(100% - 12px);
+  overflow: auto;
+  pointer-events: auto;
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: 0 12px 40px #0005;
+  padding: 12px;
+}
+.drawing-catalog header,
+.drawing-properties header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.drawing-catalog p {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 5px 0 9px;
+}
+.drawing-catalog > div {
+  display: grid;
+  gap: 2px;
+}
+.drawing-catalog > div > button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 6px;
+  text-align: left;
+  border-radius: 5px;
+}
+.drawing-catalog > div > button:hover {
+  background: var(--raised);
+}
+.drawing-catalog span {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+.drawing-catalog small {
+  color: var(--muted);
+  line-height: 1.4;
+}
+.drawing-catalog em {
+  font-size: 10px;
+  color: var(--muted);
+  font-style: normal;
+  white-space: nowrap;
+}
+.drawing-catalog footer {
+  border-top: 1px solid var(--line);
+  margin-top: 7px;
+  padding-top: 10px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.drawing-selection {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  max-width: calc(100% - 16px);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  padding: 3px;
+  pointer-events: auto;
+  box-shadow: 0 4px 15px #0003;
+}
+.drawing-selection > span {
+  font-size: 10px;
+  padding: 0 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.drawing-properties {
+  top: 50px;
+  width: min(280px, calc(100% - 14px));
+  max-height: calc(100% - 55px);
+  display: grid;
+  gap: 10px;
+}
+.drawing-properties label {
+  display: grid;
+  grid-template-columns: 1fr 115px;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.drawing-properties input {
+  width: 100%;
+  min-width: 0;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 7px;
+}
+.drawing-properties label:has(input[aria-label="Tekst op grafiek"]) {
+  grid-template-columns: 1fr;
+}
+.drawing-properties small {
+  color: var(--muted);
+  line-height: 1.5;
+}
+.drawing-colors {
+  display: flex;
+  gap: 10px;
+  padding: 4px 2px;
+}
+.drawing-colors button {
+  min-height: 20px;
+  min-width: 20px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid var(--panel);
+}
+.drawing-colors button[aria-pressed="true"] {
+  outline: 1px solid var(--text);
+}
+.drawing-properties .drawing-alert {
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+.drawing-message {
+  position: absolute;
+  pointer-events: auto;
+  padding: 8px;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--raised);
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 11px;
+}
+.chart-multi .mini-label {
+  bottom: 30px;
+}
+@media (max-width: 650px) {
+  .drawing-toolbar {
+    gap: 0;
+    padding-inline: 2px;
+  }
+  .drawing-divider {
+    margin: 0 2px;
+  }
+  .drawing-toolbar .drawing-picker {
+    max-width: 95px;
+  }
+}
+
+.chart-multi:not(.one) {
+  overflow: auto;
+  grid-auto-rows: minmax(270px, 1fr);
+  overscroll-behavior: contain;
+}

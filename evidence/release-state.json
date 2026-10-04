@@ -1,0 +1,61 @@
+{
+  "checked_at_ms": 1790946218747,
+  "mode": "PAPER_LOCAL",
+  "user_account": null,
+  "active_bots": 0,
+  "jev_cost_usd": "0",
+  "real_secrets_configured": false,
+  "spec_unchanged": true,
+  "mirrored_instructions": true,
+  "image_ids": [
+    "sha256:f47b4e9727aa650561a3fb703b310dfca9ec62c44714f4000f9515cf8f532a93",
+    "sha256:d2666cf83b9707ec100bb7156a5e9a2cca4584bf4469bd98f5cdd79249681d1d",
+    "sha256:be6e122a9a0a3f12d26dc4fb77b96dfb78273cc8957a2ae5e7d31d28d97d57de"
+  ],
+  "live_enabled": false,
+  "operations": {
+    "archive_disk_used_percent": 52,
+    "authentication": {
+      "binding": "127.0.0.1 only",
+      "configured": false,
+      "session_hours": 8
+    },
+    "database_bytes": 10114751,
+    "gates": [
+      {
+        "name": "Lokale paperhandel",
+        "state": "AVAILABLE"
+      },
+      {
+        "name": "Jev externe calls",
+        "state": "KEY_REQUIRED"
+      },
+      {
+        "name": "OKX Demo",
+        "state": "ONBOARDING_AND_EXECUTION_ACCEPTANCE_REQUIRED"
+      },
+      {
+        "name": "LIVE",
+        "state": "BLOCKED_ACCOUNT_LIMITS_PROTECTION_AND_ACCEPTANCE"
+      },
+      {
+        "name": "Pine intrabar / request.security / strategy.*",
+        "state": "COMPATIBILITY_VALIDATION_REQUIRED"
+      },
+      {
+        "name": "DeMARK",
+        "state": "LICENSE_REQUIRED"
+      }
+    ],
+    "isolation": {
+      "jev": "Decisions API; proposals only; fixed risk prefilter and final check",
+      "paper": "No private exchange module imported",
+      "pine": "Network disabled; no secrets; per-run process deadline"
+    },
+    "limits": "Loss thresholds are actions, not guarantees. Local protection pauses while host sleeps. No VPS deployment.",
+    "server_time_ms": 1790946218753,
+    "storage_alert": false,
+    "unknown_orders": 0,
+    "unprotected_or_dust_positions": 0
+  }
+}

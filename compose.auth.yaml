@@ -1,0 +1,8 @@
+services:
+  terminal:
+    secrets:
+      - db_password
+      - auth_password
+secrets:
+  auth_password:
+    file: ./.local/auth_password

@@ -1,0 +1,50 @@
+{
+  "runtime": "PineTS 0.11.0",
+  "scope": "synthetic deterministic fixtures in network-none container",
+  "checks": [
+    {
+      "name": "real Pine v6 SMA warm-up and values",
+      "passed": true
+    },
+    {
+      "name": "history never reads future bar",
+      "passed": true
+    },
+    {
+      "name": "var persists on closed bars",
+      "passed": true
+    },
+    {
+      "name": "unknown TA is rejected even in dead branch",
+      "passed": true
+    },
+    {
+      "name": "invalid Pine has no executable proposals",
+      "passed": true
+    },
+    {
+      "name": "open bars excluded by profile",
+      "passed": true
+    },
+    {
+      "name": "future security and intrabar state explicitly rejected",
+      "passed": true
+    },
+    {
+      "name": "data gaps rejected",
+      "passed": true
+    },
+    {
+      "name": "unbounded loop rejected",
+      "passed": true
+    },
+    {
+      "name": "entry and exit are untrusted proposals only",
+      "passed": true
+    },
+    {
+      "name": "AST input metadata and overrides",
+      "passed": true
+    }
+  ]
+}

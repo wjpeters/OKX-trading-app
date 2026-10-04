@@ -1,0 +1,46 @@
+{
+  "at": 1790945745.151125,
+  "scope": "disposable credentials/database only",
+  "checks": [
+    {
+      "check": "Unauthenticated private API blocked",
+      "passed": true
+    },
+    {
+      "check": "Login requires same-origin request",
+      "passed": true
+    },
+    {
+      "check": "Wrong password refused",
+      "passed": true
+    },
+    {
+      "check": "Correct password creates session",
+      "passed": true
+    },
+    {
+      "check": "Cookie HttpOnly and SameSite Strict",
+      "passed": true
+    },
+    {
+      "check": "Authenticated API available",
+      "passed": true
+    },
+    {
+      "check": "Only hash stored in database",
+      "passed": true
+    },
+    {
+      "check": "Expired session refused",
+      "passed": true
+    },
+    {
+      "check": "New login after expiry",
+      "passed": true
+    },
+    {
+      "check": "Logout revokes session",
+      "passed": true
+    }
+  ]
+}

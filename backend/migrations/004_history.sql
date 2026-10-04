@@ -1,0 +1,1 @@
+CREATE TABLE studio.history_parts(id BIGSERIAL PRIMARY KEY,instrument TEXT NOT NULL,bar TEXT NOT NULL,first_ms BIGINT NOT NULL,last_ms BIGINT NOT NULL,rows INTEGER NOT NULL,gaps INTEGER NOT NULL,path TEXT NOT NULL,created_ms BIGINT NOT NULL,UNIQUE(instrument,bar,first_ms,last_ms));

@@ -1,0 +1,45 @@
+{
+  "timestamp_utc": "2026-10-02T08:00:21Z",
+  "checks": [
+    "Database outage explicitly reported; execution stays off",
+    "Database outage fails candle request without stale success",
+    "Database recovered and cache rows preserved",
+    "Process restart resubscribes, preserves storage and keeps gate closed",
+    "LIVE environment override refuses startup before loading credentials"
+  ],
+  "cache_rows_before": 7,
+  "cache_rows_after": 7,
+  "status_after": {
+    "account": "Niet verbonden",
+    "account_region": "UNVERIFIED",
+    "active_bots": 0,
+    "clock_offset_ms": 195,
+    "clock_rtt_ms": 372,
+    "database": true,
+    "execution_enabled": false,
+    "feed_error": null,
+    "instruments": 12,
+    "jev": {
+      "authority": "PROPOSALS_ONLY",
+      "model": "typesafe/jev-1.13",
+      "state": "DISABLED"
+    },
+    "last_message_ms": 1790928020376,
+    "mode": "READ_ONLY",
+    "phase": 1,
+    "processing_ms": {
+      "p50": 0.014792,
+      "p95": 0.06695899999999999,
+      "p99": 0.130958,
+      "samples": 52,
+      "scope": "WS validation + in-memory update; no order route"
+    },
+    "public_region": "EEA",
+    "public_ws": true,
+    "reconnects": 0,
+    "risk_reason": "Read-only fase; account en limieten niet bevestigd",
+    "risk_state": "PAUSE_ENTRIES",
+    "server_time_ms": 1790928020379,
+    "version": "0.1.0"
+  }
+}

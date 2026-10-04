@@ -1,0 +1,16 @@
+{
+  "measured_utc": "2026-10-02T09:17:43.102425+00:00",
+  "hardware": "Apple M1 Pro; Docker Linux arm64, Rust release",
+  "native": {
+    "p50_ms": 0.0022919999999999998,
+    "p95_ms": 0.0025,
+    "p99_ms": 0.0037500000000000003,
+    "samples": 5000,
+    "scope": "SMA 20/50 + sizing + risk preview; 1 fixture market/manual wallet, no DB/network, 5000 serial samples"
+  },
+  "one_real_paper_submit": {
+    "http_ms": 4.179459006991237,
+    "durable_ms": 2.952708
+  },
+  "conditions": "1 native fixture market/manual wallet; other local containers running; no external AI or order network"
+}

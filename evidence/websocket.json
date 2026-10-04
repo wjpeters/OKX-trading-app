@@ -1,0 +1,19 @@
+{
+  "checks": [
+    "WS rejects None",
+    "WS rejects https://evil.example",
+    "Valid WS origin accepted; connection cap enforced"
+  ],
+  "connection_statuses": [
+    101,
+    101,
+    101,
+    101,
+    101,
+    101,
+    101,
+    429,
+    429
+  ],
+  "timestamp_utc": "2026-10-02T08:01:24Z"
+}

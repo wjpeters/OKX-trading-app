@@ -1,0 +1,10 @@
+{
+  "restore_verified": true,
+  "scope": "temporary isolated database and archive volume",
+  "source_database": "okx_phase2_test_2679a99c91",
+  "paper_accounts": 1,
+  "tables": 14,
+  "archive_files": 2,
+  "backup": "/Users/wp/WPOS-local/projects/okx-tradingterminal/.local/backups/20261002T145548-1c2e9b.aesgcm",
+  "at": 1790945750.839993
+}

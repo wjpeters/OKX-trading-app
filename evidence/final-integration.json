@@ -1,0 +1,85 @@
+{
+  "at": 1790945743.222881,
+  "scope": "isolated disposable test database",
+  "checks": [
+    {
+      "check": "AST-backed Pine input override through API",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "Pine input outside allowed range fails closed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Pine replay reads imported data and same runtime",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Pine signal cannot fill its own candle",
+      "passed": true,
+      "detail": {
+        "fills": 2,
+        "bars": 599,
+        "runtime_ms": 144.139417,
+        "http_ms": 338.8285000110045
+      }
+    },
+    {
+      "check": "Pine replay preserves paper balance",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Invalid Pine cannot enter replay risk engine",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Same-bot false comparison refused",
+      "passed": true,
+      "detail": "Twee verschillende bots op hetzelfde instrument vereist"
+    },
+    {
+      "check": "Operations reports local isolation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Pine replay report remains retrievable",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Walk-forward report remains retrievable",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Drawing-line alert stored with immutable price/time anchors",
+      "passed": true,
+      "detail": {
+        "id": 2
+      }
+    },
+    {
+      "check": "Drawing-line alert delivered server-side",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Bot condition alert stored",
+      "passed": true,
+      "detail": {
+        "id": 3
+      }
+    },
+    {
+      "check": "Bot condition delivered without browser",
+      "passed": true,
+      "detail": null
+    }
+  ]
+}

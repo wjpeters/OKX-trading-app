@@ -1,0 +1,132 @@
+{
+  "timestamp_utc": "2026-10-02T07:55:40Z",
+  "checks_passed": 26,
+  "checks": [
+    "read-only no execution",
+    "Jev disabled proposals-only",
+    "account unverified",
+    "DB and market connected",
+    "12 real instruments and books",
+    "real candles 1m",
+    "decimal strings 1m",
+    "real candles 5m",
+    "decimal strings 5m",
+    "real candles 15m",
+    "decimal strings 15m",
+    "real candles 1H",
+    "decimal strings 1H",
+    "real candles 4H",
+    "decimal strings 4H",
+    "real candles 1Dutc",
+    "decimal strings 1Dutc",
+    "historical cursor older only",
+    "order route absent",
+    "paper order route absent",
+    "read API refuses writes",
+    "evil origin blocked",
+    "DNS rebinding host blocked",
+    "unknown instrument rejected",
+    "Pine cannot reach gateway",
+    "CSP set"
+  ],
+  "coverage": [
+    {
+      "bar": "1m",
+      "count": 300,
+      "gaps": 0,
+      "first_ms": 1790909760000,
+      "last_ms": 1790927700000,
+      "calculation_ms": 0.049042,
+      "rest_roundtrip_ms": 83.243958
+    },
+    {
+      "bar": "5m",
+      "count": 300,
+      "gaps": 0,
+      "first_ms": 1790838000000,
+      "last_ms": 1790927700000,
+      "calculation_ms": 0.056208999999999995,
+      "rest_roundtrip_ms": 68.7145
+    },
+    {
+      "bar": "15m",
+      "count": 300,
+      "gaps": 0,
+      "first_ms": 1790658000000,
+      "last_ms": 1790927100000,
+      "calculation_ms": 0.050959,
+      "rest_roundtrip_ms": 127.35158299999999
+    },
+    {
+      "bar": "1H",
+      "count": 300,
+      "gaps": 0,
+      "first_ms": 1789848000000,
+      "last_ms": 1790924400000,
+      "calculation_ms": 0.26679200000000003,
+      "rest_roundtrip_ms": 135.38525
+    },
+    {
+      "bar": "4H",
+      "count": 300,
+      "gaps": 0,
+      "first_ms": 1786608000000,
+      "last_ms": 1790913600000,
+      "calculation_ms": 0.049292,
+      "rest_roundtrip_ms": 276.516792
+    },
+    {
+      "bar": "1Dutc",
+      "count": 300,
+      "gaps": 0,
+      "first_ms": 1765065600000,
+      "last_ms": 1790899200000,
+      "calculation_ms": 0.054333000000000006,
+      "rest_roundtrip_ms": 81.58787500000001
+    }
+  ],
+  "status": {
+    "account": "Niet verbonden",
+    "account_region": "UNVERIFIED",
+    "active_bots": 0,
+    "clock_offset_ms": 163,
+    "clock_rtt_ms": 322,
+    "database": true,
+    "execution_enabled": false,
+    "feed_error": null,
+    "instruments": 12,
+    "jev": {
+      "authority": "PROPOSALS_ONLY",
+      "model": "typesafe/jev-1.13",
+      "state": "DISABLED"
+    },
+    "last_message_ms": 1790927740698,
+    "mode": "READ_ONLY",
+    "phase": 1,
+    "processing_ms": {
+      "p50": 0.020292,
+      "p95": 0.08495799999999999,
+      "p99": 0.27391600000000005,
+      "samples": 2048,
+      "scope": "WS validation + in-memory update; no order route"
+    },
+    "public_region": "EEA",
+    "public_ws": true,
+    "reconnects": 0,
+    "risk_reason": "Read-only fase; account en limieten niet bevestigd",
+    "risk_state": "PAUSE_ENTRIES",
+    "server_time_ms": 1790927740706,
+    "version": "0.1.0"
+  },
+  "rest_status_roundtrip_ms": {
+    "p50": 1.5753330080769956,
+    "p95": 2.8559589991346,
+    "p99": 4.4756249990314245,
+    "samples": 50
+  },
+  "host": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "cpu": "Apple M1 Pro"
+  },
+  "note": "Read-only checks. No order execution, account access, AI call, or strategy benchmark."
+}

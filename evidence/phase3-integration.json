@@ -1,0 +1,171 @@
+{
+  "at": 1790945223.360851,
+  "scope": "isolated local test database",
+  "checks": [
+    {
+      "check": "Pine isolated real-candle preview",
+      "passed": true,
+      "detail": {
+        "duration_ms": 101.69312499999998,
+        "http_ms": 402.27533399593085,
+        "bars": 299,
+        "diagnostics": []
+      }
+    },
+    {
+      "check": "Invalid Pine has no intents",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Immutable Pine version stored",
+      "passed": true,
+      "detail": {
+        "version": 1
+      }
+    },
+    {
+      "check": "Concurrent old version rejected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Valid Pine graph compiles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Graph cycle refused",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Risk gate cannot be removed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Graph version stored",
+      "passed": true,
+      "detail": {
+        "version": 1
+      }
+    },
+    {
+      "check": "Server alert created",
+      "passed": true,
+      "detail": {
+        "id": 1
+      }
+    },
+    {
+      "check": "Server alert delivered without browser",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Alert deduplicated within cooldown",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Alert pause",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Configurable native indicators",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Walk-forward separate OOS windows",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "OOS windows do not overlap",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Compressed Parquet history import",
+      "passed": true,
+      "detail": {
+        "coverage": "Only returned pages; gaps not filled",
+        "format": "Parquet Snappy; decimal prices stored as exact strings",
+        "next_after": 1790676000000,
+        "parts": [
+          1
+        ],
+        "source": "OKX closed candles"
+      }
+    },
+    {
+      "check": "History resume uses older cursor",
+      "passed": true,
+      "detail": {
+        "coverage": "Only returned pages; gaps not filled",
+        "format": "Parquet Snappy; decimal prices stored as exact strings",
+        "next_after": 1790406000000,
+        "parts": [
+          2
+        ],
+        "source": "OKX closed candles"
+      }
+    },
+    {
+      "check": "Real Parquet file, not renamed JSON",
+      "passed": true,
+      "detail": {
+        "bytes": 14918
+      }
+    },
+    {
+      "check": "Walk-forward reads imported Parquet data",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Jev no-key precondition",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Provider status exposes missing keys honestly",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Pinned graph deployment through central kernel",
+      "passed": true,
+      "detail": {
+        "ok": true
+      }
+    },
+    {
+      "check": "Explicit resume for graph test",
+      "passed": true,
+      "detail": {
+        "ok": true
+      }
+    },
+    {
+      "check": "Graph bot starts with explicit limits",
+      "passed": true,
+      "detail": {
+        "ok": true
+      }
+    },
+    {
+      "check": "Pine bot executes server-side through fixed risk",
+      "passed": true,
+      "detail": "BUY \u2192 p-testbot-1790945160000"
+    },
+    {
+      "check": "User account remains untouched",
+      "passed": true,
+      "detail": null
+    }
+  ]
+}

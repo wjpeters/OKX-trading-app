@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-02",
+  "method": "Codex in-app browser; real local application",
+  "main_account": "Setup rendered; account deliberately remains null",
+  "isolated_test_port": 4781,
+  "verified": [
+    "Paper setup and explicit confirmation gate",
+    "Paused entry ticket disabled",
+    "Reduce-position preview and explicit paper confirmation",
+    "SELL fill visible, fees recorded, position count zero during entry pause",
+    "SMA bot paused, persisted closed-candle decision visible",
+    "Saved OHLC replay loaded; equity curve and result/risk reason visible"
+  ],
+  "console_errors": [],
+  "limits": "Desktop browser only; no physical mobile test. Test database separate from user database."
+}

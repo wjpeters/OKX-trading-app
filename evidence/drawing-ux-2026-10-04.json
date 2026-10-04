@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-04",
+  "scope": "drawing UI",
+  "unit_tests": {
+    "passed": 10,
+    "failed": 0
+  },
+  "typescript": "passed",
+  "production_build": "passed",
+  "build_warning": "Existing large chunks including Monaco remain",
+  "browser_checks": [
+    "all nine tools create drawings",
+    "two-point trend with live preview",
+    "drag endpoint",
+    "three-point channel",
+    "long and short risk/reward with user target",
+    "drag whole risk shape",
+    "lock blocks deletion",
+    "text editing and undo/redo",
+    "keyboard undo restores exact anchor y",
+    "delete and undo restore drawing",
+    "stay in drawing mode",
+    "Escape cancels without adding a drawing",
+    "hide/show preserves drawings",
+    "reload preserves drawings",
+    "in-progress trend survives 55 seconds of live polling",
+    "one/four chart layout",
+    "dark/light themes"
+  ],
+  "drag_undo_y_px": {
+    "before": 268.5039709247545,
+    "after": 238.50397092475436,
+    "undo": 268.5039709247545
+  },
+  "browser_console_errors_or_warnings": [],
+  "test_origin": "http://127.0.0.1:4781",
+  "installed_origin": "http://127.0.0.1:4780",
+  "container_health": "running healthy",
+  "runtime_image": "sha256:3eb9d9c907aa98687f5c239215c24fe67a564eed7369d2d7367c8987afbe528b",
+  "limits": [
+    "No new server alert or order created in UI tests",
+    "No touch hardware test",
+    "No automated OHLC snapping precision test at every zoom level"
+  ]
+}

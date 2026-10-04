@@ -1,0 +1,24 @@
+services:
+  demo-onboarding:
+    profiles: [demo]
+    image: okx-tradingterminal:0.4.0
+    entrypoint: [/app/okx-onboarding]
+    environment:
+      EXECUTION_MODE: OKX_DEMO
+      DEMO_CREDENTIALS_FILE: /run/secrets/okx_demo
+      ONBOARDING_OUTPUT: /onboarding/demo-snapshot.json
+    secrets: [okx_demo, local_secrets_key]
+    volumes: ["demo-onboarding:/onboarding"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    pids_limit: 32
+    networks: [market]
+secrets:
+  okx_demo:
+    file: ./.local/okx_demo.json
+  local_secrets_key:
+    file: ./.local/secrets.key
+volumes:
+  demo-onboarding:

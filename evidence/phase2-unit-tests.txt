@@ -1,0 +1,73 @@
+
+running 64 tests
+test indicators::tests::gaps_reset_warmup ... ok
+test feeds::tests::snapshots_accept_empty_book ... ok
+test indicators::tests::rising_reference ... ok
+test indicators::tests::warmup_is_missing ... ok
+test indicators::tests::zero_volume_has_no_vwap ... ok
+test indicators::tests::open_candle_does_not_commit ... ok
+test model::tests::gaps_are_not_filled ... ok
+test model::tests::exact_decimals ... ok
+test model::tests::bad_prices_fail ... ok
+test feeds::tests::bad_books_rejected ... ok
+test indicators::tests::flat_rsi_defined ... ok
+test model::tests::malformed_confirm_fails ... ok
+test model::tests::synthetic_timeframes_rejected ... ok
+test paper::replay_tests::dataset_gap_is_rejected ... ok
+test proposal::tests::changed_state_rejected ... ok
+test paper::replay_tests::insufficient_history_is_rejected ... ok
+test proposal::tests::future_reply_rejected ... ok
+test proposal::tests::ai_cannot_raise_limits ... ok
+test proposal::tests::late_decision_rejected ... ok
+test proposal::tests::missing_confidence_rejected ... ok
+test paper::replay_tests::candle_close_signal_only_fills_next_bar ... ok
+test paper::replay_tests::stop_wins_when_low_and_high_both_hit ... ok
+test proposal::tests::unknown_output_fields_fail ... ok
+test paper::replay_tests::replay_is_reproducible_and_separate_mode ... ok
+test risk::tests::account_loss_stop_latched_and_not_reset_by_restart ... ok
+test risk::tests::aggregated_underlying_exposure_across_bots ... ok
+test proposal::tests::valid_proposal_is_not_permission ... ok
+test risk::tests::all_loss_limits_are_latched ... ok
+test risk::tests::cancel_holds_reserve_until_ack ... ok
+test risk::tests::crossed_book_and_currency_block ... ok
+test risk::tests::daily_boundary_uses_previous_equity_and_keeps_highwater ... ok
+test risk::tests::deterministic_sma_has_warmup_and_no_future_access ... ok
+test risk::tests::distinct_position_count_includes_pending_entries ... ok
+test risk::tests::duplicate_and_out_of_order_fill_rejected ... ok
+test risk::tests::duplicate_intent_is_idempotent ... ok
+test risk::tests::equity_includes_unrealized_and_both_fees_no_double_reserve ... ok
+test risk::tests::emergency_is_persistent_even_when_loss_reason_changes ... ok
+test risk::tests::explicit_limits_required ... ok
+test risk::tests::fill_before_ack_and_overfill_rejected ... ok
+test risk::tests::inventory_cannot_be_sold_twice ... ok
+test risk::tests::frequency_and_order_count_limits ... ok
+test risk::tests::limit_touch_does_not_fill ... ok
+test risk::tests::missing_stop_or_bad_lot_rejected ... ok
+test risk::tests::new_snapshot_partial_completion ... ok
+test risk::tests::no_execution_on_preview ... ok
+test risk::tests::no_live_or_demo_mode ... ok
+test risk::tests::old_snapshot_does_not_reset_liquidity ... ok
+test risk::tests::original_slippage_cap_never_expands ... ok
+test risk::tests::partial_entry_rest_canceled_before_stop_exit ... ok
+test risk::tests::partial_fills_keep_unused_reserve_and_protect_quantity ... ok
+test risk::tests::rejected_exit_does_not_disable_position_protection ... ok
+test risk::tests::reserve_before_ack_not_fill ... ok
+test risk::tests::reserve_prevents_double_spending ... ok
+test risk::tests::spread_and_trade_risk_limits ... ok
+test risk::tests::same_snapshot_liquidity_not_reused ... ok
+test risk::tests::time_reversal_pauses_entries ... ok
+test risk::tests::stale_and_future_quotes_block ... ok
+test risk::tests::stale_position_freezes_valuation_and_other_entries ... ok
+test risk::tests::unknown_intent_fields_fail ... ok
+test risk::tests::stop_survives_entry_pause_and_closes_with_inventory_bound ... ok
+test risk::tests::unknown_holds_reserve_never_retries ... ok
+test tests::dns_rebinding_denied ... ok
+test risk::tests::reserve_and_limits_survive_serialized_restart ... ok
+PHASE2_NATIVE_BENCHMARK {"p50_ms":0.0022919999999999998,"p95_ms":0.0025,"p99_ms":0.0037500000000000003,"samples":5000,"scope":"SMA 20/50 + sizing + risk preview; 1 fixture market/manual wallet, no DB/network, 5000 serial samples"}
+test risk::tests::native_strategy_risk_benchmark ... ok
+
+test result: ok. 64 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+   Compiling okx-terminal v0.2.0 (/work)
+    Finished `release` profile [optimized] target(s) in 8.99s
+     Running unittests src/main.rs (target/release/deps/okx_terminal-0834e24fac272cf8)
