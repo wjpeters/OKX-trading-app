@@ -1,0 +1,131 @@
+{
+  "at": 1791276052.8846889,
+  "scope": "Disposable DB with synthetic account; public quotes; no private keys/gateway/order calls",
+  "checks": [
+    {
+      "check": "USDC native contract market",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC native contract limit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC native contract post_only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC native contract ioc",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC native contract fok",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC native contract trigger",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC native contract oco",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC native contract move_order_stop",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC native contract smart_iceberg",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC native contract twap",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "More than twelve account-allowed EUR/USDC markets can be confirmed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Other quote currency cannot be confirmed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Scope change still requires personal Live release",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Synthetic personal release accepted only in disposable DB",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "USDC buy produces a USDC reserve with current EUR conversion",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "EUR budget threshold accepts native amount only after FX",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "EUR-valued limit is distinct from USDC notional",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Stale FX prevents USDC purchase",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Missing per-market fee prevents USDC purchase",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Slider spends USDC rather than the larger EUR balance",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Selected EUR/USDC market requests an isolated refresh",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Both currency-sharing drafts are individually valid",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Concurrent buy and sale cannot double spend USDC",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Fixture intents use native reserve currencies without exchange fills",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "User account and paper-bot limits remain unchanged",
+      "passed": true,
+      "detail": null
+    }
+  ]
+}

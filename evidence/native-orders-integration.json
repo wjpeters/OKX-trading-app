@@ -1,0 +1,166 @@
+{
+  "at": 1791275133.1342962,
+  "scope": "disposable database; synthetic account; real public OKX quotes; zero private exchange calls",
+  "checks": [
+    {
+      "check": "Geen keys: ordergateway meldt ontbrekende aansluiting",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract market",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract limit",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract post_only",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract ioc",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract fok",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract trigger",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract oco",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract move_order_stop",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract smart_iceberg",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Native contract twap",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Live-preview zonder account blijft geblokkeerd",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Directe Live-submit kan de blokkade niet omzeilen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Caller mag geen risicomachtiging meesturen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Onjuiste prijsstap afgewezen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Deel groter dan totaal afgewezen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Ontbrekende Origin geblokkeerd",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Limieten vereisen persoonlijke bevestiging",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Synthetische accountlimieten in testdatabase geaccepteerd",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Previews reserveren geen saldo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Twee verkopen kunnen inventaris niet dubbel reserveren",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Herhaalde bevestiging krijgt dezelfde order",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Geen fill bij duurzaam opgeslagen intent",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Order en reservering overleven serverherstart",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Annuleren v\u00f3\u00f3r verzending veilig lokaal afgehandeld",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Verlopen preview kan niet verzonden worden",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Onderbroken private verbinding blokkeert nieuwe order",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Dubbele fill boekt exact eenmaal met basefee",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Beschermde inventaris kan niet opnieuw verkocht worden",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Bevestigde fills en bescherming leesbaar",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Demo- en Live-administratie gescheiden",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Gebruikersrekening en botlimieten behouden",
+      "passed": true,
+      "detail": null
+    }
+  ]
+}

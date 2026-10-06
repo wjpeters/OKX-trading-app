@@ -1,11 +1,5 @@
+# Compatibility overlay: provider keys are now managed under Systeem.
 services:
   terminal:
-    secrets:
-      - db_password
-      - openrouter_key
-      - local_secrets_key
-secrets:
-  openrouter_key:
-    file: ./.local/openrouter_key
-  local_secrets_key:
-    file: ./.local/secrets.key
+    environment:
+      SETTINGS_DIR: /settings

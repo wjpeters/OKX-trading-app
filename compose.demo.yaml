@@ -17,8 +17,6 @@ services:
     networks: [market]
 secrets:
   okx_demo:
-    file: ./.local/okx_demo.json
-  local_secrets_key:
-    file: ./.local/secrets.key
+    file: ./.local/provider-settings/okx_demo
 volumes:
   demo-onboarding:

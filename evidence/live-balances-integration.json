@@ -1,0 +1,176 @@
+{
+  "at": 1791221576.7343202,
+  "scope": "new disposable DB; synthetic accounts; zero private calls",
+  "checks": [
+    {
+      "check": "Geen aansluiting geeft geen verzonnen saldo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Alle munten en wallets leesbaar zonder handelsvrijgave",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Verkoopslider gebruikt vrije BTC en geen funding of frozen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Koopslider gebruikt EUR met fees, slippage en lotafronding",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Percentage groter dan honderd afgewezen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Caller kan geen size-machtiging invoeren",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Live-vrijgave zonder limieten afgewezen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Fake snapshot-vlag geeft geen Live-machtiging",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Live-limieten vragen persoonlijke bevestiging",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Synthetische Live-limieten alleen in testdatabase bevestigd",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Vrijgave zonder bevestiging afgewezen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Vrijgave voor ander account afgewezen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Vrijgave voor oude limieten afgewezen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Leesrechten geven geen handelsvrijgave",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Onverklaarde accountstatus geeft geen vrijgave",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Actueel bevestigd account kan persoonlijk worden vrijgegeven",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Vrijgegeven Live maakt uitvoerbare exacte preview",
+      "passed": true,
+      "detail": {
+        "blocked": [],
+        "can_submit": true,
+        "client_id": "Wfc9c8d6e7352433a4528a940",
+        "estimated_notional": "761.882",
+        "expires_ms": 1791221589472,
+        "kind": "limit",
+        "mode": "LIVE",
+        "native": true,
+        "payload": {
+          "clOrdId": "Wfc9c8d6e7352433a4528a940",
+          "instId": "BTC-EUR",
+          "ordType": "limit",
+          "px": "76188.2",
+          "pxAmendType": "0",
+          "side": "sell",
+          "sz": "0.01",
+          "tag": "WPOSTerminal",
+          "tdMode": "cash"
+        },
+        "plan": {
+          "expires_ms": 1791221577472,
+          "reserve": "0.01",
+          "reserve_currency": "BTC"
+        },
+        "preview_id": "W4aafc6607e5f868212ab46b7",
+        "price_bound": "76188.2",
+        "ticket": {
+          "instrument": "BTC-EUR",
+          "mode": "LIVE",
+          "order": {
+            "policy": "limit",
+            "price": "76188.2",
+            "type": "limit"
+          },
+          "protection": null,
+          "quantity": "0.01",
+          "side": "sell"
+        },
+        "warning": "Een marktorder garandeert geen prijs; een triggerprijs is geen uitvoeringsprijs. Preview verzendt niets naar OKX."
+      }
+    },
+    {
+      "check": "Live-confirmatie bewaart intent zonder exchangefill",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Slider vermindert saldo met lokale orderclaims",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Live pauzeren trekt vrijgave en niet-verzonden claims in",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Preview van voor de pauze kan geen nieuwe order indienen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Live opnieuw vrijgeven na nieuwe controle",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Limietwijziging trekt eerdere Live-vrijgave in",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Verouderd saldo mag geen hoeveelheid berekenen",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Onbekend beschikbaar saldo wordt geen nul of totaal",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Gebruikersrekening en botlimieten behouden",
+      "passed": true,
+      "detail": null
+    }
+  ]
+}

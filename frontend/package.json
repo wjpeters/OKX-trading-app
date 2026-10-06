@@ -7,7 +7,9 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "test:drawings": "node --test tests/drawing-model.test.mjs"
+    "test:drawings": "node --test tests/drawing-model.test.mjs",
+    "test:limits": "node --test tests/limit-suggestions.test.mjs",
+    "test:chart-price": "node --test tests/chart-price.test.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "4.7.0",

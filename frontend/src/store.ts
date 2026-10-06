@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 interface Preferences {
+  pineScripts: { name: string; version: number }[];
   symbol: string;
   bar: string;
   chartType: string;
@@ -13,6 +14,7 @@ interface Preferences {
 export const usePreferences = create<Preferences>()(
   persist(
     (set) => ({
+      pineScripts: [],
       symbol: "BTC-EUR",
       bar: "15m",
       chartType: "Candles",

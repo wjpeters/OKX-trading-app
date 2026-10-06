@@ -1,0 +1,64 @@
+{
+  "at_ms": 1791290359440,
+  "expected_image": "sha256:b59347f248907b2a696e97822386923c2730234a4d695830632c3c43b2d74ee4",
+  "expected_code": "d7ff8f17f0dbab0a1dea94b689f836a92b3d81fcb9076766a8050057f4589560",
+  "containers": {
+    "orders-demo": {
+      "id": "b49e5ea2815ad563def29fee9bce9d1afc7e63d3f3cbfdad013a61fa926e8fbe",
+      "image": "sha256:0796a638f671b1c51e9b69fb78fea1f89bba844a56a4e0fe8ad3f8977af59e84",
+      "running": true,
+      "started": "2026-10-06T08:39:24.434860672Z",
+      "restart_count": 0
+    },
+    "orders-live": {
+      "id": "a1a7f49bc9281f7afe46ec016132d18b39952380b3c983057e91c159dd3c6bb3",
+      "image": "sha256:0796a638f671b1c51e9b69fb78fea1f89bba844a56a4e0fe8ad3f8977af59e84",
+      "running": true,
+      "started": "2026-10-06T08:39:24.43681538Z",
+      "restart_count": 0
+    },
+    "terminal": {
+      "id": "cd485aaa9775bba941ae9cdf355185b238c350127250364534594c9ae1c23dd8",
+      "image": "sha256:b59347f248907b2a696e97822386923c2730234a4d695830632c3c43b2d74ee4",
+      "running": true,
+      "started": "2026-10-06T12:06:29.851454462Z",
+      "restart_count": 0
+    },
+    "trainer": {
+      "id": "768f405658b253038bf63328458ee645cea52641c6e29a464232d8944ebddc21",
+      "image": "sha256:848ecbd4c715fffdac40820db4c6450aee73f674040da04e3fd1a2d74b677baa",
+      "running": true,
+      "started": "2026-10-06T12:06:29.782850587Z",
+      "restart_count": 0
+    },
+    "db": {
+      "id": "92184c288a6eff19bccd18348871ca55ec31cc9f376939869933824fc1a463ff",
+      "image": "sha256:be6e122a9a0a3f12d26dc4fb77b96dfb78273cc8957a2ae5e7d31d28d97d57de",
+      "running": true,
+      "started": "2026-10-02T12:51:37.849606295Z",
+      "restart_count": 0
+    }
+  },
+  "accounts": [
+    {
+      "mode": "LIVE",
+      "policy_hash": "cf9e51cf1b3f2d6d1c1e92e3d2647498",
+      "release_hash": "3d79ec59808a11fce75b508ba7e89f61",
+      "revision": 2
+    },
+    {
+      "mode": "OKX_DEMO",
+      "policy_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "release_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "revision": 0
+    }
+  ],
+  "counts": {
+    "orders": 1,
+    "fills": 1,
+    "active_orders": 0,
+    "native_releases": 0,
+    "native_runs": 0,
+    "protection": 0
+  }
+}

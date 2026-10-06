@@ -1,0 +1,19 @@
+{
+  "at_ms": 1791288904032,
+  "policy_and_live_release_unchanged": true,
+  "hashes_before": [
+    "LIVE|cf9e51cf1b3f2d6d1c1e92e3d2647498|3d79ec59808a11fce75b508ba7e89f61|2",
+    "OKX_DEMO|d41d8cd98f00b204e9800998ecf8427e|d41d8cd98f00b204e9800998ecf8427e|0"
+  ],
+  "hashes_after": [
+    "LIVE|cf9e51cf1b3f2d6d1c1e92e3d2647498|3d79ec59808a11fce75b508ba7e89f61|2",
+    "OKX_DEMO|d41d8cd98f00b204e9800998ecf8427e|d41d8cd98f00b204e9800998ecf8427e|0"
+  ],
+  "counts": {
+    "orders": 1,
+    "active_orders": 0,
+    "training_releases": 0,
+    "native_runs": 0
+  },
+  "gateway_update_blocked": true
+}

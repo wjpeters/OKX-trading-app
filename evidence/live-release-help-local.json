@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-05T18:36:22.730154+00:00",
+  "connected": true,
+  "gateway_fresh": true,
+  "reconciled": true,
+  "trade_permission": true,
+  "limits_present": false,
+  "live_release_present": false,
+  "native_orders": 0,
+  "scope": "Only release-help UI changed; no policies, release, credentials or exchange mutations",
+  "frontend_sha256": "91100823abdacb8e043bdcc13513c361b1f3699be5ee90179a9715e5d117b0e7",
+  "css_sha256": "9a9e8e73c9818e11569fa58b79065198d5aac0440e4613c231ce8f363921b875"
+}

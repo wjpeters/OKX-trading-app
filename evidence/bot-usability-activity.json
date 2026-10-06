@@ -1,0 +1,164 @@
+{
+  "checks": {
+    "UI start activated pinned version 2": true,
+    "Real live-data paper execution": true,
+    "Activity includes decision and execution": true,
+    "Activity excludes other bots": true,
+    "Unknown bot rejected": true,
+    "Events newest first": true,
+    "Repeated BUY reports why no second order": true,
+    "Activity and pause survive server restart": true
+  },
+  "bot": {
+    "fast": 9,
+    "id": "pine-workflow",
+    "instrument": "BTC-EUR",
+    "last_bar": 1791201540000,
+    "last_signal": "BUY \u00b7 Geen nieuwe order: er is al een positie of open order",
+    "ledger": {
+      "baseline": "1000",
+      "cash": "900.19512106624",
+      "daily_loss": "0.218964903390",
+      "day": 20731,
+      "day_start": "1000",
+      "drawdown": "0.218964903390",
+      "equity": "999.781035096610",
+      "fees": "0.09970517376",
+      "high_water": "1000",
+      "loss_streak": 0,
+      "paused": false,
+      "realized": "0",
+      "reason": "",
+      "total_loss": "0.218964903390"
+    },
+    "limits": {
+      "ai_budget": "0",
+      "capital": "1000",
+      "daily_loss": "30.00",
+      "data_age_ms": 5000,
+      "drawdown": "80.00",
+      "leverage": "1",
+      "loss_streak": 3,
+      "orders": 8,
+      "orders_per_minute": 6,
+      "position": "250.00",
+      "positions": 4,
+      "slippage_bps": "20",
+      "spread_bps": "30",
+      "total_loss": "100.0",
+      "trade_risk": "10.00"
+    },
+    "name": "Studio Pine bot",
+    "order_eur": "100",
+    "running": true,
+    "slow": 21,
+    "stop_bps": "100",
+    "target_bps": "200",
+    "version": "graph:Studio Pine bot:2"
+  },
+  "fills": [
+    {
+      "fee": "0.09970517376",
+      "id": "p-pine-workflow-1791201420000-1791201489903-0",
+      "instrument": "BTC-EUR",
+      "order_id": "p-pine-workflow-1791201420000",
+      "price": "76915.2",
+      "quantity": "0.00129630",
+      "side": "BUY",
+      "ts": 1791201490096
+    }
+  ],
+  "events": [
+    {
+      "detail": "Candle 1791201540000 \u00b7 Signaal BUY \u00b7 BUY \u00b7 Geen nieuwe order: er is al een positie of open order",
+      "kind": "BOT_DECISION",
+      "seq": 15,
+      "subject": "pine-workflow",
+      "ts": 1791201612028
+    },
+    {
+      "detail": "Candle 1791201480000 \u00b7 Signaal BUY \u00b7 BUY \u00b7 Geen nieuwe order: er is al een positie of open order",
+      "kind": "BOT_DECISION",
+      "seq": 14,
+      "subject": "pine-workflow",
+      "ts": 1791201551083
+    },
+    {
+      "detail": "0.00129630 @ 76915.2; fee 0.09970517376; FILLED",
+      "kind": "FILL",
+      "seq": 13,
+      "subject": "p-pine-workflow-1791201420000",
+      "ts": 1791201490096
+    },
+    {
+      "detail": "Lokale acknowledgement; nog geen fill",
+      "kind": "ACCEPTED",
+      "seq": 12,
+      "subject": "p-pine-workflow-1791201420000",
+      "ts": 1791201489846
+    },
+    {
+      "detail": "Candle 1791201420000 \u00b7 Signaal BUY \u00b7 BUY \u2192 p-pine-workflow-1791201420000",
+      "kind": "BOT_DECISION",
+      "seq": 11,
+      "subject": "pine-workflow",
+      "ts": 1791201489345
+    },
+    {
+      "detail": "Duurzaam vastleggen v\u00f3\u00f3r adapter; 500 ms papermodelvertraging",
+      "kind": "PENDING_SUBMIT",
+      "seq": 10,
+      "subject": "p-pine-workflow-1791201420000",
+      "ts": 1791201489345
+    },
+    {
+      "detail": "Risicokern akkoord; kapitaal/inventaris atomair gereserveerd",
+      "kind": "INTENT",
+      "seq": 9,
+      "subject": "p-pine-workflow-1791201420000",
+      "ts": 1791201489345
+    },
+    {
+      "detail": "Bescherming blijft actief",
+      "kind": "BOT_STARTED",
+      "seq": 8,
+      "subject": "pine-workflow",
+      "ts": 1791201478575
+    },
+    {
+      "detail": "Studio Pine bot v2",
+      "kind": "DEPLOY_GRAPH",
+      "seq": 7,
+      "subject": "pine-workflow",
+      "ts": 1791201478566
+    },
+    {
+      "detail": "Versie/parameters/limieten vastgezet; start gepauzeerd",
+      "kind": "BOT_CREATED",
+      "seq": 6,
+      "subject": "pine-workflow",
+      "ts": 1791201478566
+    },
+    {
+      "detail": "Studio Pine bot v1",
+      "kind": "DEPLOY_GRAPH",
+      "seq": 5,
+      "subject": "pine-workflow",
+      "ts": 1791201444869
+    },
+    {
+      "detail": "Versie/parameters/limieten vastgezet; start gepauzeerd",
+      "kind": "BOT_CREATED",
+      "seq": 4,
+      "subject": "pine-workflow",
+      "ts": 1791201444869
+    },
+    {
+      "detail": "Virtueel startkapitaal; UTC daggrens; geen stortingen/opnames, funding of AI-kosten",
+      "kind": "ACCOUNT_CREATED",
+      "seq": 1,
+      "subject": "paper",
+      "ts": 1791201443352
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-05T18:35:53.663Z",
+  "url": "http://127.0.0.1:4780/",
+  "missingLimitsReasonVisible": true,
+  "directSetupButtonOpensLimits": true,
+  "budgetVisible": true,
+  "personalBudgetLeftEmpty": true,
+  "liveConfirmationDisabledWithoutLimits": true,
+  "realOrdersPlaced": false
+}

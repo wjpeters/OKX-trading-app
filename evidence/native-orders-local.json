@@ -1,0 +1,10 @@
+{
+  "at": 1791215174.9876091,
+  "account_and_bot_limits_preserved": true,
+  "demo_gateway_status": "KEY_REQUIRED",
+  "demo_credentials_configured": false,
+  "native_orders": 0,
+  "live_technical_accepted": false,
+  "test_environment_removed": true,
+  "image": "sha256:2e8c50653a6b3fb7c596f011f3db3450b994e0189c3440330aaafb9eae8116f0"
+}

@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-06T08:54:18.412Z",
+  "production": {
+    "scope": "Draft fields only; no preview, submit or financial confirmation",
+    "fields": [
+      {
+        "label": "Totale hoeveelheid",
+        "unit": "BTC",
+        "value": "0.001"
+      },
+      {
+        "label": "Limietprijs",
+        "unit": "USDC",
+        "value": "86568.2"
+      }
+    ],
+    "ipNotice": [
+      "Kies links een tekentool0 tekeningen",
+      "Ordergateway gepauzeerd: EXCHANGE_HTTP_ERROR GET /api/v5/account/bills (HTTP 401, OKX 50110): OKX weigert het huidige IP-adres; controleer de IP-lijst van deze API-key.",
+      "Grafiekprijs overgenomen: 86.568,2 USDC"
+    ],
+    "warnings": []
+  },
+  "fixture": {
+    "scope": "Disposable database, synthetic account, no private credentials or gateway",
+    "selection": "Bevestigde spotmarkten · 18 van 18\nAlle beschikbare spotmarkten kiezen\nSelectie wissen\nBTC-USDC\nUSDC-EUR",
+    "saveDisabled": true,
+    "warnings": []
+  }
+}

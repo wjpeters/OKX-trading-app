@@ -1,0 +1,32 @@
+{
+  "scope": "Six calls after full single-row/batch warm-up, while real BTC-EUR Laya feature preparation is active; no durable native order acceptance claim",
+  "calls": [
+    {
+      "model_ms": 212.46200008317828,
+      "http_ms": 263.54762504342943
+    },
+    {
+      "model_ms": 108.24366693850607,
+      "http_ms": 111.90925003029406
+    },
+    {
+      "model_ms": 70.95029100310057,
+      "http_ms": 72.699417010881
+    },
+    {
+      "model_ms": 81.55370806343853,
+      "http_ms": 83.32158299162984
+    },
+    {
+      "model_ms": 70.21533302031457,
+      "http_ms": 71.95495895575732
+    },
+    {
+      "model_ms": 362.9329999675974,
+      "http_ms": 364.6781670395285
+    }
+  ],
+  "p95_http_ms": 364.6781670395285,
+  "memory_mb": 2169.28125,
+  "runtime": "torch2.8-eager-mps-fp32-v1"
+}

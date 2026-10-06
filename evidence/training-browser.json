@@ -1,0 +1,21 @@
+{
+  "scope": "synthetic network fixture, not qualified",
+  "generation_checkpoint_loaded": true,
+  "network_rotation_verified": true,
+  "weight_matrices_verified": true,
+  "legacy_release_button_disabled": true,
+  "console_errors": [],
+  "native_demo_button_disabled": true,
+  "native_live_button_disabled": true,
+  "exact_decimal_drawdown": {
+    "budget": "100.1",
+    "drawdown": "5.005"
+  },
+  "production": {
+    "url": "http://127.0.0.1:4780",
+    "trainer_online": true,
+    "campaign_status": "PAUSED",
+    "architecture_preview_without_candidate": true,
+    "console_errors": []
+  }
+}

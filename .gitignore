@@ -7,3 +7,7 @@ target/
 .DS_Store
 __pycache__/
 *.pyc
+
+# Personal live-account balances remain local; repository is public.
+evidence/live-balances-assets.jpg
+evidence/live-balances-terminal.jpg

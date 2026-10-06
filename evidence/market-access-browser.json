@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-05T21:39:51.575Z",
+  "publicMarketCount": 1143,
+  "eurAccessProof": {
+    "limitsOpen": true,
+    "market": "NEAR-EUR",
+    "marketMatches": [
+      {
+        "checked": false,
+        "text": "NEAR-EUR"
+      }
+    ],
+    "notice": "NEAR-EUR is beschikbaar bij OKX. Deze markt ontbreekt nog in je bevestigde handelslimieten.Markt in handelslimieten instellen",
+    "search": "NEAR"
+  },
+  "usdcAccessProof": "De handelsroute van de terminal ondersteunt momenteel alleen EUR-spot. BTC-USDC vraagt een uitbreiding van de betaalvaluta en een nieuwe persoonlijke marktbevestiging. Je API-instellingen alleen veranderen dit terminalprofiel niet.",
+  "logs": [],
+  "policyWritesByAgent": 0,
+  "orderSubmissionsByAgent": 0,
+  "liveWritesByAgent": 0
+}

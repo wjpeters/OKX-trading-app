@@ -1,0 +1,29 @@
+{
+  "mode": "LIVE",
+  "balances_fresh": true,
+  "currencies": [
+    "EUR",
+    "BTC",
+    "USDC"
+  ],
+  "funding_count": 0,
+  "private_connected": true,
+  "reconciled": true,
+  "trade_permission": true,
+  "native_protection_state_verified": true,
+  "live_release": null,
+  "limits_confirmed": false,
+  "percentage": 50,
+  "quantity": "[Personal account quantity omitted from public evidence]",
+  "usdc_execution": "not applied; explicit approval pending",
+  "private_exchange_mutations": 0,
+  "native_order_acceptance": "not performed",
+  "verified_utc": "2026-10-05T18:14:19.244032+00:00",
+  "deployed_image": "sha256:b86e400c0191366acdcf648b1c43df49136c6cccba8005f4388f77e324ae92be",
+  "funding_asset_count": 0,
+  "connected": true,
+  "live_enabled": false,
+  "personal_limits_confirmed": false,
+  "native_orders": 0,
+  "public_redaction": "Personal account quantities and balance calculations omitted. Original verification retained locally outside Git."
+}

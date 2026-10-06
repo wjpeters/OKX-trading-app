@@ -1,0 +1,13 @@
+> node --test tests/chart-price.test.mjs
+✔ chart heights produce prices on the exact exchange tick (0.950583ms)
+✔ sub-cent and exponent coordinates preserve tick precision (0.16275ms)
+✔ invalid and non-positive prices or ticks never populate a draft (0.132791ms)
+✔ chart picks target existing limit prices and preserve market/trigger meaning (0.245625ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 139.463042

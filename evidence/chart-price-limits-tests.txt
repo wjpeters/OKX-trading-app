@@ -1,0 +1,16 @@
+> node --test tests/limit-suggestions.test.mjs
+✔ EUR 500 produces a complete, coherent example profile (2.74ms)
+✔ money ratios preserve decimal precision, including cents (0.3845ms)
+✔ a budget change updates automatic fields and preserves personal overrides (0.85125ms)
+✔ cleared or invalid budgets cannot leave stale automatic amounts (0.181625ms)
+✔ explicit profile reset replaces overrides only in the unsaved draft (0.232958ms)
+✔ saved account limits remain personal choices on budget changes (0.140291ms)
+✔ explicitly clearing an override preserves the cleared field for validation (0.07925ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 113.125542

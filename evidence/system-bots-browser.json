@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "Five system examples visible",
+    "Opening EMA creates independent editable copy",
+    "Candle-stop threshold changed to 1.5 percent and pause-only action persisted",
+    "AI disabled in saved copy and visibly unchecked",
+    "No browser console errors"
+  ],
+  "scope": "disposable database on port 4781",
+  "local_release": {
+    "worker_alive": true,
+    "existing_configuration_preserved": true,
+    "system_bot_count": 5
+  }
+}

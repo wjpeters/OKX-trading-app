@@ -1,0 +1,126 @@
+{
+  "at_ms": 1791290386851,
+  "user_authorization": "Willem explicitly approved updating existing Demo and Live gateways on 2026-10-06",
+  "expected_image": "sha256:b59347f248907b2a696e97822386923c2730234a4d695830632c3c43b2d74ee4",
+  "code_version": "d7ff8f17f0dbab0a1dea94b689f836a92b3d81fcb9076766a8050057f4589560",
+  "containers": {
+    "orders-demo": {
+      "id": "3267001bf799d7f2a096fc17a672ef575efb31e64e74d58ae61bbbf14ef0c8c2",
+      "image": "sha256:b59347f248907b2a696e97822386923c2730234a4d695830632c3c43b2d74ee4",
+      "running": true,
+      "started": "2026-10-06T12:39:35.529928881Z",
+      "restart_count": 0
+    },
+    "orders-live": {
+      "id": "6ecf5981c088de6696a27cb1b1b0755515b64fb198d9ad19f9ddd74b0564f3a6",
+      "image": "sha256:b59347f248907b2a696e97822386923c2730234a4d695830632c3c43b2d74ee4",
+      "running": true,
+      "started": "2026-10-06T12:39:35.528835214Z",
+      "restart_count": 0
+    },
+    "terminal": {
+      "id": "cd485aaa9775bba941ae9cdf355185b238c350127250364534594c9ae1c23dd8",
+      "image": "sha256:b59347f248907b2a696e97822386923c2730234a4d695830632c3c43b2d74ee4",
+      "running": true,
+      "started": "2026-10-06T12:06:29.851454462Z",
+      "restart_count": 0
+    },
+    "trainer": {
+      "id": "768f405658b253038bf63328458ee645cea52641c6e29a464232d8944ebddc21",
+      "image": "sha256:848ecbd4c715fffdac40820db4c6450aee73f674040da04e3fd1a2d74b677baa",
+      "running": true,
+      "started": "2026-10-06T12:06:29.782850587Z",
+      "restart_count": 0
+    },
+    "db": {
+      "id": "92184c288a6eff19bccd18348871ca55ec31cc9f376939869933824fc1a463ff",
+      "image": "sha256:be6e122a9a0a3f12d26dc4fb77b96dfb78273cc8957a2ae5e7d31d28d97d57de",
+      "running": true,
+      "started": "2026-10-02T12:51:37.849606295Z",
+      "restart_count": 0
+    }
+  },
+  "gateway_started": [
+    {
+      "mode": "LIVE",
+      "code_version": "d7ff8f17f0dbab0a1dea94b689f836a92b3d81fcb9076766a8050057f4589560",
+      "created_ms": 1791290376298
+    },
+    {
+      "mode": "OKX_DEMO",
+      "code_version": "d7ff8f17f0dbab0a1dea94b689f836a92b3d81fcb9076766a8050057f4589560",
+      "created_ms": 1791290376298
+    }
+  ],
+  "diagnostics": [
+    {
+      "mode": "OKX_DEMO",
+      "credentials_configured": false,
+      "gateway_fresh": true,
+      "status": "KEY_REQUIRED",
+      "reason": "Voeg de OKX-key, secret en passphrase toe onder Systeem \u2192 Aansluitingen & AI."
+    },
+    {
+      "mode": "LIVE",
+      "credentials_configured": true,
+      "gateway_fresh": true,
+      "status": "PAUSED",
+      "reason": "Ordergateway gepauzeerd: EXCHANGE_HTTP_ERROR GET /api/v5/account/bills (HTTP 401, OKX 50110): OKX weigert het huidige IP-adres; controleer de IP-lijst van deze API-key."
+    }
+  ],
+  "account_policy_and_release_preserved": true,
+  "accounts_before": [
+    {
+      "mode": "LIVE",
+      "policy_hash": "cf9e51cf1b3f2d6d1c1e92e3d2647498",
+      "release_hash": "3d79ec59808a11fce75b508ba7e89f61",
+      "revision": 2
+    },
+    {
+      "mode": "OKX_DEMO",
+      "policy_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "release_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "revision": 0
+    }
+  ],
+  "accounts_after": [
+    {
+      "mode": "LIVE",
+      "policy_hash": "cf9e51cf1b3f2d6d1c1e92e3d2647498",
+      "release_hash": "3d79ec59808a11fce75b508ba7e89f61",
+      "revision": 2
+    },
+    {
+      "mode": "OKX_DEMO",
+      "policy_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "release_hash": "d41d8cd98f00b204e9800998ecf8427e",
+      "revision": 0
+    }
+  ],
+  "counts_before": {
+    "orders": 1,
+    "fills": 1,
+    "active_orders": 0,
+    "native_releases": 0,
+    "native_runs": 0,
+    "protection": 0
+  },
+  "counts_after": {
+    "orders": 1,
+    "fills": 1,
+    "active_orders": 0,
+    "native_releases": 0,
+    "native_runs": 0,
+    "protection": 0
+  },
+  "other_services_unchanged": true,
+  "campaigns": [
+    {
+      "id": "e8cc8c3a1c6f595a6fd08b98ffaf6c08",
+      "desired": "RUNNING",
+      "status": "LAYA_FEATURES",
+      "feature_rows": 72816
+    }
+  ],
+  "native_run_count": 0
+}

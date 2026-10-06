@@ -16,14 +16,19 @@ services:
       DATABASE_HOST: db
       DATABASE_PASSWORD_FILE: /run/secrets/db_password
       RUST_LOG: info
+      SETTINGS_DIR: /settings
+      TRAINING_DIR: /training
     secrets:
       - db_password
+      - local_secrets_key
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - pine-jobs:/jobs
       - market-archives:/archives
+      - training-data:/training
+      - ./.local/provider-settings:/settings
     read_only: true
     tmpfs: ["/tmp:size=16m,noexec,nosuid"]
     cap_drop: [ALL]
@@ -31,6 +36,62 @@ services:
     mem_limit: 512m
     cpus: 2
     pids_limit: 128
+    restart: unless-stopped
+    networks: [market, storage]
+  orders-demo:
+    logging: *local-logs
+    image: okx-tradingterminal:0.4.0
+    entrypoint: ["/app/okx-orders"]
+    environment:
+      EXECUTION_MODE: OKX_DEMO
+      DATABASE_HOST: db
+      DATABASE_PASSWORD_FILE: /run/secrets/db_password
+      SETTINGS_DIR: /settings
+      TRAINING_DIR: /training
+    secrets: [db_password, local_secrets_key]
+    depends_on:
+      db:
+        condition: service_healthy
+      terminal:
+        condition: service_healthy
+    volumes: ["./.local/provider-settings:/settings:ro"]
+    read_only: true
+    tmpfs: ["/tmp:size=8m,noexec,nosuid"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 192m
+    cpus: 0.5
+    pids_limit: 64
+    healthcheck:
+      disable: true
+    restart: unless-stopped
+    networks: [market, storage]
+  orders-live:
+    logging: *local-logs
+    image: okx-tradingterminal:0.4.0
+    entrypoint: ["/app/okx-orders"]
+    environment:
+      EXECUTION_MODE: LIVE
+      DATABASE_HOST: db
+      DATABASE_PASSWORD_FILE: /run/secrets/db_password
+      SETTINGS_DIR: /settings
+      TRAINING_DIR: /training
+    secrets: [db_password, local_secrets_key]
+    depends_on:
+      db:
+        condition: service_healthy
+      terminal:
+        condition: service_healthy
+    volumes: ["./.local/provider-settings:/settings:ro"]
+    read_only: true
+    tmpfs: ["/tmp:size=8m,noexec,nosuid"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 192m
+    cpus: 0.5
+    pids_limit: 64
+    healthcheck:
+      disable: true
     restart: unless-stopped
     networks: [market, storage]
   pine:
@@ -75,6 +136,8 @@ services:
     restart: unless-stopped
     networks: [storage]
 secrets:
+  local_secrets_key:
+    file: ./.local/secrets.key
   db_password:
     file: ./.local/db_password
 networks:
@@ -91,3 +154,4 @@ volumes:
   postgres-data: {}
   pine-jobs: {}
   market-archives: {}
+  training-data: {}

@@ -1,0 +1,658 @@
+--- a/backend/src/order_risk.rs
++++ b/backend/src/order_risk.rs
+@@ -31,11 +31,14 @@
+         );
+         ensure!(
+             !self.instruments.is_empty()
+-                && self.instruments.len() <= 12
+-                && self.instruments.iter().all(|s| s.ends_with("-EUR")
+-                    && s.len() <= 40
+-                    && s.bytes().all(|c| c.is_ascii_alphanumeric() || c == b'-')),
+-            "Bevestig 1–12 EUR-spotmarkten"
++                && self.instruments.len() <= 2000
++                && self
++                    .instruments
++                    .iter()
++                    .all(|s| (s.ends_with("-EUR") || s.ends_with("-USDC")) && s.split_once('-').is_some_and(|(base, quote)| !base.is_empty() && !quote.is_empty() && !quote.contains('-'))
++                        && s.len() <= 40
++                        && s.bytes().all(|c| c.is_ascii_alphanumeric() || c == b'-')),
++            "Bevestig de beschikbare spotmarkten (maximaal 2000)"
+         );
+         for value in [
+             self.capital,
+@@ -88,6 +91,8 @@
+     pub holdings: BTreeMap<String, D>,
+     pub quotes: BTreeMap<String, ExecutionQuote>,
+     pub fee_rate: D,
++    #[serde(default)]
++    pub fee_rates: BTreeMap<String, D>,
+     #[serde(default)]
+     pub tradable: Vec<String>,
+     pub daily_loss: D,
+@@ -155,6 +160,57 @@
+     pub created_ms: i64,
+     pub active: bool,
+ }
++pub fn claim_base(c: &Claim) -> &str {
++    c.instrument
++        .rsplit_once('-')
++        .map(|(base, _)| base)
++        .unwrap_or("")
++}
++pub fn claim_quote(c: &Claim) -> &str {
++    c.instrument
++        .rsplit_once('-')
++        .map(|(_, quote)| quote)
++        .unwrap_or("")
++}
++pub fn claim_currency(c: &Claim) -> &str {
++    if c.side == Direction::Buy { claim_quote(c) } else { claim_base(c) }
++}
++pub fn claim_amount(c: &Claim) -> D {
++    if c.side == Direction::Buy { c.reserve } else { c.quantity }
++}
++pub fn account_fee(s: &AccountSnapshot, instrument: &str) -> Result<D> {
++    // Older persisted EUR snapshots remain readable. New snapshots require a fee
++    // checked for this exact instrument, including incentive/fee-group differences.
++    if s.fee_rates.is_empty() && instrument.ends_with("-EUR") { return Ok(s.fee_rate); }
++    s.fee_rates.get(instrument).copied().ok_or_else(|| anyhow::anyhow!("Actuele accountfee voor deze markt ontbreekt; wacht op marktcontrole"))
++}
++pub fn euro_bounds(s: &AccountSnapshot, currency: &str, now: i64) -> Result<(D,D)> {
++    fn walk(s: &AccountSnapshot, c: &str, now: i64, path: &mut Vec<String>) -> Option<(D,D)> {
++        if c == "EUR" { return Some((D::ONE,D::ONE)); }
++        if path.len() >= 3 || path.iter().any(|v| v == c) { return None; }
++        path.push(c.into());
++        // Direct EUR paths first. Otherwise use actual conversion books; never
++        // assume USD, USDC or USDT are equal to each other or to one EUR.
++        let mut quotes: Vec<_> = s.quotes.values().collect();
++        quotes.sort_by_key(|q| q.rules.quote != "EUR" && q.rules.base != "EUR");
++        for q in quotes {
++            if !(0..=15000).contains(&(now-q.received_ms)) || q.bid <= D::ZERO || q.ask < q.bid { continue; }
++            let edge = if q.rules.base == c {
++                Some((q.rules.quote.as_str(),q.bid,q.ask))
++            } else if q.rules.quote == c {
++                Some((q.rules.base.as_str(),D::ONE.checked_div(q.ask)?,D::ONE.checked_div(q.bid)?))
++            } else { None };
++            if let Some((next,lo,hi)) = edge {
++                if let Some((a,b)) = walk(s,next,now,path) {
++                    path.pop();return Some((lo.checked_mul(a)?,hi.checked_mul(b)?));
++                }
++            }
++        }
++        path.pop();None
++    }
++    walk(s,currency,now,&mut vec![]).ok_or_else(||anyhow::anyhow!("Actuele EUR-waardering ontbreekt voor {}",currency))
++}
++fn euro_rate(s: &AccountSnapshot, currency: &str, now: i64) -> Result<D> { Ok(euro_bounds(s,currency,now)?.1) }
+ #[derive(Debug)]
+ pub struct AuthorizedOrder {
+     compiled: CompiledOrder,
+@@ -294,12 +350,14 @@
+         "Limiet voor open orders bereikt"
+     );
+     ensure!(recent < policy.orders_per_minute, "Orderfrequentie bereikt");
+-    let fee = snapshot.fee_rate;
++    ensure!(snapshot.tradable.contains(&ticket.instrument), "Deze spotmarkt is niet beschikbaar voor dit OKX-account");
++    let fee = account_fee(snapshot, &ticket.instrument)?;
+     ensure!(
+         fee >= D::ZERO && fee <= D::new(1, 1),
+         "Actuele fee ontbreekt of is ongeldig"
+     );
+     let (currency, reserve) = if ticket.side == Direction::Buy {
++        let fx = euro_rate(snapshot, &quote.rules.quote, now)?;
+         ensure!(
+             snapshot.valuation_complete && snapshot.equity_eur > D::ZERO,
+             "Rekeningwaardering onvolledig; nieuwe koop geblokkeerd"
+@@ -334,53 +392,53 @@
+             "Deze koop heeft geen vaste maximale uitvoeringsprijs. Gebruik een trigger met limiet, of gebruik dit type voor verkoop van bestaande inventaris."
+         );
+         let amount = ticket.quantity * compiled.worst_price * (D::ONE + fee);
+-        let trade_risk = ticket.quantity * (compiled.worst_price - protection.stop)
+-            + ticket.quantity * (compiled.worst_price + protection.stop) * fee;
++        let trade_risk = (ticket.quantity * (compiled.worst_price - protection.stop)
++            + ticket.quantity * (compiled.worst_price + protection.stop) * fee)
++            * fx;
+         ensure!(
+             trade_risk > D::ZERO && trade_risk <= policy.trade_risk,
+             "Risico per order inclusief fee overschrijdt limiet"
+         );
+         ensure!(
+-            amount <= policy.max_order,
++            amount * fx <= policy.max_order,
+             "Maximaal orderbedrag overschreden"
+         );
+-        let reserved: D = other
+-            .iter()
+-            .filter(|c| c.side == Direction::Buy)
+-            .map(|c| c.reserve)
+-            .sum();
++        let reserved: D =
++            other
++                .iter()
++                .filter(|c| c.side == Direction::Buy)
++                .try_fold(D::ZERO, |sum, c| {
++                    Ok::<_, anyhow::Error>(
++                        sum + c.reserve * euro_rate(snapshot, claim_quote(c), now)?,
++                    )
++                })?;
+         let pending: D = other
+             .iter()
+-            .filter(|c| c.side == Direction::Buy && c.instrument == ticket.instrument)
+-            .map(|c| c.reserve)
+-            .sum();
++            .filter(|c| c.side == Direction::Buy && claim_base(c) == quote.rules.base)
++            .try_fold(D::ZERO, |sum, c| {
++                Ok::<_, anyhow::Error>(sum + c.reserve * euro_rate(snapshot, claim_quote(c), now)?)
++            })?;
+         let held = snapshot
+             .holdings
+             .get(&quote.rules.base)
+             .copied()
+             .unwrap_or_default()
+-            * quote.ask;
+-        let total_held: D = snapshot
+-            .holdings
+-            .iter()
+-            .filter_map(|(base, qty)| {
+-                snapshot
+-                    .quotes
+-                    .get(&format!("{base}-EUR"))
+-                    .map(|q| *qty * q.ask)
+-            })
+-            .sum();
+-        ensure!(
+-            amount + reserved + total_held <= policy.capital
+-                && amount + pending + held <= policy.max_position,
++            * quote.ask
++            * fx;
++        let total_held: D = snapshot.holdings.iter()
++            .filter(|(base,qty)| **qty > D::ZERO && !["EUR","USDC","USDT","USD","AUD","AED","BRL","TRY","SGD","PLN"].contains(&base.as_str()))
++            .try_fold(D::ZERO,|sum,(base,qty)| Ok::<_,anyhow::Error>(sum + *qty * euro_rate(snapshot,base,now)?))?;
++        ensure!(
++            amount * fx + reserved + total_held <= policy.capital
++                && amount * fx + pending + held <= policy.max_position,
+             "Rekeningbudget of muntblootstelling overschreden"
+         );
+         (quote.rules.quote.clone(), amount)
+     } else {
+         let reserved: D = other
+             .iter()
+-            .filter(|c| c.side == Direction::Sell && c.instrument == ticket.instrument)
+-            .map(|c| c.quantity)
++            .filter(|c| claim_currency(c) == quote.rules.base)
++            .map(|c| claim_amount(c))
+             .sum();
+         (quote.rules.base.clone(), ticket.quantity + reserved)
+     };
+@@ -394,8 +452,8 @@
+         // may make this check conservative; never assume an algo freezes assets.
+         let reserved: D = other
+             .iter()
+-            .filter(|c| c.side == Direction::Buy)
+-            .map(|c| c.reserve)
++            .filter(|c| claim_currency(c) == currency)
++            .map(|c| claim_amount(c))
+             .sum();
+         ensure!(
+             reserve + reserved <= available,
+@@ -480,6 +538,7 @@
+             tradable: vec!["BTC-EUR".into()],
+             quotes: [("BTC-EUR".into(), quote)].into_iter().collect(),
+             fee_rate: D::new(1, 3),
++            fee_rates: BTreeMap::new(),
+             daily_loss: D::ZERO,
+             total_loss: D::ZERO,
+             drawdown: D::ZERO,
+@@ -535,6 +594,48 @@
+         assert!(!s.live_enabled);
+     }
+     #[test]
++    fn usdc_buys_use_native_reserve_but_eur_limits_and_current_fx() {
++        let (mut t, mut l, mut s) = fixture();
++        t.instrument = "BTC-USDC".into();
++        l.instruments.push(t.instrument.clone());
++        s.tradable.push(t.instrument.clone());
++        s.fee_rates.insert(t.instrument.clone(),s.fee_rate);
++        let mut q = s.quotes["BTC-EUR"].clone();
++        q.rules.quote = "USDC".into();
++        s.quotes.insert(t.instrument.clone(), q);
++        let mut fx = s.quotes["BTC-EUR"].clone();
++        fx.rules.base = "USDC".into();
++        fx.bid = D::new(8, 1);
++        fx.ask = D::new(8, 1);
++        s.quotes.insert("USDC-EUR".into(), fx);
++        s.available.insert("USDC".into(), D::from(500));
++        l.max_order = D::from(90);
++        let a = authorize(&t, &l, &s, &[], 10000, "usdcfixture").unwrap();
++        assert_eq!(a.currency(), "USDC");
++        assert_eq!(a.reserve(), D::new(1001, 1));
++        l.max_order = D::from(80);
++        assert!(authorize(&t, &l, &s, &[], 10000, "usdcfixture").is_err());
++        l.max_order = D::from(90);
++        s.quotes.get_mut("USDC-EUR").unwrap().received_ms = 0;
++        assert!(authorize(&t, &l, &s, &[], 20000, "usdcfixture").is_err());
++    }
++    #[test]
++    fn sell_inventory_is_shared_between_eur_and_usdc_markets() {
++        let (mut t, l, s) = fixture();
++        t.side = Direction::Sell;
++        t.protection = None;
++        let c = Claim {
++            id: "othermarket".into(),
++            instrument: "BTC-USDC".into(),
++            side: Direction::Sell,
++            quantity: D::from(2),
++            reserve: D::from(2),
++            created_ms: 10000,
++            active: true,
++        };
++        assert!(authorize(&t, &l, &s, &[c], 10000, "newid").is_err());
++    }
++    #[test]
+     fn missing_protection_and_stale_or_unreconciled_state_fail() {
+         let (mut t, l, mut s) = fixture();
+         t.protection = None;
+@@ -593,4 +694,28 @@
+         s.native_protection_verified = false;
+         assert!(authorize(&t, &l, &s, &[], 10000, "id").is_err());
+     }
+-}
++    #[test]
++    fn markets_are_not_limited_to_twelve_and_syntax_stays_spot_only() {
++        let (_,mut l,_)=fixture();l.instruments=(0..500).map(|i|format!("ASSET{i}-USDC")).collect();assert!(l.validate().is_ok());
++        l.instruments.push("BTC-USDT-SWAP".into());assert!(l.validate().is_err());
++    }
++    #[test]
++    fn different_instruments_spending_the_same_currency_share_claims() {
++        let (t,l,s)=fixture();let c=Claim{id:"sellcash".into(),instrument:"EUR-USDC".into(),side:Direction::Sell,quantity:D::from(450),reserve:D::from(450),created_ms:10000,active:true};
++        assert!(authorize(&t,&l,&s,&[c],10000,"buybitcoin").is_err());
++        let (mut t,l,s)=fixture();t.side=Direction::Sell;t.protection=None;
++        let c=Claim{id:"buywithbtc".into(),instrument:"ETH-BTC".into(),side:Direction::Buy,quantity:D::ONE,reserve:D::from(2),created_ms:10000,active:true};
++        assert!(authorize(&t,&l,&s,&[c],10000,"sellbitcoin").is_err());
++    }
++    #[test]
++    fn inverse_conversion_and_stale_fx_do_not_assume_stablecoin_parity() {
++        let (_,_,mut s)=fixture();let mut q=s.quotes["BTC-EUR"].clone();q.bid=D::from(90);q.ask=D::from(100);s.quotes.insert("BTC-EUR".into(),q.clone());q.rules.quote="USDT".into();q.bid=D::from(180);q.ask=D::from(200);s.quotes.insert("BTC-USDT".into(),q);
++        let (bid,ask)=euro_bounds(&s,"USDT",10000).unwrap();assert_eq!(bid,D::new(45,2));assert!((ask-D::from(100)/D::from(180)).abs()<D::new(1,25));
++        assert!(euro_bounds(&s,"USDT",30000).is_err());assert!(euro_bounds(&s,"AUD",10000).is_err());
++    }
++    #[test]
++    fn new_snapshots_need_fees_for_the_exact_selected_market() {
++        let (t,l,mut s)=fixture();s.fee_rates.insert("ETH-EUR".into(),D::ZERO);assert!(authorize(&t,&l,&s,&[],10000,"feechecked").is_err());s.fee_rates.insert(t.instrument.clone(),D::new(1,3));assert!(authorize(&t,&l,&s,&[],10000,"feechecked").is_ok());s.tradable.clear();assert!(authorize(&t,&l,&s,&[],10000,"feechecked").is_err());
++    }
++
++}
+--- a/backend/src/order_types.rs
++++ b/backend/src/order_types.rs
+@@ -191,8 +191,8 @@
+         client_id: &str,
+     ) -> Result<CompiledOrder> {
+         ensure!(
+-            market.quote == "EUR" && self.instrument == format!("{}-{}", market.base, market.quote),
+-            "Dit uitvoeringsprofiel ondersteunt accounttoegankelijke EUR-spotmarkten zonder hefboom"
++            !market.base.is_empty() && ["EUR","USDC"].contains(&market.quote.as_str()) && self.instrument == format!("{}-{}", market.base, market.quote),
++            "Dit uitvoeringsprofiel ondersteunt accounttoegankelijke spotmarkten zonder hefboom"
+         );
+         ensure!(
+             !client_id.is_empty()
+--- a/backend/src/order_wallet.rs
++++ b/backend/src/order_wallet.rs
+@@ -108,8 +108,8 @@
+         "Accountsaldo ontbreekt of is verouderd"
+     );
+     ensure!(
+-        r.instrument == format!("{}-{}", rules.base, rules.quote) && rules.quote == "EUR",
+-        "Geen ondersteunde EUR-spotmarkt"
++        r.instrument == format!("{}-{}", rules.base, rules.quote) && ["EUR","USDC"].contains(&rules.quote.as_str()),
++        "Geen ondersteunde spotmarkt"
+     );
+     ensure!(
+         r.percent <= 100 && rules.lot > D::ZERO && rules.minimum > D::ZERO && reserved >= D::ZERO,
+--- a/backend/src/trading.rs
++++ b/backend/src/trading.rs
+@@ -35,6 +35,7 @@
+ #[derive(Deserialize)]
+ pub struct ModeQuery {
+     pub mode: ExecutionMode,
++    pub instrument: Option<String>,
+ }
+ async fn catalogue() -> Json<Value> {
+     Json(catalog())
+@@ -90,10 +91,10 @@
+                 row.get::<Option<Value>, _>("snapshot")
+                     .ok_or_else(|| anyhow::anyhow!("OKX-saldo ontbreekt"))?,
+             )?;
+-            let q = crate::paper::quotes(&a).await;
++            let q = crate::paper::native_quotes(&a).await;
+             let q = q
+                 .get(&r.instrument)
+-                .ok_or_else(|| anyhow::anyhow!("Verse EUR-spotkoers ontbreekt"))?;
++                .ok_or_else(|| anyhow::anyhow!("Verse spotkoers ontbreekt"))?;
+             let rules = MarketRules {
+                 tick: q.tick,
+                 lot: q.lot,
+@@ -109,21 +110,16 @@
+             let fee = snapshot
+                 .and_then(|v| serde_json::from_value::<AccountSnapshot>(v).ok())
+                 .filter(|s| s.uid == w.uid && (0..=15000).contains(&(now_ms() - s.received_ms)))
+-                .map(|s| s.fee_rate);
++                .and_then(|s| order_risk::account_fee(&s,&r.instrument).ok());
+             let cs = claims(&mut tx, r.mode).await?;
+             let reserved = cs
+                 .iter()
+                 .filter(|c| {
+                     c.active
+-                        && c.side == r.side
+-                        && (r.side == Direction::Buy || c.instrument == r.instrument)
++                        && order_risk::claim_currency(c) == if r.side == Direction::Buy { &rules.quote } else { &rules.base }
+                 })
+                 .map(|c| {
+-                    if r.side == Direction::Buy {
+-                        c.reserve
+-                    } else {
+-                        c.quantity
+-                    }
++                    order_risk::claim_amount(c)
+                 })
+                 .sum::<D>();
+             let sized = crate::order_wallet::size(
+@@ -197,7 +193,7 @@
+     ))
+ }
+ async fn fresh_quote(a: &App, s: &mut AccountSnapshot, t: &Ticket) -> Result<()> {
+-    let q = crate::paper::quotes(a).await;
++    let q = crate::paper::native_quotes(a).await;
+     let q = q
+         .get(&t.instrument)
+         .ok_or_else(|| anyhow::anyhow!("Verse gecontroleerde koers ontbreekt"))?;
+@@ -218,12 +214,16 @@
+ }
+ async fn status(State(a): State<App>, Query(q): Query<ModeQuery>) -> Response {
+     reply(async {
++    if let Some(ref instrument)=q.instrument {
++        ensure!(a.market.read().await.catalogue.iter().any(|i|i["instId"]==*instrument),"Spotmarkt niet beschikbaar in de publieke catalogus");
++        sqlx::query("INSERT INTO execution.market_interest(mode,instrument,updated_ms) VALUES($1,$2,$3) ON CONFLICT(mode,instrument) DO UPDATE SET updated_ms=$3").bind(q.mode.id()).bind(instrument).bind(now_ms()).execute(&a.db).await?;
++    }
+     let r=sqlx::query("SELECT snapshot,policy,status,reason,updated_ms,policy_revision,live_release FROM execution.accounts WHERE mode=$1").bind(q.mode.id()).fetch_one(&a.db).await?;
+     let snapshot:Option<Value>=r.get("snapshot");let policy:Option<Value>=r.get("policy");
+     let credentials_configured=crate::secrets::configured(if q.mode==ExecutionMode::OkxDemo {"okx_demo"}else{"okx_live"}).await;
+     let updated=r.get::<i64,_>("updated_ms");let fresh=(0..=15000).contains(&(now_ms()-updated));
+     let reason=if !credentials_configured {"Voeg de OKX-key, secret en passphrase toe onder Systeem → Aansluitingen & AI.".to_string()}else if !fresh {"De ordergateway draait nog niet. Start OKX Orders.command opent de afzonderlijke lokale gateway.".into()}else{r.get::<String,_>("reason")};
+-    Ok(json!({"mode":q.mode,"credentials_configured":credentials_configured,"gateway_fresh":fresh,"status":if fresh {r.get::<String,_>("status")}else{"OFFLINE".into()},"reason":reason,"snapshot":snapshot,"limits":policy,"policy_revision":r.get::<i64,_>("policy_revision"),"profile":"EUR spot · zonder hefboom","live_technical_accepted":false,"live_release":r.get::<Option<Value>,_>("live_release")}))
++    Ok(json!({"mode":q.mode,"credentials_configured":credentials_configured,"gateway_fresh":fresh,"status":if fresh {r.get::<String,_>("status")}else{"OFFLINE".into()},"reason":reason,"snapshot":snapshot,"limits":policy,"policy_revision":r.get::<i64,_>("policy_revision"),"profile":"Accountbeschikbare spotmarkten · zonder hefboom","live_technical_accepted":false,"live_release":r.get::<Option<Value>,_>("live_release")}))
+ }.await)
+ }
+ #[derive(Deserialize)]
+@@ -287,7 +287,7 @@
+     let snapshot:Option<Value>=r.get("snapshot");let policy:Option<Value>=r.get("policy");let id=nonce()?;let client_id=nonce()?;
+     // Even before connecting an account, validate against fresh public market metadata.
+     // This is a reviewable order draft, never an execution authorization.
+-    let quotes=crate::paper::quotes(&a).await;let q=quotes.get(&ticket.instrument).ok_or_else(||anyhow::anyhow!("Geen actuele gecontroleerde EUR-spotkoers; probeer opnieuw"))?;
++    let quotes=crate::paper::native_quotes(&a).await;let q=quotes.get(&ticket.instrument).ok_or_else(||anyhow::anyhow!("Geen actuele gecontroleerde spotkoers; probeer opnieuw"))?;
+     let rules=MarketRules{tick:q.tick,lot:q.lot,minimum:q.minimum,base:q.base.clone(),quote:q.quote.clone()};
+     let compiled=ticket.compile(&rules,if ticket.side==Direction::Buy{q.ask}else{q.bid},&client_id)?;
+     let mut blocked=vec![];let mut risk_plan=None;
+--- a/backend/src/paper.rs
++++ b/backend/src/paper.rs
+@@ -18,7 +18,9 @@
+ use sqlx::{Postgres, Row, Transaction};
+ use std::{collections::BTreeMap, sync::atomic::Ordering, time::Duration};
+ 
+-pub async fn quotes(app: &App) -> Quotes {
++pub async fn quotes(app: &App) -> Quotes { quotes_in(app, true).await }
++pub async fn native_quotes(app: &App) -> Quotes { quotes_in(app, false).await }
++async fn quotes_in(app: &App, paper_only: bool) -> Quotes {
+     let m = app.market.read().await;
+     let mut out = Quotes::new();
+     if !m.feed_connected
+@@ -30,7 +32,7 @@
+         return out;
+     }
+     for i in &m.instruments {
+-        if i["quoteCcy"] != "EUR" || i["state"] != "live" {
++        if (paper_only && i["quoteCcy"] != "EUR") || i["state"] != "live" {
+             continue;
+         }
+         let Some(id) = i["instId"].as_str() else {
+@@ -57,7 +59,7 @@
+             Quote {
+                 instrument: id.into(),
+                 base: i["baseCcy"].as_str().unwrap_or_default().into(),
+-                quote: "EUR".into(),
++                quote: i["quoteCcy"].as_str().unwrap_or_default().into(),
+                 bid,
+                 ask,
+                 bid_size: bs,
+--- a/backend/src/bin/okx-orders.rs
++++ b/backend/src/bin/okx-orders.rs
+@@ -199,87 +199,43 @@
+         holdings.insert(ccy.into(), total);
+         available.insert(ccy.into(), free);
+     }
+-    let policy: Option<Value> =
+-        sqlx::query_scalar("SELECT policy FROM execution.accounts WHERE mode=$1")
+-            .bind(mode.id())
+-            .fetch_one(db)
+-            .await?;
+-    let mut wanted: BTreeSet<String> = policy
+-        .as_ref()
+-        .and_then(|p| p["instruments"].as_array())
+-        .into_iter()
+-        .flatten()
+-        .filter_map(|v| v.as_str().map(String::from))
+-        .collect();
++    // Account instruments determine eligibility. Refresh execution books/fees only
++    // for selected or outstanding instruments; selecting hundreds of allowed pairs
++    // must not turn into hundreds of private calls every reconciliation cycle.
++    let selected:Vec<String>=sqlx::query_scalar("SELECT instrument FROM execution.market_interest WHERE mode=$1 AND updated_ms>$2 ORDER BY updated_ms DESC LIMIT 16").bind(mode.id()).bind(now()-60000).fetch_all(db).await?;
++    let active:Vec<String>=sqlx::query_scalar("SELECT DISTINCT ticket->>'instrument' FROM execution.orders WHERE mode=$1 AND state NOT IN ('FILLED','CANCELED','REJECTED')").bind(mode.id()).fetch_all(db).await?;
++    let mut wanted:BTreeSet<String>=selected.into_iter().chain(active).collect();
+     wanted.insert("BTC-EUR".into());
+-    wanted.extend(
+-        holdings
+-            .iter()
+-            .filter(|(c, v)| c.as_str() != "EUR" && **v > D::ZERO)
+-            .map(|(c, _)| format!("{c}-EUR")),
+-    );
+-    ensure!(
+-        wanted.len() <= 20,
+-        "Te veel waarderingsmarkten voor het huidige spotprofiel"
+-    );
+-    let mut quotes = BTreeMap::new();
+-    let mut fee_rate = D::ZERO;
+-    let mut fee_seen = false;
+-    for instrument in rows(&meta)?.iter().filter(|i| {
+-        i["state"] == "live"
+-            && i["quoteCcy"] == "EUR"
+-            && i["instId"].as_str().is_some_and(|s| wanted.contains(s))
+-    }) {
+-        let id = instrument["instId"].as_str().unwrap();
+-        ensure!(
+-            id.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-'),
+-            "Ongeldig instrument-id"
+-        );
+-        let book = okx
+-            .get(&format!("/api/v5/market/books?instId={id}&sz=5"))
+-            .await?;
+-        let b = rows(&book)?
+-            .first()
+-            .ok_or_else(|| anyhow::anyhow!("Orderboek ontbreekt"))?;
+-        let q = ExecutionQuote {
+-            bid: dec(&b["bids"][0][0])?,
+-            ask: dec(&b["asks"][0][0])?,
+-            received_ms: now(),
+-            rules: MarketRules {
+-                tick: dec(&instrument["tickSz"])?,
+-                lot: dec(&instrument["lotSz"])?,
+-                minimum: dec(&instrument["minSz"])?,
+-                base: instrument["baseCcy"].as_str().unwrap_or("").into(),
+-                quote: "EUR".into(),
+-            },
+-        };
+-        let fees = okx
+-            .get(&format!(
+-                "/api/v5/account/trade-fee?instType=SPOT&instId={id}"
+-            ))
+-            .await?;
+-        let f = rows(&fees)?
+-            .first()
+-            .ok_or_else(|| anyhow::anyhow!("Fee ontbreekt"))?;
+-        fee_rate = fee_rate
+-            .max(dec(&f["taker"])?.abs())
+-            .max(dec(&f["maker"])?.abs());
+-        fee_seen = true;
+-        quotes.insert(id.into(), q);
+-    }
+-    ensure!(
+-        fee_seen,
+-        "Geen accounttoegankelijke EUR-spotmarkt met actuele fee gevonden"
+-    );
+-    let mut complete = true;
+-    let mut equity = holdings.get("EUR").copied().unwrap_or_default();
+-    for (ccy, qty) in &holdings {
+-        if ccy != "EUR" && *qty > D::ZERO {
+-            if let Some(q) = quotes.get(&format!("{ccy}-EUR")) {
+-                equity += *qty * q.bid;
+-            } else {
+-                complete = false;
+-            }
++    let prices=okx.get("/api/v5/market/tickers?instType=SPOT").await?;
++    let mut quotes=BTreeMap::new();
++    for instrument in rows(&meta)?.iter().filter(|i|i["state"]=="live") {
++        let Some(id)=instrument["instId"].as_str() else {continue;};
++        if !id.bytes().all(|b|b.is_ascii_alphanumeric()||b==b'-'){continue;}
++        let Some(t)=rows(&prices)?.iter().find(|t|t["instId"]==id) else {continue;};
++        let (Ok(bid),Ok(ask))=(dec(&t["bidPx"]),dec(&t["askPx"])) else {continue;};
++        if bid<=D::ZERO||ask<bid{continue;}
++        quotes.insert(id.into(),ExecutionQuote{bid,ask,received_ms:now(),rules:MarketRules{
++            tick:dec(&instrument["tickSz"])?,lot:dec(&instrument["lotSz"])?,minimum:dec(&instrument["minSz"])?,base:instrument["baseCcy"].as_str().unwrap_or("").into(),quote:instrument["quoteCcy"].as_str().unwrap_or("").into()}});
++    }
++    let mut fee_rate=D::ZERO;
++    let mut fee_rates=BTreeMap::new();
++    for id in wanted {
++        let Some(q)=quotes.get_mut(&id) else {continue;};
++        let book=okx.get(&format!("/api/v5/market/books?instId={id}&sz=5")).await?;
++        let b=rows(&book)?.first().ok_or_else(||anyhow::anyhow!("Orderboek ontbreekt"))?;
++        q.bid=dec(&b["bids"][0][0])?;q.ask=dec(&b["asks"][0][0])?;q.received_ms=now();
++        let fees=okx.get(&format!("/api/v5/account/trade-fee?instType=SPOT&instId={id}")).await?;
++        let f=rows(&fees)?.first().ok_or_else(||anyhow::anyhow!("Marktfee ontbreekt"))?;
++        let fee=dec(&f["taker"])?.abs().max(dec(&f["maker"])?.abs());
++        fee_rate=fee_rate.max(fee);fee_rates.insert(id,fee);
++    }
++    ensure!(!fee_rates.is_empty(),"Geen accountbeschikbare spotmarkt met gecontroleerde fee");
++    let mut complete=true;let mut equity=D::ZERO;
++    // Valuation reuses the same checked conversion graph as the risk core.
++    let valuation=AccountSnapshot{uid:uid.clone(),mode,received_ms:now(),connected:false,reconciled:false,trade_permission:permission,valuation_complete:false,equity_eur:D::ZERO,available:available.clone(),holdings:holdings.clone(),quotes:quotes.clone(),fee_rate,fee_rates:fee_rates.clone(),tradable:vec![],daily_loss:D::ZERO,total_loss:D::ZERO,drawdown:D::ZERO,native_protection_verified:false,live_acceptance_complete:false,live_enabled:false};
++    for (ccy,qty) in &holdings {
++        if *qty>D::ZERO {
++            match euro_bounds(&valuation,ccy,now()) {Ok((bid,_))=>equity+=*qty*bid,Err(_)=>complete=false}
+         }
+     }
+     let pending = okx
+@@ -417,6 +373,7 @@
+         holdings,
+         quotes,
+         fee_rate,
++        fee_rates,
+         daily_loss: (day_start - equity).max(D::ZERO),
+         total_loss: (start - equity).max(D::ZERO),
+         drawdown: (high - equity).max(D::ZERO),
+--- a/backend/src/exchange.rs
++++ b/backend/src/exchange.rs
+@@ -100,6 +100,7 @@
+             "/api/v5/trade/orders-history",
+             "/api/v5/account/bills",
+             "/api/v5/market/books",
++            "/api/v5/market/tickers",
+             "/api/v5/public/time",
+         ]
+         .contains(&p),
+--- a/backend/migrations/009_market_interest.sql
++++ b/backend/migrations/009_market_interest.sql
+@@ -0,0 +1 @@
++CREATE TABLE execution.market_interest (mode text NOT NULL REFERENCES execution.accounts(mode), instrument text NOT NULL, updated_ms bigint NOT NULL, PRIMARY KEY(mode,instrument));
+--- a/frontend/src/OrderTicket.tsx
++++ b/frontend/src/OrderTicket.tsx
+@@ -67,21 +67,21 @@
+   useEffect(()=>{
+     if(consumedPrice.current===chartPrice)return;
+     consumedPrice.current=chartPrice;
+-    if(!chartPrice||chartPrice.instrument!==symbol||busy||preview||!symbol.endsWith("-EUR")||!acceptsChartLimitPrice(kind,fields.execution))return;
++    if(!chartPrice||chartPrice.instrument!==symbol||busy||preview||!acceptsChartLimitPrice(kind,fields.execution))return;
+     setPercentage(null);setSized(undefined);setSizeError("");
+     setFields(old=>({...old,price:chartPrice.price}));
+     setPickedPrice(chartPrice.price);
+   },[chartPrice,symbol,mode,kind,side,fields.execution,busy,preview]);
+   useEffect(()=>{setFields(old=>({...old,price:""}));setPickedPrice(undefined);},[symbol]);
+-  const status=useQuery({queryKey:["gateway",mode],queryFn:()=>api<Gateway>(`/api/trading?mode=${mode}`),refetchInterval:3000});
++  const status=useQuery({queryKey:["gateway",mode,symbol],queryFn:()=>api<Gateway>(`/api/trading?mode=${mode}&instrument=${encodeURIComponent(symbol)}`),refetchInterval:3000});
+   const balances=useQuery({queryKey:["okx-balances",mode],queryFn:()=>api<Balances>(`/api/trading/balances?mode=${mode}`),refetchInterval:3000});
+   const orders=useQuery({queryKey:["exchange-orders",mode],queryFn:()=>api<{orders:NativeOrder[]}>(`/api/trading/orders?mode=${mode}`),refetchInterval:3000});
+   const activity=useQuery({queryKey:["native-activity",mode],queryFn:()=>api<Activity>(`/api/trading/activity?mode=${mode}`),refetchInterval:3000});
+-  const meta=market.instruments.find(i=>i.instId===symbol);const base=meta?.baseCcy||symbol.split("-")[0];
+-  const balanceAsset=balances.data?.snapshot?.trading.find(a=>a.currency===(side==="buy"?"EUR":base));
++  const meta=market.instruments.find(i=>i.instId===symbol);const base=meta?.baseCcy||symbol.split("-")[0];const quote=meta?.quoteCcy||symbol.split("-").at(-1)||"EUR";
++  const balanceAsset=balances.data?.snapshot?.trading.find(a=>a.currency===(side==="buy"?quote:base));
+   const freeBalance=balances.data?.fresh?(balanceAsset?balanceAsset.available??undefined:"0"):undefined;
+   const set=(name:string,value:string)=>{if(name==="price")setPickedPrice(undefined);if(name==="quantity"){setPercentage(null);setSized(undefined);}setFields(old=>({...old,[name]:value,...(name==="start"&&value==="price"&&! ["cross_up","cross_down"].includes(old.condition)?{condition:"cross_up"}:{})}));};
+-  const price = (name:string,title:string,required=true)=> <label key={name}>{title}<div className="order-input-unit"><input aria-label={title} type="number" step={meta?.tickSz||"any"} min={meta?.tickSz||"0.00000001"} required={required} value={fields[name]||""} onChange={e=>set(name,e.target.value)}/><span>EUR</span></div></label>;
++  const price = (name:string,title:string,required=true)=> <label key={name}>{title}<div className="order-input-unit"><input aria-label={title} type="number" step={meta?.tickSz||"any"} min={meta?.tickSz||"0.00000001"} required={required} value={fields[name]||""} onChange={e=>set(name,e.target.value)}/><span>{quote}</span></div></label>;
+   const amount = (name:string,title:string)=> <label key={name}>{title}<div className="order-input-unit"><input aria-label={title} type="number" step={meta?.lotSz||"any"} min={meta?.minSz||"0.00000001"} required value={fields[name]||""} onChange={e=>set(name,e.target.value)}/><span>{base}</span></div></label>;
+   function percentRatio(value:string){ if(!/^\d+(?:\.\d{1,4})?$/.test(value))throw Error("Ongeldig percentage");const [whole,fraction=""]=value.split(".");return `${whole.padStart(3,"0").slice(0,-2)}.${whole.padStart(2,"0").slice(-2)}${fraction}`; }
+   function distance(unit:string,value:string) { return {unit,value:unit==="ratio" ? percentRatio(value):value}; }
+@@ -116,34 +116,34 @@
+       {!status.data?.credentials_configured&&<button type="button" className="order-secondary" onClick={openSettings}>OKX aansluiten</button>}
+       <WalletBalances data={balances.data} error={balances.isError?String(balances.error):""} onRefresh={()=>qc.invalidateQueries({queryKey:["okx-balances",mode]})}/>
+       {mode==="LIVE"&&<LiveControl gateway={status.data} onConfigure={configureLimits} onChanged={()=>qc.invalidateQueries({queryKey:["gateway",mode]})}/>}
+-      <div className="order-market-access">{!symbol.endsWith("-EUR")?<p className="order-notice">De handelsroute van de terminal ondersteunt momenteel alleen EUR-spot. {symbol} vraagt een uitbreiding van de betaalvaluta en een nieuwe persoonlijke marktbevestiging. Je API-instellingen alleen veranderen dit terminalprofiel niet.</p>:status.data?.snapshot?.tradable?.includes(symbol)?status.data?.limits&&Array.isArray(status.data.limits.instruments)&&status.data.limits.instruments.includes(symbol)?<small>Deze markt is beschikbaar bij OKX en bevestigd in je handelslimieten.</small>:<><p className="order-notice">{symbol} is beschikbaar bij OKX. Deze markt ontbreekt nog in je bevestigde handelslimieten.</p><button type="button" className="order-secondary" onClick={configureLimits}>Markt in handelslimieten instellen</button></>:<p className="order-notice">{status.data?.snapshot?`OKX geeft ${symbol} momenteel niet vrij voor deze rekening.`:"Verbind je OKX-account om de beschikbare markten te controleren."}</p>}</div>
+-      {symbol.endsWith("-EUR")?<form onSubmit={review}>
++      <div className="order-market-access">{status.data?.snapshot?.tradable?.includes(symbol)?status.data?.limits&&Array.isArray(status.data.limits.instruments)&&status.data.limits.instruments.includes(symbol)?<small>Deze markt is beschikbaar bij OKX en bevestigd in je handelslimieten.</small>:<><p className="order-notice">{symbol} is beschikbaar bij OKX. Voeg deze markt toe aan je handelslimieten en bevestig daarna Live opnieuw.</p><button type="button" className="order-secondary" onClick={configureLimits}>Markt in handelslimieten instellen</button></>:<p className="order-notice">{status.data?.snapshot?`OKX geeft ${symbol} momenteel niet vrij voor deze rekening.`:"Verbind je OKX-account om de beschikbare markten te controleren."}</p>}</div>
++      <form onSubmit={review}>
+         <div className="order-side"><button type="button" className={side==="buy"?"buy active":"buy"} onClick={()=>setSide("buy")}>Kopen</button><button type="button" className={side==="sell"?"sell active":"sell"} onClick={()=>setSide("sell")}>Verkopen</button></div>
+         <label>Ordertype<select aria-label="Ordertype" value={kind} onChange={e=>setKind(e.target.value as Kind)}>{groups.map(g=><optgroup key={g.name} label={g.name}>{g.kinds.map(([v,n])=><option key={v} value={v}>{n}</option>)}</optgroup>)}</select></label>
+         <p className="order-help">{help[kind]}</p>
+         <div className="order-market"><strong>{symbol}</strong><span>Spot · zonder hefboom</span></div>
+-        <p className="order-available">Beschikbaar bij OKX: {fmt(freeBalance)} {side==="buy"?"EUR":base}</p>
++        <p className="order-available">Beschikbaar bij OKX: {fmt(freeBalance)} {side==="buy"?quote:base}</p>
+         {amount("quantity","Totale hoeveelheid")}
+-        <div className="order-percentage"><label htmlFor="order-percentage">Gebruik {percentage===null?"een percentage":`${percentage}%`} van beschikbaar {side==="buy"?"EUR":base}</label><input id="order-percentage" aria-label="Percentage van beschikbaar saldo" type="range" min="0" max="100" step="1" value={percentage??0} disabled={!balances.data?.fresh||busy} onChange={e=>setPercentage(Number(e.target.value))}/><div className="percentage-presets">{[0,25,50,75,100].map(p=><button type="button" key={p} className={percentage===p?"active":""} disabled={!balances.data?.fresh||busy} onClick={()=>setPercentage(p)}>{p}%</button>)}</div>{sizeBusy?<small>Hoeveelheid berekenen…</small>:sized&&percentage!==null?<small>{sized.percent}% van {fmt(sized.available)} {sized.currency} = {fmt(sized.quantity)} {base}.{side==="buy"?" Inclusief ruimte voor fees en je prijsgrens.":" Afgerond op de OKX-stapgrootte."}{sized.below_minimum&&" Onder het minimum voor deze markt."}</small>:<small>Kopen gebruikt EUR. Verkopen gebruikt {base}. Funding-saldo wordt niet meegerekend.</small>}{sizeError&&<small className="order-error">{sizeError}</small>}</div>
+-        {["limit","post_only","ioc","fok"].includes(kind)&&<>{price("price","Limietprijs")}<small className="order-chart-price" role="status">{pickedPrice?`Grafiekprijs overgenomen: € ${fmt(pickedPrice)}`:"Klik in de koersgrafiek om je limietprijs te kiezen."}</small><button type="button" className="order-bbo" onClick={()=>set("price",String(market.books[symbol]?.[side==="buy"?"bids":"asks"][0][0]||""))}>Gebruik beste {side==="buy"?"bied":"laat"}prijs</button></>}
++        <div className="order-percentage"><label htmlFor="order-percentage">Gebruik {percentage===null?"een percentage":`${percentage}%`} van beschikbaar {side==="buy"?quote:base}</label><input id="order-percentage" aria-label="Percentage van beschikbaar saldo" type="range" min="0" max="100" step="1" value={percentage??0} disabled={!balances.data?.fresh||busy} onChange={e=>setPercentage(Number(e.target.value))}/><div className="percentage-presets">{[0,25,50,75,100].map(p=><button type="button" key={p} className={percentage===p?"active":""} disabled={!balances.data?.fresh||busy} onClick={()=>setPercentage(p)}>{p}%</button>)}</div>{sizeBusy?<small>Hoeveelheid berekenen…</small>:sized&&percentage!==null?<small>{sized.percent}% van {fmt(sized.available)} {sized.currency} = {fmt(sized.quantity)} {base}.{side==="buy"?" Inclusief ruimte voor fees en je prijsgrens.":" Afgerond op de OKX-stapgrootte."}{sized.below_minimum&&" Onder het minimum voor deze markt."}</small>:<small>Kopen gebruikt {quote}. Verkopen gebruikt {base}. Funding-saldo wordt niet meegerekend.</small>}{sizeError&&<small className="order-error">{sizeError}</small>}</div>
++        {["limit","post_only","ioc","fok"].includes(kind)&&<>{price("price","Limietprijs")}<small className="order-chart-price" role="status">{pickedPrice?`Grafiekprijs overgenomen: ${fmt(pickedPrice)} ${quote}`:"Klik in de koersgrafiek om je limietprijs te kiezen."}</small><button type="button" className="order-bbo" onClick={()=>set("price",String(market.books[symbol]?.[side==="buy"?"bids":"asks"][0][0]||""))}>Gebruik beste {side==="buy"?"bied":"laat"}prijs</button></>}
+         {kind==="market"&&<>{side==="buy"?numeric("slippage","Maximale slippage (%)",0,5,0.01):<p className="order-help">Een marktverkoop heeft geen gegarandeerde minimumprijs. Kies een limietorder voor een vaste prijsgrens.</p>}</>}
+-        {kind==="trigger"&&<>{price("trigger","Triggerprijs")}{select("execution","Order na trigger",[["market","Marktorder"],["limit","Limietorder"],["ioc","IOC"],["fok","FOK"]])}{fields.execution!=="market"&&<>{price("price","Orderprijs na trigger")}<small className="order-chart-price" role="status">{pickedPrice?`Grafiekprijs overgenomen: € ${fmt(pickedPrice)}`:"Klik in de koersgrafiek om je orderprijs te kiezen."}</small></>}<p className="order-help">Triggerbron: laatste handelsprijs. Mark/index zijn alleen voor derivaten.</p></>}
++        {kind==="trigger"&&<>{price("trigger","Triggerprijs")}{select("execution","Order na trigger",[["market","Marktorder"],["limit","Limietorder"],["ioc","IOC"],["fok","FOK"]])}{fields.execution!=="market"&&<>{price("price","Orderprijs na trigger")}<small className="order-chart-price" role="status">{pickedPrice?`Grafiekprijs overgenomen: ${fmt(pickedPrice)} ${quote}`:"Klik in de koersgrafiek om je orderprijs te kiezen."}</small></>}<p className="order-help">Triggerbron: laatste handelsprijs. Mark/index zijn alleen voor derivaten.</p></>}
+         {kind==="tp_sl"&&<><fieldset><legend>Take-profit (optioneel)</legend>{price("tpTrigger","TP-triggerprijs",false)}{select("tpMethod","TP-uitvoering",[["market","Markt"],["limit","Limiet"]])}{fields.tpTrigger&&fields.tpMethod==="limit"&&price("tpLimit","TP-orderprijs")}</fieldset><fieldset><legend>Stop-loss (optioneel)</legend>{price("slTrigger","SL-triggerprijs",false)}{select("slMethod","SL-uitvoering",[["market","Markt"],["limit","Limiet"]])}{fields.slTrigger&&fields.slMethod==="limit"&&price("slLimit","SL-orderprijs")}</fieldset></>}
+-        {kind==="trailing"&&<>{select("callbackUnit","Trailing-afstand",[["ratio","Percentage"],["price","Vaste prijsafstand (EUR)"]])}{fields.callbackUnit==="ratio"?numeric("callback","Terugval (%)",0.01,100,0.01):price("callback","Terugval (EUR)")}{price("activation","Activatieprijs (optioneel)",false)}</>}
++        {kind==="trailing"&&<>{select("callbackUnit","Trailing-afstand",[["ratio","Percentage"],["price",`Vaste prijsafstand (${quote})`]])}{fields.callbackUnit==="ratio"?numeric("callback","Terugval (%)",0.01,100,0.01):price("callback",`Terugval (${quote})`)}{price("activation","Activatieprijs (optioneel)",false)}</>}
+         {(kind==="iceberg"||kind==="twap")&&<>{amount("slice","Hoeveelheid per deelorder")}{price("priceLimit",side==="buy"?"Maximale koopprijs":"Minimale verkoopprijs")}</>}
+         {kind==="iceberg"&&<>{numeric("visible","Aantal zichtbare orders",1,100,1)}{select("aggression","Uitvoersnelheid",[["conservative","Passief in het orderboek"],["mid","Balans tussen prijs en snelheid"],["radical","Snelle uitvoering"]])}{select("start","Startvoorwaarde",[["instant","Direct starten"],["price","Bij een prijs"],["rsi","Bij RSI"]])}{fields.start==="price"&&price("startPrice","Startprijs")}{fields.start!=="instant"&&select("condition","Start wanneer",fields.start==="price"?[["cross_up","Prijs kruist omhoog"],["cross_down","Prijs kruist omlaag"]]:[["cross_up","RSI kruist omhoog"],["cross_down","RSI kruist omlaag"],["above","RSI is hoger"],["below","RSI is lager"],["cross","RSI kruist"]])}{fields.start==="rsi"&&<>{select("timeframe","RSI-interval",["3m","5m","15m","30m","1H","4H","1D"].map(v=>[v,v]))}{numeric("threshold","RSI-drempel",1,100,1)}<small>RSI-periode: 14 bij OKX.</small></>}</>}
+-        {kind==="twap"&&<>{numeric("interval","Interval tussen delen (seconden)",1,86400,1)}{select("varianceUnit","Prijsruimte per deel",[["ratio","Percentage"],["price","Vaste prijsafstand (EUR)"]])}{fields.varianceUnit==="ratio"?numeric("variance","Prijsruimte (%)",0.01,1,0.01):price("variance","Prijsruimte (EUR)")}</>}
++        {kind==="twap"&&<>{numeric("interval","Interval tussen delen (seconden)",1,86400,1)}{select("varianceUnit","Prijsruimte per deel",[["ratio","Percentage"],["price",`Vaste prijsafstand (${quote})`]])}{fields.varianceUnit==="ratio"?numeric("variance","Prijsruimte (%)",0.01,1,0.01):price("variance",`Prijsruimte (${quote})`)}</>}
+         {side==="buy"&&<fieldset><legend>Bescherming na aankoop</legend>{price("protectStop","Beschermende stopprijs")}{price("protectTarget","Beschermend koersdoel (optioneel)",false)}<small>De uitvoering moet ook gedeeltelijke aankopen aantoonbaar beschermen.</small></fieldset>}
+-        <button className={`order-review ${side}`} disabled={busy||sizeBusy||(percentage!==null&&(!sized||sized.below_minimum))||!symbol.endsWith("-EUR")} type="submit">{busy?"Controleren…":"Order controleren"}</button>
++        <button className={`order-review ${side}`} disabled={busy||sizeBusy||(percentage!==null&&(!sized||sized.below_minimum))} type="submit">{busy?"Controleren…":"Order controleren"}</button>
+         <small className="order-help">Controleren maakt een preview. Het plaatst nog geen order bij OKX.</small>
+-      </form>:<p className="order-notice">EUR-spotorders kun je hier voorbereiden. Andere betaalvaluta’s wachten op de uitbreiding van de handelsroute.</p>}
+-      <details ref={limitsRef} className="order-account"><summary>Account en handelslimieten</summary><Limits mode={mode} gateway={status.data} instruments={(status.data?.snapshot?.tradable||[]).filter(id=>id.endsWith("-EUR"))} onSaved={()=>qc.invalidateQueries({queryKey:["gateway",mode]})}/></details>
++      </form>
++      <details ref={limitsRef} className="order-account"><summary>Account en handelslimieten</summary><Limits mode={mode} gateway={status.data} instruments={(status.data?.snapshot?.tradable||[]).filter(id=>id.endsWith("-EUR")||id.endsWith("-USDC"))} onSaved={()=>qc.invalidateQueries({queryKey:["gateway",mode]})}/></details>
+       <details className="order-history" open><summary>Mijn OKX-orders · {orders.data?.orders.length||0}</summary>{orders.isError&&<p className="order-error">{String(orders.error)}</p>}{orders.data?.orders.map(o=><div className="native-order" key={o.client_id}><strong>{o.ticket.side==="buy"?"Koop":"Verkoop"} {o.ticket.instrument}</strong><span>{label[o.state]||o.state}</span><small>{o.ticket.order.type} · {fmt(o.filled)} / {fmt(o.quantity)}</small>{o.reason&&<p>{o.reason}</p>}{!["FILLED","CANCELED","REJECTED"].includes(o.state)&&<button disabled={busy} onClick={()=>run(async()=>{await post("/api/trading/cancel",{mode,client_id:o.client_id});setMessage("Annulering aangevraagd.");})}>Annuleren</button>}</div>)}{orders.data&&!orders.data.orders.length&&<p className="order-help">Nog geen orders vanuit deze terminal in deze omgeving.</p>}</details>
+       <details className="order-history"><summary>Uitvoeringen en fees · {activity.data?.fills.length||0}</summary>{activity.data?.fills.map(f=><div className="native-order" key={f.bill_id}><strong>{f.side==="buy"?"Koop":"Verkoop"} {f.instrument}</strong><small>{fmt(f.quantity)} tegen € {fmt(f.price)}</small><small>Fee / rebate: {fmt(f.fee)} {f.fee_currency}</small></div>)}{activity.data&&!activity.data.fills.length&&<p className="order-help">Nog geen bevestigde OKX-uitvoeringen.</p>}</details>
+       <details className="order-history"><summary>Bescherming · {activity.data?.protection.length||0}</summary>{activity.data?.protection.map(p=><div className="native-order" key={p.client_id}><strong>{p.state==="ACTIVE"?"Actieve stop bij OKX":p.state}</strong><small>Hoeveelheid: {fmt(p.quantity)}</small></div>)}<p className="order-help">Een ontvangen aanvraag is nog geen actieve stop. Bij onzekere bescherming blokkeert de gateway nieuwe aankopen.</p></details>
+       {message&&<p role="status" className="order-error">{message}</p>}
+     </div>
+-    {preview&&<div className="order-modal-backdrop"><section className="order-modal" role="dialog" aria-modal="true" aria-label="Orderpreview"><h3>{preview.mode==="LIVE"?"Live-order controleren · echt geld":"OKX Demo-order controleren"}</h3><dl><dt>Instrument</dt><dd>{preview.ticket.instrument}</dd><dt>Richting</dt><dd>{preview.ticket.side==="buy"?"Kopen":"Verkopen"}</dd><dt>Hoeveelheid</dt><dd>{fmt(preview.ticket.quantity)} {base}</dd><dt>Ordertype</dt><dd>{preview.kind}</dd><dt>Geschatte waarde</dt><dd>€ {fmt(preview.estimated_notional)}</dd><dt>Prijsreferentie / limiet</dt><dd>€ {fmt(preview.price_bound)}</dd><dt>Geldig</dt><dd>{Math.max(0,Math.ceil((preview.expires_ms-now)/1000))} seconden</dd></dl><p>{preview.warning}</p>{preview.blocked.length>0&&<div className="order-notice"><strong>Nog nodig om te verzenden</strong><ul>{preview.blocked.map(v=><li key={v}>{v}</li>)}</ul></div>}<div className="order-modal-actions"><button onClick={()=>setPreview(undefined)} disabled={busy}>Terug naar order</button><button className="order-review" disabled={busy||!preview.can_submit||now>=preview.expires_ms} onClick={()=>run(async()=>{const r=await post<{message:string}>("/api/trading/submit",{preview_id:preview.preview_id,confirmed:true});setPreview(undefined);setMessage(r.message);})}>{preview.mode==="LIVE"?"Bevestigen en naar OKX Live":"Bevestigen en naar OKX Demo"}</button></div></section></div>}
++    {preview&&<div className="order-modal-backdrop"><section className="order-modal" role="dialog" aria-modal="true" aria-label="Orderpreview"><h3>{preview.mode==="LIVE"?"Live-order controleren · echt geld":"OKX Demo-order controleren"}</h3><dl><dt>Instrument</dt><dd>{preview.ticket.instrument}</dd><dt>Richting</dt><dd>{preview.ticket.side==="buy"?"Kopen":"Verkopen"}</dd><dt>Hoeveelheid</dt><dd>{fmt(preview.ticket.quantity)} {base}</dd><dt>Ordertype</dt><dd>{preview.kind}</dd><dt>Geschatte waarde</dt><dd>{fmt(preview.estimated_notional)} {quote}</dd><dt>Prijsreferentie / limiet</dt><dd>{fmt(preview.price_bound)} {quote}</dd><dt>Geldig</dt><dd>{Math.max(0,Math.ceil((preview.expires_ms-now)/1000))} seconden</dd></dl><p>{preview.warning}</p>{preview.blocked.length>0&&<div className="order-notice"><strong>Nog nodig om te verzenden</strong><ul>{preview.blocked.map(v=><li key={v}>{v}</li>)}</ul></div>}<div className="order-modal-actions"><button onClick={()=>setPreview(undefined)} disabled={busy}>Terug naar order</button><button className="order-review" disabled={busy||!preview.can_submit||now>=preview.expires_ms} onClick={()=>run(async()=>{const r=await post<{message:string}>("/api/trading/submit",{preview_id:preview.preview_id,confirmed:true});setPreview(undefined);setMessage(r.message);})}>{preview.mode==="LIVE"?"Bevestigen en naar OKX Live":"Bevestigen en naar OKX Demo"}</button></div></section></div>}
+   </section>;
+ }
+ 
+@@ -185,7 +185,7 @@
+     <label>Totaal handelsbudget (EUR)<input aria-label="Totaal handelsbudget (EUR)" type="number" min="0.000001" step="any" required disabled={busy} placeholder="Bijvoorbeeld 500" value={values.capital||""} onChange={e=>change("capital",e.target.value)}/></label>
+     <div className="limits-profile"><strong>{custom?"Startprofiel met eigen aanpassingen":"Startprofiel · automatisch invullen"}</strong><p>Vul je handelsbudget in. De overige waarden rekenen mee. Zelf aangepaste velden blijven behouden als je het budget wijzigt.</p>{suggestions?<p className="limits-summary">Order: € {fmt(values.max_order)} · Risico: € {fmt(values.trade_risk)} · Dagverlies: € {fmt(values.daily_loss)}</p>:<p className="order-help">Gebruik een positief bedrag zoals 500 of 500,50 om de voorbeeldwaarden te berekenen.</p>}<button type="button" className="order-secondary" disabled={busy||!suggestions} onClick={()=>{setDraft(old=>applyLimitSuggestions(old));setConfirmed(false);setMessage("");}}>Startprofiel opnieuw invullen</button><small>Dit zijn aanpasbare voorbeeldwaarden voor je handelsplan.</small></div>
+     {limitFields.map(field=><label key={field.key}>{field.title}<input aria-label={field.title} type="number" min={field.kind==="integer"?"1":"0.00000001"} max={field.kind==="money"?values.capital:field.max} step={field.kind==="integer"?"1":"any"} required disabled={busy} value={values[field.key]||""} onChange={e=>change(field.key,e.target.value)}/><small className={`limits-field-hint ${draft.manual[field.key]?"custom":""}`}>{draft.manual[field.key]?"Zelf aangepast · blijft behouden bij budgetwijziging":field.hint}</small></label>)}
+-    <fieldset><legend>Bevestigde spotmarkten · {chosen.length} gekozen</legend><input aria-label="Zoek markt in handelslimieten" placeholder="Bijvoorbeeld BTC of ETH" value={marketSearch} onChange={e=>setMarketSearch(e.target.value)}/><small>{instruments.length} EUR-markten beschikbaar bij OKX. Je huidige handelsprofiel accepteert maximaal 12 tegelijk.</small>{instruments.filter(id=>id.toLowerCase().includes(marketSearch.toLowerCase().replaceAll("/","-"))).slice(0,40).map(id=><label className="order-check" key={id}><input type="checkbox" disabled={busy} checked={chosen.includes(id)} onChange={e=>{setChosen(e.target.checked?[...chosen,id]:chosen.filter(v=>v!==id));setConfirmed(false);}}/>{id}</label>)}{instruments.length>40&&<small>Zoek om andere EUR-markten te kiezen.</small>}{!chosen.length&&<small>Kies ten minste één markt om je handelslimieten te bevestigen.</small>}</fieldset>
++    <fieldset><legend>Bevestigde spotmarkten · {chosen.length} van {instruments.length}</legend><input aria-label="Zoek markt in handelslimieten" placeholder="Bijvoorbeeld BTC of USDC" value={marketSearch} onChange={e=>setMarketSearch(e.target.value)}/><div className="market-selection-actions"><button type="button" disabled={busy||!instruments.length} onClick={()=>{setChosen([...instruments]);setConfirmed(false);}}>Alle beschikbare spotmarkten kiezen</button><button type="button" disabled={busy} onClick={()=>{setChosen([]);setConfirmed(false);}}>Selectie wissen</button></div>{instruments.filter(id=>id.toLowerCase().includes(marketSearch.toLowerCase().replaceAll("/","-"))).slice(0,60).map(id=><label className="order-check" key={id}><input type="checkbox" disabled={busy} checked={chosen.includes(id)} onChange={e=>{setChosen(e.target.checked?[...chosen,id]:chosen.filter(v=>v!==id));setConfirmed(false);}}/>{id}</label>)}{instruments.length>60&&<small>Zoek om andere markten te kiezen. Alle kiezen omvat de volledige accountlijst; je bevestigt de keuze hieronder.</small>}{!chosen.length&&<small>Kies ten minste één markt om je handelslimieten te bevestigen.</small>}</fieldset>
+     <label className="order-check"><input type="checkbox" disabled={busy} checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/>Ik bevestig dit account, deze markten, dit budget en alle limieten voor {mode==="LIVE"?"echt geld":"OKX Demo"}.</label>
+     <button type="submit" disabled={busy||!confirmed||!chosen.length||!gateway?.snapshot?.uid}>Limieten bevestigen</button>{message&&<p role="status">{message}</p>}
+   </form>;

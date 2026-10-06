@@ -24,10 +24,9 @@ export default function Operations() {
     <section className="studio-page" style={{ height: "auto" }}>
       <div className="studio-title">
         <div>
-          <h2>Bedrijf en vrijgave</h2>
+          <h2>Opslag, toegang en vrijgave</h2>
           <p>
-            Werkelijke gereedheid. Een ontbrekende bevestiging activeert geen
-            handel.
+            Controleer de lokale opslag, toegang en gereedheid voor uitvoering.
           </p>
         </div>
         <span className="pill">LOKAAL</span>
@@ -58,7 +57,8 @@ export default function Operations() {
             {d?.storage_alert
               ? "Opslagstatus vraagt controle."
               : "Opslag onder waarschuwingsdrempel."}{" "}
-            Bij 95% bezetting of een onbekende opslagmeting pauzeren nieuwe entries. Stops blijven actief.
+            Bij 95% bezetting of een onbekende opslagmeting pauzeren nieuwe
+            entries. Stops blijven actief.
           </p>
           <p>
             Backups worden lokaal versleuteld met AES-256-GCM. De sleutel blijft
@@ -71,7 +71,7 @@ export default function Operations() {
           <p>
             {d?.authentication.configured
               ? "Wachtwoordbeveiliging actief, HttpOnly-sessie verloopt na 8 uur."
-              : "Alleen localhost. Optionele wachtwoordbeveiliging kan via de lokale setup worden ingesteld."}
+              : "Alleen localhost. Stel een wachtwoord in via Beveilig terminal.command in de projectmap."}
           </p>
           <p>
             Geen publieke poort, clouddeployment of Docker-socket in de app.

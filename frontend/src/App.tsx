@@ -1,3 +1,5 @@
+import OrderTicket from "./OrderTicket";
+import type { ChartPricePick } from "./chart-price";
 import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -7,7 +9,6 @@ import {
   ArrowUpRight,
   BarChart3,
   Blocks,
-  Check,
   ChevronDown,
   ChevronRight,
   Code2,
@@ -15,7 +16,6 @@ import {
   Download,
   Expand,
   FlaskConical,
-  LockKeyhole,
   Newspaper,
   Search,
   ShieldCheck,
@@ -29,21 +29,22 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import ChartWorkspace from "./ChartWorkspace";
+import { timeframes, timeframeGroups } from "./timeframes";
 import Research from "./Research";
-import Evaluation from "./Evaluation";
+import BotOverview from "./BotOverview";
 import Operations from "./Operations";
+import SystemSettings from "./SystemSettings";
 const PineEditor = lazy(() =>
   import("./Studio").then((m) => ({ default: m.PineEditor })),
 );
-const BotStudio = lazy(() =>
-  import("./Studio").then((m) => ({ default: m.BotStudio })),
-);
+const BotStudio = lazy(() => import("./BotStudio"));
 const Alerts = lazy(() =>
   import("./Studio").then((m) => ({ default: m.Alerts })),
 );
 import "./studio.css";
-import PaperWorkspace from "./Paper";
+
 import { api } from "./types";
+import { post } from "./studio-ui";
 import type { Candles, Market, Snapshot, Status, Ticker } from "./types";
 import { usePreferences } from "./store";
 const pages: { name: string; icon: LucideIcon; phase?: number }[] = [
@@ -51,9 +52,7 @@ const pages: { name: string; icon: LucideIcon; phase?: number }[] = [
   { name: "Alerts", icon: Bell },
   { name: "Screener", icon: Activity },
   { name: "Pine Editor", icon: Code2 },
-  { name: "Paper", icon: ShieldCheck },
   { name: "Bot Studio", icon: Blocks },
-  { name: "Backtests", icon: FlaskConical },
   { name: "Nieuws", icon: Newspaper },
   { name: "Systeem", icon: SlidersHorizontal },
 ];
@@ -161,6 +160,16 @@ export function TerminalApp() {
   const pref = usePreferences();
   const { symbol, bar, set, light, timezone } = pref;
   const [page, setPage] = useState("Terminal");
+  const [chartPrice, setChartPrice] = useState<ChartPricePick>();
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [page]);
+  useEffect(() => {
+    const handle = (event: Event) =>
+      setPage((event as CustomEvent<string>).detail);
+    window.addEventListener("okx-navigate", handle);
+    return () => window.removeEventListener("okx-navigate", handle);
+  }, []);
   const [bottom, setBottom] = useState("Marktgegevens");
   const [search, setSearch] = useState("");
   const [palette, setPalette] = useState(false);
@@ -169,7 +178,10 @@ export function TerminalApp() {
   const [dock, setDock] = useState(localStorage.getItem("okx-dock") || "right");
   const dragged = useRef<string | null>(null);
   const chartRef = useRef<HTMLElement>(null);
-  const { market, connected, received } = useMarket();
+  const { market: activeMarket, connected, received } = useMarket();
+  const catalogue=useQuery({queryKey:["spot-catalogue"],queryFn:()=>api<{instruments:Market["instruments"]}>("/api/markets"),refetchInterval:q=>q.state.data?.instruments.length?60000:1000});
+  const market={...activeMarket,instruments:catalogue.data?.instruments.length?catalogue.data.instruments:activeMarket.instruments};
+  useEffect(()=>{if(market.instruments.some(i=>i.instId===symbol))post("/api/markets/watch",{instrument:symbol}).catch(()=>{});},[symbol,catalogue.data]);
   const status = useQuery({
     queryKey: ["status"],
     queryFn: () => api<Status>("/api/status"),
@@ -192,7 +204,7 @@ export function TerminalApp() {
   }, [light]);
   useEffect(() => {
     if (
-      market.instruments.length &&
+      catalogue.data?.instruments.length &&
       !market.instruments.some((i) => i.instId === symbol)
     )
       set({ symbol: market.instruments[0].instId });
@@ -227,9 +239,8 @@ export function TerminalApp() {
     age !== null &&
     age < 15000 &&
     Number(ticker?.ts) <= now + (status.data?.clock_offset_ms || 0) + 3000;
-  const quotes = market.instruments.filter((i) =>
-    i.instId.toLowerCase().includes(search.toLowerCase()),
-  );
+  const matches=market.instruments.filter(i=>i.instId.toLowerCase().includes(search.toLowerCase().replaceAll("/","-").replaceAll(" ","")));
+  const quotes=(search?matches:market.instruments.filter(i=>activeMarket.instruments.some(a=>a.instId===i.instId))).slice(0,60);
   const buy = book?.bids[0]?.[0],
     sell = book?.asks[0]?.[0];
   const spread = buy && sell ? Number(sell) - Number(buy) : null;
@@ -356,7 +367,7 @@ export function TerminalApp() {
         )}
         {page === "Terminal" ? (
           <div
-            className={`terminal-grid ${hideList ? "no-list" : ""} dock-${dock}`}
+            className={`terminal-grid ${hideList ? "no-list" : ""} dock-${dock} ${bottom === "Bots" ? "bot-monitor" : ""}`}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => {
               if (!dragged.current) return;
@@ -396,6 +407,7 @@ export function TerminalApp() {
                   <span>Prijs / 24u</span>
                 </div>
                 <div className="watch-rows">
+                  {search&&matches.length>60&&<small>Toont 60 van {matches.length}. Zoek specifieker.</small>}
                   {quotes.map((i) => (
                     <button
                       className={`watch-row ${i.instId === symbol ? "selected" : ""}`}
@@ -482,17 +494,43 @@ export function TerminalApp() {
                 </div>
               </div>
               <div className="chart-toolbar">
-                <div className="timeframes">
-                  {["1m", "5m", "15m", "1H", "4H", "1Dutc"].map((t) => (
-                    <button
-                      className={bar === t ? "selected" : ""}
-                      onClick={() => set({ bar: t })}
-                      key={t}
-                    >
-                      {t === "1Dutc" ? "1D" : t}
-                    </button>
-                  ))}
+                <div
+                  className="timeframes"
+                  role="group"
+                  aria-label="Snelle tijdframes"
+                >
+                  {timeframes
+                    .filter((t) => t.quick)
+                    .map((t) => (
+                      <button
+                        className={bar === t.value ? "selected" : ""}
+                        aria-pressed={bar === t.value}
+                        title={t.name}
+                        onClick={() => set({ bar: t.value })}
+                        key={t.value}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
                 </div>
+                <select
+                  className="timeframe-select"
+                  aria-label="Alle tijdframes"
+                  value={bar}
+                  onChange={(e) => set({ bar: e.target.value })}
+                >
+                  {timeframeGroups.map((group) => (
+                    <optgroup key={group} label={group}>
+                      {timeframes
+                        .filter((t) => t.group === group)
+                        .map((t) => (
+                          <option key={t.value} value={t.value}>
+                            {t.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ))}
+                </select>
                 <span className="separator" />
                 <select
                   aria-label="Grafiektype"
@@ -565,6 +603,7 @@ export function TerminalApp() {
                   <ChartWorkspace
                     data={data}
                     tickSize={instrument?.tickSz || "0.01"}
+                    onPricePick={setChartPrice}
                   />
                 ) : (
                   <div className="chart-empty">
@@ -707,59 +746,31 @@ export function TerminalApp() {
                   </span>
                 </div>
               </section>
-              <section className="execution panel">
-                <div className="panel-title">
-                  <strong>Orderuitvoering</strong>
-                  <LockKeyhole size={14} />
-                </div>
-                <div className="execution-content">
-                  <div className="locked-icon">
-                    <ShieldCheck size={25} />
-                  </div>
-                  <h3>De risicokern beslist.</h3>
-                  <p>
-                    De paperadapter voert uitsluitend door de vaste risicokern
-                    goedgekeurde orders uit. Controleer budget, prijs en stop in
-                    de preview.
-                  </p>
-                  <div className="gate-row">
-                    <Check size={13} />
-                    <span>Geen live-orderpad in deze build</span>
-                  </div>
-                  <div className="gate-row muted">
-                    <LockKeyhole size={13} />
-                    <span>Virtuele budgetten eerst bewust bevestigen</span>
-                  </div>
-                  <button
-                    onClick={() => setPage("Paper")}
-                    className="paper-primary"
-                  >
-                    <ShieldCheck size={14} /> Open paperhandel
-                  </button>
-                  <small>
-                    Verlieslimieten zijn actiedrempels, geen verliesgarantie.
-                  </small>
-                </div>
-              </section>
+              <section className="execution panel"><OrderTicket market={market} symbol={symbol} chartPrice={chartPrice} openSettings={() => setPage("Systeem")} /></section>
             </aside>
             <section className="bottom-panel panel">
               <div className="bottom-tabs">
-                {["Marktgegevens", "Transactiestroom", "Risicocontroles"].map(
-                  (b) => (
-                    <button
-                      className={bottom === b ? "active" : ""}
-                      key={b}
-                      onClick={() => setBottom(b)}
-                    >
-                      {b}
-                    </button>
-                  ),
-                )}
+                {[
+                  "Marktgegevens",
+                  "Bots",
+                  "Transactiestroom",
+                  "Risicocontroles",
+                ].map((b) => (
+                  <button
+                    className={bottom === b ? "active" : ""}
+                    key={b}
+                    onClick={() => setBottom(b)}
+                  >
+                    {b}
+                  </button>
+                ))}
                 <span className="bottom-caption">
                   {symbol} <span className="muted">/ Publieke data</span>
                 </span>
               </div>
-              {bottom === "Marktgegevens" ? (
+              {bottom === "Bots" ? (
+                <BotOverview compact />
+              ) : bottom === "Marktgegevens" ? (
                 <div className="market-details">
                   <div>
                     <small>Tick size</small>
@@ -920,26 +931,16 @@ export function TerminalApp() {
           <Suspense fallback={<p>Alerts laden…</p>}>
             <Alerts />
           </Suspense>
-        ) : page === "Paper" ? (
-          <PaperWorkspace market={market} />
         ) : page === "Bot Studio" ? (
           <Suspense fallback={<p>Bot Studio laden…</p>}>
             <BotStudio market={market} />
           </Suspense>
-        ) : page === "Backtests" ? (
-          <div style={{ overflow: "auto", height: "100%" }}>
-            <PaperWorkspace market={market} view="replay" />
-            <Evaluation />
-          </div>
         ) : page === "Systeem" ? (
-          <div style={{ overflow: "auto", height: "100%" }}>
-            <System
-              status={status.data}
-              error={status.isError}
-              streamFresh={streamFresh}
-            />
-            <Operations />
-          </div>
+          <SystemWorkspace
+            status={status.data}
+            error={status.isError}
+            streamFresh={streamFresh}
+          />
         ) : (
           <p>Werkruimte niet gevonden.</p>
         )}
@@ -1024,6 +1025,48 @@ export function TerminalApp() {
     </div>
   );
 }
+function SystemWorkspace(props: {
+  status: Status | undefined;
+  error: boolean;
+  streamFresh: boolean;
+}) {
+  const [view, setView] = useState("connections");
+  return (
+    <div className="system-workspace">
+      <div className="system-tabs" role="group" aria-label="Systeemweergave">
+        <button
+          aria-pressed={view === "connections"}
+          onClick={() => setView("connections")}
+        >
+          Aansluitingen & AI
+        </button>
+        <button
+          aria-pressed={view === "status"}
+          onClick={() => setView("status")}
+        >
+          Status & bescherming
+        </button>
+      </div>
+      {view === "connections" ? (
+        <section className="system-connections-page">
+          <div className="system-heading">
+            <span className="eyebrow">JOUW AANSLUITINGEN</span>
+            <h2>Sleutels, providers en controle.</h2>
+            <p>
+              Beheer je OKX-sleutels en bepaal welke Jev jouw terminal gebruikt.
+            </p>
+          </div>
+          <SystemSettings />
+        </section>
+      ) : (
+        <>
+          <System {...props} />
+          <Operations />
+        </>
+      )}
+    </div>
+  );
+}
 function System({
   status: s,
   error,
@@ -1033,14 +1076,16 @@ function System({
   error: boolean;
   streamFresh: boolean;
 }) {
+  const gateway=useQuery({queryKey:["gateway","OKX_DEMO"],queryFn:()=>api<{gateway_fresh:boolean;status:string;reason:string;snapshot?:{uid:string;connected:boolean}}>("/api/trading?mode=OKX_DEMO"),refetchInterval:3000});
+  const live=useQuery({queryKey:["gateway","LIVE"],queryFn:()=>api<{gateway_fresh:boolean;reason:string;snapshot?:{live_enabled:boolean}}>("/api/trading?mode=LIVE"),refetchInterval:3000});
+  const liveBalances=useQuery({queryKey:["okx-balances","LIVE"],queryFn:()=>api<{fresh:boolean;reason:string}>("/api/trading/balances?mode=LIVE"),refetchInterval:3000});
   return (
     <div className="system">
       <div className="system-heading">
         <span className="eyebrow">LOKALE CONTROLEKAMER</span>
         <h2>Inzicht in elke verbinding.</h2>
         <p>
-          Gemeten status van deze lokale installatie. Echte handel is niet
-          vrijgegeven.
+          Gemeten status van je aansluitingen. Handmatige orders en Live-vrijgave vind je in de Terminal.
         </p>
       </div>
       <div className="system-grid">
@@ -1056,14 +1101,24 @@ function System({
             "PostgreSQL · lokale Docker-opslag",
           ],
           [
-            "Account",
-            "Niet geverifieerd",
-            "Regio, rechten en fees nog te controleren",
+            "OKX Demo-account",
+            gateway.data?.gateway_fresh&&gateway.data.snapshot?.connected?"Verbonden":"Nog niet verbonden",
+            gateway.data?.reason||"Aansluiting controleren",
           ],
           [
-            "Uitvoering",
+            "OKX Live-account",
+            liveBalances.data?.fresh?"Verbonden":"Nog niet verbonden",
+            liveBalances.data?.reason||"Saldi ophalen",
+          ],
+          [
+            "Handmatige Live-orders",
+            live.data?.gateway_fresh&&live.data.snapshot?.live_enabled?"Vrijgegeven":"Nog te bevestigen",
+            live.data?.reason||"Aansluiting controleren",
+          ],
+          [
+            "Paperbots",
             "PAPER_LOCAL",
-            "Lokale simulatie; geen exchange-orderadapter",
+            "Bots gebruiken virtueel geld. Handmatige orders hebben een eigen omgeving.",
           ],
         ].map(([title, value, detail]) => (
           <section className="system-card panel" key={title}>
@@ -1114,7 +1169,7 @@ function System({
           "Accountregio, instrumentrechten en actuele fees vaststellen",
           "Verplichte account- en botlimieten expliciet invullen",
           "Paper risk/OMS getest; private reconcile moet nog met jouw Demo-account worden geaccepteerd",
-          "Paper en OKX Demo isoleren en foutinjectie doorlopen",
+          "Native orders: lokaal geteste contracten; echte Demo-acceptatie volgt na aansluiten",
           "Beveiligingsreview en bewuste vrijgave voor LIVE",
         ].map((x, i) => (
           <div className="system-gate" key={x}>

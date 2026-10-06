@@ -1,0 +1,44 @@
+{
+  "instrument": "BTC-EUR",
+  "bar": "15m",
+  "ok": true,
+  "bars": 299,
+  "duration_ms": 292.6,
+  "diagnostics": [],
+  "source_sha256": "662c564d49a35f71a0aeaf6971bff20dc0b48b2301e58ae2cf60b3a9f7e88299",
+  "plots": [
+    {
+      "title": "Dalend signaal",
+      "bars": 299,
+      "events": 8,
+      "observed_values": [
+        0,
+        7,
+        8,
+        9,
+        11,
+        12,
+        13
+      ]
+    },
+    {
+      "title": "Stijgend signaal",
+      "bars": 299,
+      "events": 23,
+      "observed_values": [
+        0,
+        7,
+        8,
+        9,
+        11,
+        12
+      ]
+    }
+  ],
+  "intents": [],
+  "stored_name": "913sig OKX",
+  "stored_version": 1,
+  "stored_display": "pane",
+  "stored_kind": "indicator",
+  "source_verified_after_save": true
+}

@@ -584,3 +584,58 @@ fn distinct_position_count_includes_pending_entries() {
             .contains("OPEN_POSITION_LIMIT")
     );
 }
+
+#[test]
+fn candle_exit_is_durable_retries_stale_quotes_and_blocks_entries() {
+    let (mut p, mut q, id) = entered();
+    p.bots.get_mut("manual").unwrap().running = true;
+    p.candle_halt("manual", true, true, NOW + 600).unwrap();
+    assert!(!p.bots["manual"].running);
+    p = serde_json::from_value(serde_json::to_value(&p).unwrap()).unwrap();
+    p.tick(&qs(&q), NOW + 10000);
+    assert!(p.positions[&id].closing_order.is_none());
+    assert!(p.bot_exits.contains("manual"));
+    q.ts = NOW + 10001;
+    q.received_ms = q.ts;
+    assert!(
+        p.submit(intent("forbidden"), &q, q.ts)
+            .unwrap_err()
+            .to_string()
+            .contains("BOT_EXIT_IN_PROGRESS")
+    );
+    p.tick(&qs(&q), q.ts);
+    assert!(p.positions[&id].closing_order.is_some());
+    p.tick(&qs(&q), q.ts + 500);
+    p.tick(&qs(&q), q.ts + 501);
+    p.tick(&qs(&q), q.ts + 502);
+    assert_eq!(p.positions[&id].quantity, zero());
+    assert!(!p.bot_exits.contains("manual"));
+    assert!(!p.bots["manual"].running);
+}
+#[test]
+fn candle_pause_keeps_position_and_cancels_pending_entry() {
+    let (mut p, q, id) = entered();
+    p.candle_halt("manual", false, true, NOW + 600).unwrap();
+    p.tick(&qs(&q), NOW + 601);
+    assert_eq!(p.positions[&id].quantity, D::ONE);
+    assert!(!p.bot_exits.contains("manual"));
+    let mut p = account();
+    let id = p.submit(intent("pending"), &q, NOW).unwrap();
+    p.candle_halt("manual", true, true, NOW + 1).unwrap();
+    p.tick(&qs(&q), NOW + 600);
+    assert_eq!(p.orders[&id].state, OrderState::Canceled);
+    assert!(p.fills.is_empty());
+}
+#[test]
+fn candle_close_only_keeps_bot_running_and_old_storage_still_loads() {
+    let (mut p, q, id) = entered();
+    p.bots.get_mut("manual").unwrap().running = true;
+    p.candle_halt("manual", true, false, NOW + 600).unwrap();
+    p.tick(&qs(&q), NOW + 601);
+    assert!(p.bots["manual"].running);
+    assert!(p.positions[&id].closing_order.is_some());
+    let mut old = serde_json::to_value(account()).unwrap();
+    old.as_object_mut().unwrap().remove("bot_exits");
+    let restored: Paper = serde_json::from_value(old).unwrap();
+    assert!(restored.bot_exits.is_empty());
+}

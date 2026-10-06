@@ -1,5 +1,7 @@
 # Pine, Bot Studio, alerts en onderzoek · versie 0.4.0
 
+**Bediening vernieuwd op 5 oktober 2026:** zie [Pine en Bot Studio](BOT_STUDIO.md) voor de actuele geïntegreerde werkstroom. Onderstaande oorspronkelijke fasebeschrijving blijft als achtergrond; de losse Paper-/Backtestpagina’s zijn uit het menu gehaald.
+
 ## Pine
 
 Importeer toegestane `.pine`-bron of gebruik het educatieve SMA-voorbeeld. **Preview** voert de echte parser/runtime uit op maximaal 300 recente gesloten, aaneengesloten OKX-candles. AST-inputmetadata levert de parameterformulieren; een onbekende input of waarde buiten min/max wordt geweigerd. Geen handmatige JavaScript-conversie. Bewaar een immutable versie voor gebruik in een bot.
@@ -34,7 +36,7 @@ Vergelijking met/zonder Jev gebruikt werkelijk geregistreerde forward-paperdata.
 
 ## Jev en nieuws
 
-Model vast `typesafe/jev-1.13`, OpenRouter Decisions API. Geen gewone chatcompletion of automatische fallback. Drie modelkeuzes worden genormaliseerd in een intern envelope; werkelijk ontvangen confidence/probabilities/kosten worden behouden. Confidence is geen winstkans.
+Providerkeuze via **Systeem → Aansluitingen & AI**: TypeSafe direct (`jev-1.13.0`) of OpenRouter Decisions (`typesafe/jev-1.13`). Zie [Systeem-instellingen](SYSTEM_SETTINGS.md) voor sleutelbeheer en kostenverschillen. Geen gewone chatcompletion of automatische fallback. Drie modelkeuzes worden genormaliseerd in een intern envelope; werkelijk ontvangen confidence/probabilities/kosten worden behouden. Confidence is geen winstkans.
 
 Account-/botkostenlimieten, één gelijktijdige aanvraag, vooraf $0,005 reserve, 2,5 s deadline en een breaker na drie mislukkingen beschermen de route. Onbekende kosten houden hun reserve. Te laat, lage zekerheid (<0,8), gewijzigde rekening/candle/strategie of ongeldige output betekent geen AI-afhankelijke instap. Bescherming blijft zonder AI werken. Kostentelling per bot-id overleeft strategiewijzigingen.
 

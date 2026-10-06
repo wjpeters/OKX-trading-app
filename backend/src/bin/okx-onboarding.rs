@@ -1,4 +1,10 @@
-//! Separate private adapter, never linked by the PAPER_LOCAL terminal binary.
+#[path = "../order_risk.rs"]
+#[allow(dead_code)]
+mod order_risk;
+#[path = "../order_types.rs"]
+#[allow(dead_code)]
+mod order_types;
+// Separate private adapter, never linked by the PAPER_LOCAL terminal binary.
 #[path = "../exchange.rs"]
 #[allow(dead_code)]
 mod exchange;

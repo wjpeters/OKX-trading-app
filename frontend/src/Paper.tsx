@@ -13,7 +13,7 @@ import { api } from "./types";
 import type { Market } from "./types";
 import "./paper.css";
 
-type Limits = {
+export type Limits = {
   capital: string;
   trade_risk: string;
   daily_loss: string;
@@ -79,7 +79,7 @@ type Position = {
   closing_order: string | null;
   protection_state: string;
 };
-type Bot = {
+export type Bot = {
   id: string;
   name: string;
   instrument: string;
@@ -105,7 +105,7 @@ type Fill = {
   fee: string;
   ts: number;
 };
-type PaperAccount = {
+export type PaperAccount = {
   revision: number;
   limits: Limits;
   ledger: Ledger;
@@ -123,8 +123,9 @@ type PaperAccount = {
   valuation_fresh: boolean;
   heartbeat_ms: number;
   flatten: boolean;
+  bot_exits?: string[];
 };
-type PaperState = {
+export type PaperState = {
   account: PaperAccount | null;
   presets: { account: Limits; manual: Limits };
   worker_alive: boolean;
@@ -195,7 +196,7 @@ const active = (s: string) =>
     "PENDING_CANCEL",
     "UNKNOWN",
   ].includes(s);
-const preset = (capital: number): Limits => ({
+export const preset = (capital: number): Limits => ({
   capital: String(capital),
   trade_risk: String(capital * 0.01),
   daily_loss: String(capital * 0.03),
@@ -248,7 +249,7 @@ const otherFields: [keyof Limits, string, string][] = [
   ["orders_per_minute", "Instaporders per minuut", "aantal"],
   ["loss_streak", "Verliesreeks", "aantal"],
 ];
-function LimitsForm({
+export function LimitsForm({
   value,
   onChange,
   title,
@@ -431,7 +432,7 @@ export default function PaperWorkspace({
       {!state.data ? (
         <Empty>Paperomgeving laden…</Empty>
       ) : !account ? (
-        <Setup
+        <PaperSetup
           presets={state.data.presets}
           busy={busy || state.isError}
           onSetup={(a, m) =>
@@ -880,7 +881,7 @@ export default function PaperWorkspace({
     </div>
   );
 }
-function Setup({
+export function PaperSetup({
   presets,
   busy,
   onSetup,
@@ -903,7 +904,7 @@ function Setup({
       <div className="paper-setup-intro">
         <ShieldCheck size={24} />
         <div>
-          <h3>Stel je paperrisico vast</h3>
+          <h3>Maak je virtuele rekening aan</h3>
           <p>
             Start met virtueel kapitaal. Onderstaande waarden zijn bewerkbare
             voorstellen. De rekening wordt pas na jouw bevestiging aangemaakt.
@@ -911,8 +912,40 @@ function Setup({
           </p>
         </div>
       </div>
-      <LimitsForm title="Rekeninglimieten" value={a} onChange={setA} />
-      <LimitsForm title="Handmatig deelbudget" value={m} onChange={setM} />
+      <div className="bot-config-grid">
+        <label>
+          Virtueel startkapitaal (€)
+          <input
+            type="number"
+            min="100"
+            value={a.capital}
+            onChange={(e) => setA(preset(Number(e.target.value)))}
+          />
+        </label>
+        <label>
+          Reservering voor handmatige orders (€)
+          <input
+            type="number"
+            min="1"
+            value={m.capital}
+            onChange={(e) => setM(preset(Number(e.target.value)))}
+          />
+        </label>
+      </div>
+      <p>
+        Beschikbaar voor bots: {money(Number(a.capital) - Number(m.capital))}.
+        Dit is een fictief saldo; er wordt niets gestort of afgeschreven.
+      </p>
+      <p>
+        Rekening: maximaal {money(a.daily_loss)} dagverlies en{" "}
+        {money(a.total_loss)} totaalverlies. Deze grenzen staan vast na
+        aanmaken.
+      </p>
+      <details>
+        <summary>Bekijk of wijzig alle rekeninglimieten</summary>
+        <LimitsForm title="Rekeninglimieten" value={a} onChange={setA} />
+        <LimitsForm title="Handmatig deelbudget" value={m} onChange={setM} />
+      </details>
       <label className="paper-checkbox">
         <input
           type="checkbox"

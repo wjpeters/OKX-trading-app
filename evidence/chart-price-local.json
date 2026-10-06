@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-05T20:57:43.282161+00:00",
+  "scope": "Chart click changes the active limit-order draft only",
+  "health": {
+    "alive": true
+  },
+  "image": "sha256:aea855fb3dbeef19e69162d81a3f77ee6506183c77573c075d0ac3ee418520c3",
+  "policy_preserved": true,
+  "release_preserved": true,
+  "policy_revision": 2,
+  "native_order_count_before": 0,
+  "native_order_count_now": 0,
+  "native_order_count_preserved": true,
+  "live_gateway_preserved": true,
+  "demo_gateway_preserved": true,
+  "connected": true,
+  "reconciled": true,
+  "live_enabled": true,
+  "gateway_fresh": true,
+  "account_writes_by_agent": 0,
+  "native_orders_by_agent": 0,
+  "new_tests_passed": 4,
+  "existing_limit_tests_passed": 7,
+  "existing_drawing_tests_passed": 11,
+  "source_sha256": {
+    "frontend/src/chart-price.ts": "2bf1791e21c5e663be9e879e587961c1a17ae110577b039bbfc2dbe67b050462",
+    "frontend/src/Drawings.tsx": "bed9aad55a4a5cf758cbe63e398fe983950d35178b7edced01cbb7fe9e023b74",
+    "frontend/src/Chart.tsx": "c4ceb40f3cbedfd66c050a9dbcdd627ac736b84ee8864c6feea58ee08da6aa30",
+    "frontend/src/ChartWorkspace.tsx": "bc105cfba4223d1a49ee9c3ff6099b614e9061443dce15025e48c55a56703040",
+    "frontend/src/App.tsx": "66341f2e12e8900aa965d37531fad809d86b01eb42e444afaac24ea8039ab2ab",
+    "frontend/src/OrderTicket.tsx": "96ee7d0b187e5d350ea4ab2c7d6c7469d3aaab18a93cb8b8c8485431784fee76",
+    "frontend/src/orders.css": "558b11a75b07607686f3c3dc3d90bd0c09fb22dbc9880768779bddda3263c045",
+    "frontend/tests/chart-price.test.mjs": "7dde15443b8c23e92dd30b817c7f7230cf3522408e82d48f380bfda27fea8189",
+    "frontend/package.json": "8d09c63c46b3714bdc0aad0998bbac2ec59c6bbf533b84a1916826ff6b8b92a2"
+  }
+}

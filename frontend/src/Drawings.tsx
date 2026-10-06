@@ -37,7 +37,10 @@ import {
   translateDrawing,
 } from "./drawing-model";
 import type { Anchor, Drawing, Tool } from "./drawing-model";
+import { chartPriceAtTick } from "./chart-price";
+import type { ChartPricePick } from "./chart-price";
 import "./drawings.css";
+import { timeframeLabel } from "./timeframes";
 
 type Drag = {
   original: Drawing;
@@ -52,11 +55,13 @@ export default function Drawings({
   series,
   data,
   tickSize,
+  onPricePick,
 }: {
   chart: IChartApi;
   series: ISeriesApi<SeriesType>;
   data: Candles;
   tickSize: string;
+  onPricePick?: (pick: ChartPricePick) => void;
 }) {
   const key = `okx-drawings-v1:${data.instrument}:${data.bar}`;
   const [loaded] = useState(() => {
@@ -94,6 +99,8 @@ export default function Drawings({
   const ref = useRef<HTMLDivElement>(null);
   const svg = useRef<SVGSVGElement>(null);
   const textInput = useRef<HTMLInputElement>(null);
+  const pricePick = useRef(onPricePick);
+  pricePick.current = onPricePick;
   const latest = useRef({ drawings, drag });
   latest.current = { drawings, drag };
   const clipId = useId().replace(/:/g, "");
@@ -214,10 +221,26 @@ export default function Drawings({
       textInput.current?.select();
     }
   }, [selected, editing]);
+  useEffect(() => {
+    if (tool !== "select") return;
+    const pick = (event: import("lightweight-charts").MouseEventParams) => {
+      const point = event.point;
+      if (!pricePick.current || latest.current.drag || event.paneIndex !== 0 || !point ||
+          point.x < 0 || point.x >= chart.timeScale().width() ||
+          point.y < 0 || point.y >= (chart.panes()[0]?.getHeight() || 0)) return;
+      const value = series.coordinateToPrice(point.y);
+      const price = value === null ? null : chartPriceAtTick(value, tickSize);
+      if (price !== null) pricePick.current({ instrument: data.instrument, price });
+    };
+    chart.subscribeClick(pick);
+    return () => chart.unsubscribeClick(pick);
+  }, [chart, series, data.instrument, tickSize, tool]);
   const project = (a: Anchor) => {
     const x = chart
         .timeScale()
-        .logicalToCoordinate(indexAt(data.candles, a.time) as Logical),
+        .logicalToCoordinate(
+          indexAt(data.candles, a.time, data.bar) as Logical,
+        ),
       y = series.priceToCoordinate(a.price);
     return x === null || y === null ? null : { x, y };
   };
@@ -232,7 +255,7 @@ export default function Drawings({
     const logical = chart.timeScale().coordinateToLogical(x),
       price = series.coordinateToPrice(y);
     if (logical === null || price === null) return;
-    let a: Anchor = { time: timeAt(data.candles, logical), price };
+    let a: Anchor = { time: timeAt(data.candles, logical, data.bar), price };
     if (snap && magnet) {
       const candle = data.candles[Math.round(logical)];
       if (candle) {
@@ -446,7 +469,7 @@ export default function Drawings({
       ref={ref}
       className="drawing-layer"
       tabIndex={-1}
-      aria-label={`Tekenen op ${data.instrument} ${data.bar}`}
+      aria-label={`Tekenen op ${data.instrument} ${timeframeLabel(data.bar)}`}
       onKeyDown={(e) => {
         if (e.key === "Escape") {
           e.preventDefault();

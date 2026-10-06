@@ -1,6 +1,6 @@
 //! Incremental display analytics. Never used for monetary sizing or order validation.
 //! Warm-up values are null; no backfilled or invented indicator values.
-use crate::model::Candle;
+use crate::model::{Candle, Timeframe};
 use rust_decimal::prelude::ToPrimitive;
 use serde::Serialize;
 use std::collections::VecDeque;
@@ -299,20 +299,28 @@ pub fn calculate(candles: &[Candle], step: i64) -> Vec<Point> {
     calculate_with(candles, step, &Settings::default())
 }
 pub fn calculate_with(candles: &[Candle], step: i64, settings: &Settings) -> Vec<Point> {
+    calculate_for(candles, Timeframe::Fixed(step), settings)
+}
+pub fn calculate_for(candles: &[Candle], timeframe: Timeframe, settings: &Settings) -> Vec<Point> {
     let mut engine = settings.engine();
     let mut prev = None;
     candles
         .iter()
         .map(|c| {
-            if prev.is_some_and(|ts| c.ts - ts != step) {
+            if prev.is_some_and(|ts| !timeframe.consecutive(ts, c.ts)) {
                 engine = settings.engine();
             }
             prev = Some(c.ts);
-            if c.closed {
+            let mut point = if c.closed {
                 engine.push(c)
             } else {
                 engine.clone().push(c)
+            };
+            // Daily VWAP cannot be reconstructed from weekly/monthly OHLCV.
+            if matches!(timeframe, Timeframe::Week | Timeframe::CalendarMonths(_)) {
+                point.vwap = None;
             }
+            point
         })
         .collect()
 }
@@ -376,5 +384,32 @@ mod tests {
         let mut c = candle(1, 100);
         c.volume = Decimal::ZERO;
         assert!(Engine::default().push(&c).vwap.is_none());
+    }
+    #[test]
+    fn variable_length_months_preserve_indicator_warmup_and_reset_on_real_gap() {
+        let frame = Timeframe::CalendarMonths(1);
+        let mut ts = chrono::DateTime::parse_from_rfc3339("2022-01-01T00:00:00Z")
+            .unwrap()
+            .timestamp_millis();
+        let mut cs: Vec<_> = (1..=40)
+            .map(|i| {
+                let mut c = candle(i, 100 + i);
+                c.ts = ts;
+                ts = frame.next_open(ts).unwrap();
+                c
+            })
+            .collect();
+        let points = calculate_for(&cs, frame, &Settings::default());
+        assert_eq!(points.last().unwrap().sma, Some(130.5));
+        assert!(points.last().unwrap().rsi.is_some());
+        assert!(points.last().unwrap().vwap.is_none());
+        cs.remove(25);
+        assert!(
+            calculate_for(&cs, frame, &Settings::default())
+                .last()
+                .unwrap()
+                .sma
+                .is_none()
+        );
     }
 }

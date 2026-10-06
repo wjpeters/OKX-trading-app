@@ -32,6 +32,7 @@ type ResearchData = {
   restricted: { name: string; state: string; reason: string }[];
   jev: {
     model: string;
+    provider: "typesafe" | "openrouter";
     configured: boolean;
     enabled: boolean;
     budget_usd: string;
@@ -85,11 +86,17 @@ export default function Research() {
         <div className="studio-card">
           <h3>Jev · {d?.jev.model || "typesafe/jev-1.13"}</h3>
           <p>
+            {d?.jev.provider === "typesafe"
+              ? "Rechtstreeks via TypeSafe"
+              : "Via OpenRouter"}{" "}
+            · Instellingen bij Systeem
+          </p>
+          <p>
             {d?.jev.configured
               ? d.jev.enabled
                 ? "Beschikbaar voor voorstellen"
                 : "Sleutel aanwezig · kostenbudget nog uitgeschakeld"
-              : "Sleutel ontbreekt. Voer de lokale sleutelsetup uit; plak geen sleutels in de chat."}
+              : "Sleutel ontbreekt. Voeg de sleutel toe bij Systeem en kies daar je Jev-provider."}
           </p>
           <div className="metric-line">
             <span>Gebruikt / budget (USD)</span>

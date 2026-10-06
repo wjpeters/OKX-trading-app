@@ -1,0 +1,379 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile:
+#1 transferring dockerfile: 1.55kB 0.0s done
+#1 DONE 0.2s
+
+#2 [internal] load metadata for docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 137B 0.0s done
+#3 DONE 0.0s
+
+#4 [backend 1/5] FROM docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 30.94kB 0.1s done
+#5 DONE 0.1s
+
+#6 [backend 2/5] RUN apk add --no-cache musl-dev gcc make
+#6 CACHED
+
+#7 [backend 3/5] WORKDIR /build
+#7 CACHED
+
+#8 [backend 4/5] COPY backend/ ./
+#8 DONE 0.2s
+
+#9 [backend 5/5] RUN --mount=type=cache,target=/usr/local/cargo/registry --mount=type=cache,target=/build/target,id=okx-musl-target cargo build --release --locked && cp target/release/okx-terminal /okx-terminal && cp target/release/okx-onboarding /okx-onboarding && cp target/release/okx-orders /okx-orders
+#9 8.542    Compiling okx-terminal v0.4.0 (/build)
+#9 8.545 warning: unused import: `Value`
+#9 8.545   --> src/settings.rs:11:18
+#9 8.545    |
+#9 8.545 11 | use serde_json::{Value, json};
+#9 8.546    |                  ^^^^^
+#9 8.546    |
+#9 8.546    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+#9 8.546 
+#9 8.566 warning: method `payload` is never used
+#9 8.566    --> src/order_risk.rs:178:12
+#9 8.566     |
+#9 8.570 165 | impl AuthorizedOrder {
+#9 8.570     | -------------------- method in this implementation
+#9 8.570 ...
+#9 8.570 178 |     pub fn payload(&self) -> &Value {
+#9 8.570     |            ^^^^^^^
+#9 8.570     |
+#9 8.570     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#9 8.570 
+#9 8.570 warning: function `authorize_protection` is never used
+#9 8.570    --> src/order_risk.rs:183:8
+#9 8.570     |
+#9 8.570 183 | pub fn authorize_protection(
+#9 8.570     |        ^^^^^^^^^^^^^^^^^^^^
+#9 8.570 
+#9 8.570 warning: function `decimal` is never used
+#9 8.570   --> src/order_wallet.rs:27:4
+#9 8.570    |
+#9 8.570 27 | fn decimal(v: &Value) -> Result<D> {
+#9 8.570    |    ^^^^^^^
+#9 8.570 
+#9 8.570 warning: function `optional` is never used
+#9 8.570   --> src/order_wallet.rs:33:4
+#9 8.570    |
+#9 8.570 33 | fn optional(v: &Value) -> Result<Option<D>> {
+#9 8.570    |    ^^^^^^^^
+#9 8.570 
+#9 8.570 warning: function `assets` is never used
+#9 8.570   --> src/order_wallet.rs:40:8
+#9 8.570    |
+#9 8.570 40 | pub fn assets(items: &[Value], funding: bool) -> Result<Vec<Asset>> {
+#9 8.570    |        ^^^^^^
+#9 8.570 
+#9 8.570 warning: `okx-terminal` (bin "okx-terminal") generated 6 warnings (run `cargo fix --bin "okx-terminal" -p okx-terminal` to apply 1 suggestion)
+#9 15.67 warning: function `configured` is never used
+#9 15.67   --> src/bin/../secrets.rs:48:14
+#9 15.67    |
+#9 15.67 48 | pub async fn configured(purpose: &str) -> bool {
+#9 15.67    |              ^^^^^^^^^^
+#9 15.67    |
+#9 15.67    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#9 15.67 
+#9 15.67 warning: function `encrypt` is never used
+#9 15.67   --> src/bin/../secrets.rs:51:8
+#9 15.67    |
+#9 15.67 51 | pub fn encrypt(plain: &[u8], key: &[u8], purpose: &str) -> Result<Vec<u8>> {
+#9 15.67    |        ^^^^^^^
+#9 15.67 
+#9 15.67 warning: function `write` is never used
+#9 15.67   --> src/bin/../secrets.rs:75:14
+#9 15.67    |
+#9 15.67 75 | pub async fn write(purpose: &str, value: &str) -> Result<()> {
+#9 15.67    |              ^^^^^
+#9 15.67 
+#9 16.97 warning: methods `inventory` and `postings` are never used
+#9 16.97   --> src/bin/../order_ledger.rs:51:12
+#9 16.97    |
+#9 16.97 26 | impl Fill {
+#9 16.97    | --------- methods in this implementation
+#9 16.97 ...
+#9 16.97 51 |     pub fn inventory(&self, base: &str) -> D {
+#9 16.97    |            ^^^^^^^^^
+#9 16.97 ...
+#9 16.97 64 |     pub fn postings(&self, base: &str, quote: &str) -> BTreeMap<String, D> {
+#9 16.97    |            ^^^^^^^^
+#9 16.97    |
+#9 16.97    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#9 16.97 
+#9 35.96 warning: `okx-terminal` (bin "okx-onboarding") generated 3 warnings
+#9 95.87 warning: `okx-terminal` (bin "okx-orders") generated 1 warning
+#9 95.87     Finished `release` profile [optimized] target(s) in 1m 34s
+#9 DONE 97.6s
+
+#10 [verification 1/1] RUN --mount=type=cache,target=/usr/local/cargo/registry --mount=type=cache,target=/build/target,id=okx-musl-target cargo test --release --locked
+#10 1.835    Compiling okx-terminal v0.4.0 (/build)
+#10 1.836 warning: unused import: `Value`
+#10 1.836   --> src/settings.rs:11:18
+#10 1.836    |
+#10 1.836 11 | use serde_json::{Value, json};
+#10 1.836    |                  ^^^^^
+#10 1.836    |
+#10 1.836    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+#10 1.836 
+#10 1.836 warning: method `payload` is never used
+#10 1.836    --> src/order_risk.rs:178:12
+#10 1.836     |
+#10 1.836 165 | impl AuthorizedOrder {
+#10 1.836     | -------------------- method in this implementation
+#10 1.836 ...
+#10 1.836 178 |     pub fn payload(&self) -> &Value {
+#10 1.836     |            ^^^^^^^
+#10 1.836     |
+#10 1.836     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#10 1.836 
+#10 1.836 warning: function `authorize_protection` is never used
+#10 1.836    --> src/order_risk.rs:183:8
+#10 1.836     |
+#10 1.836 183 | pub fn authorize_protection(
+#10 1.836     |        ^^^^^^^^^^^^^^^^^^^^
+#10 1.836 
+#10 1.836 warning: `okx-terminal` (bin "okx-terminal" test) generated 3 warnings (run `cargo fix --bin "okx-terminal" -p okx-terminal --tests` to apply 1 suggestion)
+#10 5.140 warning: function `configured` is never used
+#10 5.140   --> src/bin/../secrets.rs:48:14
+#10 5.140    |
+#10 5.140 48 | pub async fn configured(purpose: &str) -> bool {
+#10 5.140    |              ^^^^^^^^^^
+#10 5.140    |
+#10 5.140    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#10 5.140 
+#10 5.140 warning: function `write` is never used
+#10 5.140   --> src/bin/../secrets.rs:75:14
+#10 5.140    |
+#10 5.140 75 | pub async fn write(purpose: &str, value: &str) -> Result<()> {
+#10 5.140    |              ^^^^^
+#10 5.140 
+#10 14.06 warning: `okx-terminal` (bin "okx-onboarding" test) generated 2 warnings
+#10 24.74     Finished `release` profile [optimized] target(s) in 24.04s
+#10 24.89      Running unittests src/bin/okx-onboarding.rs (target/release/deps/okx_onboarding-28895e5f1465e0f4)
+#10 24.89 
+#10 24.89 running 25 tests
+#10 24.89 test exchange::tests::external_order_blocks ... ok
+#10 24.89 test exchange::connection_control_tests::counter_is_valid_control_and_never_a_subscription_ack ... ok
+#10 24.89 test exchange::tests::known_filled_order_never_resubmitted ... ok
+#10 24.89 test exchange::tests::accepted_timeout_never_resubmits ... ok
+#10 24.89 test exchange::connection_control_tests::count_error_unknown_channel_and_bad_count_fail_closed ... ok
+#10 24.89 test exchange::tests::live_readiness_missing_acceptance_fails ... ok
+#10 24.89 test exchange::tests::old_fill_ignored ... ok
+#10 24.89 test exchange::tests::signing_fixture ... ok
+#10 24.89 test exchange::tests::withdraw_never_allowed ... ok
+#10 24.89 test order_risk::tests::entries_fail_closed_on_losses_and_unprotected_fills ... ok
+#10 24.89 test order_risk::tests::live_cannot_be_enabled_by_client_mode_or_flags ... ok
+#10 24.89 test order_risk::tests::missing_protection_and_stale_or_unreconciled_state_fail ... ok
+#10 24.89 test order_risk::tests::release_is_bound_to_account_revision_and_current_private_readiness ... ok
+#10 24.89 test order_risk::tests::simultaneous_sell_claims_never_double_spend_inventory ... ok
+#10 24.89 test order_risk::tests::total_parent_quantity_reserved_for_iceberg_not_one_slice ... ok
+#10 24.89 test order_types::tests::current_iceberg_api_not_deprecated_iceberg ... ok
+#10 24.89 test order_types::tests::iceberg_rsi_fields_and_fresh_trigger_execution ... ok
+#10 24.89 test order_types::tests::limit_policies_are_exact_and_spot_has_no_leverage_fields ... ok
+#10 24.89 test order_types::tests::native_market_qty_is_base_and_never_silently_reduced ... ok
+#10 24.89 test order_types::tests::malformed_or_unsupported_payloads_fail ... ok
+#10 24.89 test order_types::tests::oco_never_degrades_to_conditional_that_ignores_tp ... ok
+#10 24.89 test order_types::tests::slice_and_callback_bounds ... ok
+#10 24.89 test secrets::tests::encrypted_fixture_is_authenticated_and_scoped ... ok
+#10 24.89 test secrets::tests::fresh_encryption_uses_unique_nonces_and_scope ... ok
+#10 24.89 test secrets::tests::plaintext_credentials_rejected ... ok
+#10 24.89 
+#10 24.89 test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+#10 24.89 
+#10 24.90      Running unittests src/bin/okx-orders.rs (target/release/deps/okx_orders-9a56520d697d6480)
+#10 24.90 
+#10 24.90 running 37 tests
+#10 24.90 test exchange::tests::accepted_timeout_never_resubmits ... ok
+#10 24.90 test exchange::connection_control_tests::count_error_unknown_channel_and_bad_count_fail_closed ... ok
+#10 24.90 test exchange::connection_control_tests::counter_is_valid_control_and_never_a_subscription_ack ... ok
+#10 24.90 test exchange::tests::external_order_blocks ... ok
+#10 24.90 test exchange::tests::known_filled_order_never_resubmitted ... ok
+#10 24.90 test exchange::tests::live_readiness_missing_acceptance_fails ... ok
+#10 24.90 test exchange::tests::old_fill_ignored ... ok
+#10 24.90 test exchange::tests::signing_fixture ... ok
+#10 24.90 test exchange::tests::withdraw_never_allowed ... ok
+#10 24.90 test order_ledger::tests::base_fee_changes_protectable_quantity ... ok
+#10 24.90 test order_ledger::tests::cancel_with_partial_children_is_not_final_before_children ... ok
+#10 24.90 test order_ledger::tests::duplicate_fill_identity_can_only_post_once ... ok
+#10 24.90 test order_ledger::tests::effective_trigger_is_not_a_fill ... ok
+#10 24.90 test order_ledger::tests::fee_adjusted_partial_fill_dust_is_never_oversold ... ok
+#10 24.90 test order_ledger::tests::impossible_protection_and_unknown_state_fail ... ok
+#10 24.90 test order_ledger::tests::quote_fee_and_rebate_are_booked_in_correct_currency ... ok
+#10 24.90 test order_risk::tests::entries_fail_closed_on_losses_and_unprotected_fills ... ok
+#10 24.90 test order_risk::tests::live_cannot_be_enabled_by_client_mode_or_flags ... ok
+#10 24.90 test order_risk::tests::missing_protection_and_stale_or_unreconciled_state_fail ... ok
+#10 24.90 test order_risk::tests::release_is_bound_to_account_revision_and_current_private_readiness ... ok
+#10 24.90 test order_risk::tests::simultaneous_sell_claims_never_double_spend_inventory ... ok
+#10 24.90 test order_risk::tests::total_parent_quantity_reserved_for_iceberg_not_one_slice ... ok
+#10 24.90 test order_types::tests::current_iceberg_api_not_deprecated_iceberg ... ok
+#10 24.90 test order_types::tests::limit_policies_are_exact_and_spot_has_no_leverage_fields ... ok
+#10 24.90 test order_types::tests::iceberg_rsi_fields_and_fresh_trigger_execution ... ok
+#10 24.90 test order_types::tests::malformed_or_unsupported_payloads_fail ... ok
+#10 24.90 test order_types::tests::native_market_qty_is_base_and_never_silently_reduced ... ok
+#10 24.90 test order_types::tests::oco_never_degrades_to_conditional_that_ignores_tp ... ok
+#10 24.90 test order_types::tests::slice_and_callback_bounds ... ok
+#10 24.90 test order_wallet::tests::buy_includes_fee_slippage_and_floors_lots ... ok
+#10 24.90 test order_wallet::tests::rejects_stale_wrong_mode_unbounded_and_missing_fee ... ok
+#10 24.90 test order_wallet::tests::parses_all_assets_and_rejects_duplicate_or_malformed ... ok
+#10 24.90 test order_wallet::tests::sell_sizes_free_base_after_claims_without_trade_permission ... ok
+#10 24.90 test order_wallet::tests::zero_is_preview_only_and_missing_available_is_unknown ... ok
+#10 24.90 test secrets::tests::encrypted_fixture_is_authenticated_and_scoped ... ok
+#10 24.90 test secrets::tests::plaintext_credentials_rejected ... ok
+#10 24.90 test secrets::tests::fresh_encryption_uses_unique_nonces_and_scope ... ok
+#10 24.90 
+#10 24.90 test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+#10 24.90 
+#10 24.90      Running unittests src/main.rs (target/release/deps/okx_terminal-38851a9b89befe60)
+#10 24.91 
+#10 24.91 running 129 tests
+#10 24.91 test auth::tests::malformed_hash_fails ... ok
+#10 24.91 test feeds::tests::snapshots_accept_empty_book ... ok
+#10 24.91 test feeds::tests::bad_books_rejected ... ok
+#10 24.91 test book::tests::delta_requires_snapshot ... ok
+#10 24.91 test graph::tests::both_if_else_paths_must_be_connected ... ok
+#10 24.91 test book::tests::empty_heartbeat_accepted ... ok
+#10 24.91 test comparison::tests::parameter_change_is_not_same_strategy ... ok
+#10 24.91 test book::tests::deletion_applied ... ok
+#10 24.91 test book::tests::gap_is_rejected_without_changing_state ... ok
+#10 24.91 test graph::tests::cooldown_uses_order_time_and_does_not_block_exit ... ok
+#10 24.91 test book::tests::reset_with_continuity_accepted ... ok
+#10 24.91 test comparison::tests::only_ai_filter_removed_from_comparison ... ok
+#10 24.91 test graph::tests::exit_wins_for_pine_and_plot_comparison_is_explicit ... ok
+#10 24.91 test graph::tests::comparison_boundary_is_false ... ok
+#10 24.91 test graph::tests::explicit_ai_permission_is_required ... ok
+#10 24.91 test graph::tests::missing_or_unknown_branch_handles_rejected ... ok
+#10 24.91 test graph::tests::not_cannot_activate_unchosen_branch ... ok
+#10 24.91 test graph::tests::standard_crosses_and_warmup ... ok
+#10 24.91 test graph::tests::branches_are_exclusive_and_roundtrip_preserves_handles ... ok
+#10 24.91 test graph::tests::candle_stop_threshold_and_priority ... ok
+#10 24.91 test graph::tests::system_catalog_is_valid_and_has_no_external_filters ... ok
+#10 24.91 test graph::tests::unknown_action_rejected ... ok
+#10 24.91 test graph::tests::warmup_cannot_invent_branch ... ok
+#10 24.92 test indicators::tests::flat_rsi_defined ... ok
+#10 24.92 test indicators::tests::gaps_reset_warmup ... ok
+#10 24.92 test indicators::tests::warmup_is_missing ... ok
+#10 24.92 test indicators::tests::rising_reference ... ok
+#10 24.92 test indicators::tests::zero_volume_has_no_vwap ... ok
+#10 24.92 test model::tests::bad_prices_fail ... ok
+#10 24.92 test model::tests::exact_decimals ... ok
+#10 24.92 test model::tests::gaps_are_not_filled ... ok
+#10 24.92 test model::tests::malformed_confirm_fails ... ok
+#10 24.92 test indicators::tests::variable_length_months_preserve_indicator_warmup_and_reset_on_real_gap ... ok
+#10 24.92 test indicators::tests::open_candle_does_not_commit ... ok
+#10 24.92 test model::tests::month_calendar_including_leap_year ... ok
+#10 24.92 test model::tests::new_intraday_intervals_and_monthly_fixed_duration_guard ... ok
+#10 24.92 test model::tests::monthly_normalization_counts_real_gaps_only ... ok
+#10 24.92 test model::tests::synthetic_timeframes_rejected ... ok
+#10 24.92 test model::tests::utc_weeks_start_on_monday_not_unix_epoch_thursday ... ok
+#10 24.92 test operations::tests::full_storage_and_unavailable_probe_block_entries ... ok
+#10 24.92 test model::tests::quarters_start_in_january_april_july_october ... ok
+#10 24.92 test order_risk::tests::live_cannot_be_enabled_by_client_mode_or_flags ... ok
+#10 24.92 test order_risk::tests::entries_fail_closed_on_losses_and_unprotected_fills ... ok
+#10 24.92 test order_risk::tests::simultaneous_sell_claims_never_double_spend_inventory ... ok
+#10 24.92 test order_types::tests::current_iceberg_api_not_deprecated_iceberg ... ok
+#10 24.92 test order_risk::tests::missing_protection_and_stale_or_unreconciled_state_fail ... ok
+#10 24.92 test order_risk::tests::total_parent_quantity_reserved_for_iceberg_not_one_slice ... ok
+#10 24.92 test order_types::tests::limit_policies_are_exact_and_spot_has_no_leverage_fields ... ok
+#10 24.92 test order_types::tests::iceberg_rsi_fields_and_fresh_trigger_execution ... ok
+#10 24.92 test order_types::tests::native_market_qty_is_base_and_never_silently_reduced ... ok
+#10 24.92 test order_types::tests::oco_never_degrades_to_conditional_that_ignores_tp ... ok
+#10 24.92 test order_types::tests::slice_and_callback_bounds ... ok
+#10 24.92 test order_wallet::tests::buy_includes_fee_slippage_and_floors_lots ... ok
+#10 24.92 test order_wallet::tests::parses_all_assets_and_rejects_duplicate_or_malformed ... ok
+#10 24.92 test order_types::tests::malformed_or_unsupported_payloads_fail ... ok
+#10 24.92 test order_wallet::tests::rejects_stale_wrong_mode_unbounded_and_missing_fee ... ok
+#10 24.92 test order_wallet::tests::sell_sizes_free_base_after_claims_without_trade_permission ... ok
+#10 24.92 test order_wallet::tests::zero_is_preview_only_and_missing_available_is_unknown ... ok
+#10 24.92 test paper::replay_tests::insufficient_history_is_rejected ... ok
+#10 24.92 test paper::replay_tests::dataset_gap_is_rejected ... ok
+#10 24.92 test proposal::tests::future_reply_rejected ... ok
+#10 24.92 test proposal::tests::ai_cannot_raise_limits ... ok
+#10 24.92 test proposal::tests::late_decision_rejected ... ok
+#10 24.92 test proposal::tests::changed_state_rejected ... ok
+#10 24.92 test proposal::tests::missing_confidence_rejected ... ok
+#10 24.92 test proposal::tests::unknown_output_fields_fail ... ok
+#10 24.92 test order_risk::tests::release_is_bound_to_account_revision_and_current_private_readiness ... ok
+#10 24.92 test proposal::tests::valid_proposal_is_not_permission ... ok
+#10 24.92 test providers::tests::direct_provider_uses_its_schema_and_explicit_calculated_cost ... ok
+#10 24.92 test providers::tests::invented_action_fails ... ok
+#10 24.92 test providers::tests::missing_cost_fails ... ok
+#10 24.92 test providers::tests::missing_probability_fails ... ok
+#10 24.92 test providers::tests::provider_shape ... ok
+#10 24.92 test providers::tests::unpinned_model_fails ... ok
+#10 24.92 test risk::tests::all_loss_limits_are_latched ... ok
+#10 24.92 test risk::tests::aggregated_underlying_exposure_across_bots ... ok
+#10 24.92 test paper::replay_tests::candle_close_signal_only_fills_next_bar ... ok
+#10 24.92 test risk::tests::cancel_holds_reserve_until_ack ... ok
+#10 24.93 test paper::replay_tests::stop_wins_when_low_and_high_both_hit ... ok
+#10 24.93 test history::tests::parquet_is_readable_and_exact ... ok
+#10 24.93 test risk::tests::account_loss_stop_latched_and_not_reset_by_restart ... ok
+#10 24.93 test risk::tests::candle_close_only_keeps_bot_running_and_old_storage_still_loads ... ok
+#10 24.93 test risk::tests::daily_boundary_uses_previous_equity_and_keeps_highwater ... ok
+#10 24.93 test risk::tests::crossed_book_and_currency_block ... ok
+#10 24.93 test risk::tests::deterministic_sma_has_warmup_and_no_future_access ... ok
+#10 24.93 test risk::tests::candle_exit_is_durable_retries_stale_quotes_and_blocks_entries ... ok
+#10 24.93 test risk::tests::candle_pause_keeps_position_and_cancels_pending_entry ... ok
+#10 24.93 test paper::replay_tests::replay_is_reproducible_and_separate_mode ... ok
+#10 24.93 test risk::tests::distinct_position_count_includes_pending_entries ... ok
+#10 24.93 test risk::tests::duplicate_and_out_of_order_fill_rejected ... ok
+#10 24.93 test risk::tests::duplicate_intent_is_idempotent ... ok
+#10 24.93 test risk::tests::emergency_is_persistent_even_when_loss_reason_changes ... ok
+#10 24.93 test risk::tests::equity_includes_unrealized_and_both_fees_no_double_reserve ... ok
+#10 24.93 test risk::tests::explicit_limits_required ... ok
+#10 24.93 test risk::tests::fill_before_ack_and_overfill_rejected ... ok
+#10 24.93 test risk::tests::frequency_and_order_count_limits ... ok
+#10 24.93 test risk::tests::inventory_cannot_be_sold_twice ... ok
+#10 24.93 test risk::tests::limit_touch_does_not_fill ... ok
+#10 24.93 test risk::tests::missing_stop_or_bad_lot_rejected ... ok
+#10 24.93 test risk::tests::new_snapshot_partial_completion ... ok
+#10 24.93 test risk::tests::no_execution_on_preview ... ok
+#10 24.93 test risk::tests::no_live_or_demo_mode ... ok
+#10 24.93 test risk::tests::original_slippage_cap_never_expands ... ok
+#10 24.93 test risk::tests::old_snapshot_does_not_reset_liquidity ... ok
+#10 24.93 test risk::tests::partial_fills_keep_unused_reserve_and_protect_quantity ... ok
+#10 24.93 test risk::tests::partial_entry_rest_canceled_before_stop_exit ... ok
+#10 24.93 test risk::tests::rejected_exit_does_not_disable_position_protection ... ok
+#10 24.93 test risk::tests::reserve_and_limits_survive_serialized_restart ... ok
+#10 24.93 test risk::tests::reserve_before_ack_not_fill ... ok
+#10 24.93 test risk::tests::spread_and_trade_risk_limits ... ok
+#10 24.93 test risk::tests::stale_and_future_quotes_block ... ok
+#10 24.93 test risk::tests::reserve_prevents_double_spending ... ok
+#10 24.93 test risk::tests::time_reversal_pauses_entries ... ok
+#10 24.93 test risk::tests::unknown_intent_fields_fail ... ok
+#10 24.93 test risk::tests::unknown_holds_reserve_never_retries ... ok
+#10 24.93 test risk::tests::stale_position_freezes_valuation_and_other_entries ... ok
+#10 24.93 test secrets::tests::encrypted_fixture_is_authenticated_and_scoped ... ok
+#10 24.93 test secrets::tests::fresh_encryption_uses_unique_nonces_and_scope ... ok
+#10 24.93 test secrets::tests::plaintext_credentials_rejected ... ok
+#10 24.93 test studio::tests::alert_intrabar_indicators_rejected ... ok
+#10 24.93 test settings::tests::incomplete_or_injected_secrets_are_rejected ... ok
+#10 24.93 test studio::tests::cycles_rejected ... ok
+#10 24.93 test risk::tests::stop_survives_entry_pause_and_closes_with_inventory_bound ... ok
+#10 24.93 test settings::tests::provider_destinations_are_fixed_and_distinct ... ok
+#10 24.93 test risk::tests::same_snapshot_liquidity_not_reused ... ok
+#10 24.93 test studio::tests::drawing_alert_projects_time_not_screen_pixels ... ok
+#10 24.93 test tests::dns_rebinding_denied ... ok
+#10 24.93 test studio::tests::graph_gate_required ... ok
+#10 24.95 test risk::tests::native_strategy_risk_benchmark ... ok
+#10 24.95 
+#10 24.95 test result: ok. 129 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+#10 24.95 
+#10 DONE 25.0s
+
+#11 exporting to image
+#11 exporting layers
+#11 exporting layers 0.2s done
+#11 writing image sha256:5bc0ebb3d11e2d96c3abf8de5d410d6b1b703f521273bf71d8b5c10eb8d750c2
+#11 writing image sha256:5bc0ebb3d11e2d96c3abf8de5d410d6b1b703f521273bf71d8b5c10eb8d750c2 done
+#11 naming to docker.io/library/okx-live-verification:0.4.0 done
+#11 DONE 0.2s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/x2d2isa8m0vw68u8mxoc90c48

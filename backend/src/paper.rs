@@ -18,7 +18,9 @@ use serde_json::{Value, json};
 use sqlx::{Postgres, Row, Transaction};
 use std::{collections::BTreeMap, sync::atomic::Ordering, time::Duration};
 
-pub async fn quotes(app: &App) -> Quotes {
+pub async fn quotes(app: &App) -> Quotes { quotes_in(app, true).await }
+pub async fn native_quotes(app: &App) -> Quotes { quotes_in(app, false).await }
+async fn quotes_in(app: &App, paper_only: bool) -> Quotes {
     let m = app.market.read().await;
     let mut out = Quotes::new();
     if !m.feed_connected
@@ -30,7 +32,7 @@ pub async fn quotes(app: &App) -> Quotes {
         return out;
     }
     for i in &m.instruments {
-        if i["quoteCcy"] != "EUR" || i["state"] != "live" {
+        if (paper_only && i["quoteCcy"] != "EUR") || i["state"] != "live" {
             continue;
         }
         let Some(id) = i["instId"].as_str() else {
@@ -57,7 +59,7 @@ pub async fn quotes(app: &App) -> Quotes {
             Quote {
                 instrument: id.into(),
                 base: i["baseCcy"].as_str().unwrap_or_default().into(),
-                quote: "EUR".into(),
+                quote: i["quoteCcy"].as_str().unwrap_or_default().into(),
                 bid,
                 ask,
                 bid_size: bs,
@@ -115,6 +117,7 @@ pub fn router() -> Router<App> {
     Router::new()
         .route("/api/paper", get(state))
         .route("/api/paper/setup", post(setup))
+        .route("/api/paper/bots/activity", get(bot_activity))
         .route("/api/paper/preview", post(preview))
         .route("/api/paper/submit", post(submit))
         .route("/api/paper/cancel", post(cancel))
@@ -124,6 +127,7 @@ pub fn router() -> Router<App> {
         .route("/api/replay", post(replay))
         .route("/api/replay/evaluate", post(evaluate))
         .route("/api/replay/pine", post(pine_replay))
+        .route("/api/replay/graph", post(graph_replay))
         .route("/api/replay/reports", get(reports))
 }
 async fn state(State(app): State<App>) -> Response {
@@ -132,6 +136,24 @@ async fn state(State(app): State<App>) -> Response {
     let payload:Option<Value>=row.map(|r|r.get("payload"));
     Ok(json!({"account":payload,"presets":{"account":Limits::preset(d("10000")),"manual":Limits::preset(d("1000"))},"assumptions":{"fee_bps":FEE_BPS,"latency_ms":LATENCY_MS,"participation_percent":10,"timezone":"UTC","quote_currency":"EUR","price_source":"OKX EEA books5","leverage":"1","funding":"0","ai_cost":"0","cashflows":"initial virtual deposit only"},"worker_alive":now_ms()-app.paper_heartbeat.load(Ordering::Relaxed)<3000,"server_time_ms":now_ms()}))
 }.await)
+}
+#[derive(Deserialize)]
+struct ActivityQuery {
+    bot_id: String,
+}
+async fn bot_activity(State(app): State<App>, Query(q): Query<ActivityQuery>) -> Response {
+    response(async {
+        let payload: Value = sqlx::query_scalar("SELECT payload FROM paper_v2.account WHERE id=1")
+            .fetch_optional(&app.db).await?.ok_or_else(|| anyhow::anyhow!("Nog geen virtuele rekening"))?;
+        let p: Paper = serde_json::from_value(payload)?;
+        ensure!(p.bots.contains_key(&q.bot_id) && q.bot_id != "manual", "Bot ontbreekt");
+        let mut subjects = vec![q.bot_id.clone(), "account".into(), "paper".into()];
+        subjects.extend(p.orders.values().filter(|o| o.intent.bot_id == q.bot_id).map(|o| o.id.clone()));
+        subjects.extend(p.positions.values().filter(|x| x.bot_id == q.bot_id).map(|x| x.id.clone()));
+        let rows = sqlx::query("SELECT seq,ts,kind,subject,detail FROM paper_v2.events WHERE subject = ANY($1) ORDER BY seq DESC LIMIT 150")
+            .bind(subjects).fetch_all(&app.db).await?;
+        Ok(json!(rows.iter().map(|r| json!({"seq":r.get::<i64,_>("seq"),"ts":r.get::<i64,_>("ts"),"kind":r.get::<String,_>("kind"),"subject":r.get::<String,_>("subject"),"detail":r.get::<String,_>("detail")})).collect::<Vec<_>>()))
+    }.await)
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -236,6 +258,8 @@ async fn control(State(app): State<App>, Json(r): Json<Control>) -> Response {
 #[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BotConfig {
+    #[serde(default = "default_bot_bar")]
+    pub bar: String,
     pub id: String,
     pub name: String,
     pub instrument: String,
@@ -246,8 +270,10 @@ pub struct BotConfig {
     pub stop_bps: D,
     pub target_bps: D,
 }
+fn default_bot_bar() -> String { "1m".into() }
 impl BotConfig {
-    fn bot(self, now: i64) -> Result<Bot> {
+    pub(crate) fn bot(self, now: i64) -> Result<Bot> {
+        ensure!(["1m", "5m", "15m"].contains(&self.bar.as_str()), "Botinterval ongeldig");
         let seed = Paper::new(self.limits.clone(), self.limits.clone(), now)?;
         Ok(Bot {
             id: self.id,
@@ -257,6 +283,7 @@ impl BotConfig {
             limits: self.limits,
             ledger: seed.ledger,
             running: false,
+            bar: self.bar,
             last_bar: 0,
             last_signal: String::new(),
             fast: self.fast,
@@ -324,7 +351,7 @@ async fn run_bots(app: &App) -> Result<()> {
             app,
             &CandleQuery {
                 instrument: bot.instrument.clone(),
-                bar: "1m".into(),
+                bar: bot.bar.clone(),
                 after: None,
             },
         )
@@ -343,7 +370,7 @@ async fn run_bots(app: &App) -> Result<()> {
         let cs: Vec<Candle> = serde_json::from_value(data["candles"].clone())?;
         let closed: Vec<_> = cs
             .iter()
-            .filter(|c| c.closed && c.ts + 60000 <= now_ms())
+            .filter(|c| c.closed && c.ts + crate::model::interval(&bot.bar).unwrap_or(60000) <= now_ms())
             .collect();
         let Some(last) = closed.last() else { continue };
         if last.ts <= bot.last_bar {
@@ -371,7 +398,12 @@ async fn run_bots(app: &App) -> Result<()> {
             continue;
         }
         p.mark(&qs, now);
-        let signal = if last.ts + 75000 < now {
+        let signal = if graph_signal
+            .as_deref()
+            .is_some_and(|s| ["STOP_CLOSE", "STOP_PAUSE", "EXIT_NOW"].contains(&s))
+        {
+            graph_signal.as_deref().unwrap()
+        } else if last.ts + crate::model::interval(&bot.bar).unwrap_or(60000) + 15000 < now {
             "STALE_CLOSE"
         } else if let Some(ref s) = graph_signal {
             s.as_str()
@@ -391,7 +423,7 @@ async fn run_bots(app: &App) -> Result<()> {
             now,
             "BOT_DECISION",
             &bot.id,
-            &format!("Candle {}: {outcome}", last.ts),
+            &format!("Candle {} · Signaal {signal} · {outcome}", last.ts),
         );
         persist(&mut tx, &mut p).await?;
         tx.commit().await?;
@@ -399,6 +431,20 @@ async fn run_bots(app: &App) -> Result<()> {
     Ok(())
 }
 fn process_signal(p: &mut Paper, b: &Bot, signal: &str, qs: &Quotes, bar: i64, now: i64) -> String {
+    if ["STOP_CLOSE", "STOP_PAUSE", "EXIT_NOW"].contains(&signal) {
+        return match p.candle_halt(&b.id, signal != "STOP_PAUSE", signal != "EXIT_NOW", now) {
+            Ok(()) => match signal {
+                "STOP_CLOSE" => "Candle-stop · bot gepauzeerd; afbouw aangevraagd",
+                "STOP_PAUSE" => "Candle-stop · bot gepauzeerd; positie behouden",
+                _ => "Candle-stop · afbouw aangevraagd; bot blijft actief",
+            }
+            .into(),
+            Err(e) => format!("Candle-stop geblokkeerd: {e}"),
+        };
+    }
+    if !b.running {
+        return "Bot gepauzeerd".into();
+    }
     let Some(q) = qs.get(&b.instrument) else {
         return "Geen verse marktdata".into();
     };
@@ -420,7 +466,14 @@ fn process_signal(p: &mut Paper, b: &Bot, signal: &str, qs: &Quotes, bar: i64, n
             Err(e) => format!("Afgewezen: {e}"),
         };
     }
+    if signal == "BUY" {
+        return "BUY · Geen nieuwe order: er is al een positie of open order".into();
+    }
     if signal == "SELL" {
+        if positions.is_empty() {
+            return "SELL · Geen order: er is geen open positie".into();
+        }
+        let mut submitted = Vec::new();
         for pos in positions {
             if pos.closing_order.is_some() {
                 continue;
@@ -439,11 +492,17 @@ fn process_signal(p: &mut Paper, b: &Bot, signal: &str, qs: &Quotes, bar: i64, n
             };
             match p.submit(i, q, now) {
                 Ok(id) => {
-                    p.positions.get_mut(&pos.id).unwrap().closing_order = Some(id);
+                    p.positions.get_mut(&pos.id).unwrap().closing_order = Some(id.clone());
+                    submitted.push(id);
                 }
                 Err(e) => return format!("Afbouw afgewezen: {e}"),
             }
         }
+        return if submitted.is_empty() {
+            "SELL · Wachten op bestaande sluitorder".into()
+        } else {
+            format!("SELL → {}", submitted.join(", "))
+        };
     }
     signal.into()
 }
@@ -543,6 +602,7 @@ pub(crate) struct ReplayRequest {
 async fn replay(State(app): State<App>, Json(r): Json<ReplayRequest>) -> Response {
     response(
         async {
+            let step = crate::model::interval(&r.bar).ok_or_else(|| anyhow::anyhow!("Replay ondersteunt nog geen maand- of kwartaalcandles; kies een vast interval t/m week"))?;
             let _permit = app
                 .replays
                 .clone()
@@ -574,7 +634,7 @@ async fn replay(State(app): State<App>, Json(r): Json<ReplayRequest>) -> Respons
                 .into_iter()
                 .filter(|c| {
                     c.closed
-                        && c.ts + crate::model::interval(&r.bar).unwrap_or(i64::MAX) <= now_ms()
+                        && c.ts.checked_add(step).is_some_and(|end| end <= now_ms())
                 })
                 .collect();
             let report = replay_candles(&closed, &q, &r)?;
@@ -596,7 +656,7 @@ async fn reports(State(app): State<App>, Query(q): Query<ReportsQuery>) -> Respo
     response(
         async {
             let mode=q.mode.as_deref().unwrap_or("REPLAY");
-            ensure!(["REPLAY","PINE_REPLAY","WALK_FORWARD"].contains(&mode),"Rapporttype ongeldig");
+            ensure!(["REPLAY","PINE_REPLAY","WALK_FORWARD","GRAPH_REPLAY"].contains(&mode),"Rapporttype ongeldig");
             let rows =
                 sqlx::query("SELECT id,report FROM paper_v2.replays WHERE report->>'mode'=$1 ORDER BY id DESC LIMIT 20")
                     .bind(mode)
@@ -619,6 +679,21 @@ fn replay_signals(
     meta: &Quote,
     r: &ReplayRequest,
     signals: Option<&BTreeMap<i64, String>>,
+) -> Result<Value> {
+    replay_engine(cs, meta, r, signals, None)
+}
+struct GraphReplayData {
+    graph: Value,
+    plan: Vec<String>,
+    pine: BTreeMap<String, Value>,
+    limits: Limits,
+}
+fn replay_engine(
+    cs: &[Candle],
+    meta: &Quote,
+    r: &ReplayRequest,
+    signals: Option<&BTreeMap<i64, String>>,
+    graph: Option<&GraphReplayData>,
 ) -> Result<Value> {
     ensure!(
         r.spread_bps >= d("1")
@@ -646,12 +721,17 @@ fn replay_signals(
         cs.windows(2).all(|w| w[1].ts - w[0].ts == step),
         "Dataset niet aaneengesloten"
     );
-    let mut limits = Limits::preset(r.capital);
-    limits.orders_per_minute = 60;
+    let mut limits = graph
+        .map(|g| g.limits.clone())
+        .unwrap_or_else(|| Limits::preset(r.capital));
+    if graph.is_none() {
+        limits.orders_per_minute = 60;
+    }
     let mut p = Paper::new(limits.clone(), limits.clone(), cs[0].ts)?;
     p.mode = "REPLAY".into();
     p.bots.clear();
     let config = BotConfig {
+        bar: r.bar.clone(),
         id: "replay".into(),
         name: "SMA replay".into(),
         instrument: r.instrument.clone(),
@@ -664,6 +744,7 @@ fn replay_signals(
     };
     p.add_bot(config.bot(cs[0].ts)?, cs[0].ts)?;
     p.bots.get_mut("replay").unwrap().running = true;
+    let features = serde_json::to_value(crate::indicators::calculate(cs, step))?;
     let mut closes = vec![];
     let mut curve = vec![];
     let mut max_drawdown = D::ZERO;
@@ -681,7 +762,7 @@ fn replay_signals(
         q.ask_size = c.volume / d("5");
         q
     };
-    for c in cs {
+    for (index, c) in cs.iter().enumerate() {
         // OHLC path is an explicit conservative assumption: open -> low -> high -> close.
         // No signal based on this close can fill before the next candle opens.
         for (offset, price) in [
@@ -717,13 +798,54 @@ fn replay_signals(
         }
         closes.push(c.close);
         let b = p.bots["replay"].clone();
-        let signal = if let Some(s) = signals {
+        let graph_signal;
+        let signal = if let Some(g) = graph {
+            let mut external = BTreeMap::new();
+            for n in g.graph["nodes"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|n| n["kind"] == "pine")
+            {
+                let id = n["id"].as_str().unwrap();
+                external.insert(
+                    id.to_string(),
+                    crate::graph::pine_value(&g.pine[id], &n["params"], c.ts)?,
+                );
+            }
+            let last_order = p
+                .orders
+                .values()
+                .filter(|o| o.intent.bot_id == "replay" && o.intent.side == Side::Buy)
+                .map(|o| o.created_ms)
+                .max()
+                .unwrap_or(0);
+            let mut candle_features = features[index].clone();
+            candle_features["candle_open"] = json!(c.open);
+            candle_features["candle_close"] = json!(c.close);
+            graph_signal = if !b.running {
+                "PAUSED".into()
+            } else if index < 100 {
+                "WARMUP".into()
+            } else {
+                crate::graph::evaluate(
+                    &g.graph,
+                    &g.plan,
+                    &closes,
+                    &candle_features,
+                    c.ts,
+                    last_order,
+                    &external,
+                )?
+            };
+            graph_signal.as_str()
+        } else if let Some(s) = signals {
             s.get(&c.ts).map(String::as_str).unwrap_or("HOLD")
         } else {
             sma_signal(&closes, b.fast, b.slow).unwrap_or("WARMUP")
         };
         let outcome = process_signal(&mut p, &b, signal, &qs, c.ts, c.ts + step - 1);
-        if signal != "HOLD" && signal != "WARMUP" {
+        if signal != "HOLD" && signal != "WARMUP" && signal != "PAUSED" {
             decisions.push(json!({"ts":c.ts,"signal":signal,"outcome":outcome}));
         }
         curve.push(json!({"ts":c.ts,"equity":p.ledger.equity,"drawdown":p.ledger.drawdown}));
@@ -846,7 +968,7 @@ async fn pine_replay(State(a): State<App>, Json(r): Json<PineReplayRequest>) -> 
         let _permit=a.replays.clone().try_acquire_owned().map_err(|_|anyhow::anyhow!("Replay/historie is bezig"))?;
         let meta=quotes(&a).await.remove(&r.config.instrument).ok_or_else(||anyhow::anyhow!("EUR-instrumentmetadata ontbreekt"))?;
         let mut cs=crate::history::dataset(&a,&r.config.instrument,&r.config.bar).await?;
-        if cs.len()>5000{cs.drain(..cs.len()-5000);}
+        ensure!(cs.len()<=100000,"Deze Pine-runtime accepteert maximaal 100.000 candles. Kies een kleiner expliciet datumbereik.");
         let inputs=r.inputs.unwrap_or(Value::Null);
         let result=crate::studio::pine_on_candles(&a,&r.source,&r.config.instrument,&r.config.bar,&inputs,&cs).await?;
         ensure!(result["ok"]==true,"Pine compile/runtimefout: {}",result["diagnostics"]);
@@ -862,4 +984,42 @@ async fn pine_replay(State(a): State<App>, Json(r): Json<PineReplayRequest>) -> 
         let id:i64=sqlx::query_scalar("INSERT INTO paper_v2.replays(report) VALUES($1) RETURNING id").bind(&report).fetch_one(&a.db).await?;
         Ok(json!({"id":id,"report":report}))
     }.await)
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct GraphReplayRequest {
+    name: String,
+    version: i64,
+    spread_bps: D,
+    slippage_bps: D,
+}
+async fn graph_replay(State(a): State<App>, Json(r): Json<GraphReplayRequest>) -> Response {
+    response(async {
+    let _permit=a.replays.clone().try_acquire_owned().map_err(|_|anyhow::anyhow!("Backtest of historie is bezig"))?;
+    let graph:Value=sqlx::query_scalar("SELECT payload FROM studio.documents WHERE kind='graph' AND name=$1 AND version=$2").bind(&r.name).bind(r.version).fetch_one(&a.db).await?;
+    let plan=crate::studio::graph_plan(&graph)?;crate::graph::validate_parameters(&graph)?;
+    ensure!(!graph["nodes"].as_array().unwrap().iter().any(|n|["news","jev"].contains(&n["kind"].as_str().unwrap_or(""))),"Backtest niet beschikbaar voor nieuws/Jev: historische beslissingen ontbreken. Deze nodes worden niet overgeslagen.");
+    let bot:BotConfig=serde_json::from_value(graph["bot"]["config"].clone())?;
+    let config=ReplayRequest{instrument:bot.instrument.clone(),bar:graph["bot"]["bar"].as_str().unwrap_or("1m").into(),fast:9,slow:21,capital:bot.limits.capital,order_eur:bot.order_eur,stop_bps:bot.stop_bps,target_bps:bot.target_bps,spread_bps:r.spread_bps,slippage_bps:r.slippage_bps};
+    let meta=quotes(&a).await.remove(&config.instrument).ok_or_else(||anyhow::anyhow!("EUR-marktmetadata ontbreekt"))?;
+    let mut cs=crate::history::dataset(&a,&config.instrument,&config.bar).await?;
+    ensure!(cs.len()<=100000,"Deze grafiek-replay accepteert maximaal 100.000 candles. Gebruik Training Lab voor grote onderzoeksdatasets.");
+    ensure!(cs.len()>100,"Minimaal 101 gesloten candles vereist");
+    let mut pine=BTreeMap::new();let mut pinned=vec![];
+    for n in graph["nodes"].as_array().unwrap().iter().filter(|n|n["kind"]=="pine") {
+        let p=&n["params"];
+        let doc:Value=sqlx::query_scalar("SELECT payload FROM studio.documents WHERE kind='pine' AND name=$1 AND version=$2").bind(p["name"].as_str().unwrap()).bind(p["version"].as_i64().unwrap()).fetch_one(&a.db).await?;
+        let result=crate::studio::pine_on_candles(&a,doc["source"].as_str().unwrap_or(""),&config.instrument,&config.bar,&doc["inputs"],&cs).await?;
+        ensure!(result["ok"]==true,"Pine-fout: {}",result["diagnostics"]);
+        pine.insert(n["id"].as_str().unwrap().to_string(),result);
+        pinned.push(json!({"name":p["name"],"version":p["version"],"payload":doc}));
+    }
+    let data=GraphReplayData{graph:graph.clone(),plan,pine,limits:bot.limits};
+    let mut report=replay_engine(&cs,&meta,&config,None,Some(&data))?;
+    report["mode"]=json!("GRAPH_REPLAY");report["strategy"]=json!(format!("{} v{}",r.name,r.version));report["graph"]=graph;report["pine_versions"]=json!(pinned);
+    report["warmup"]=json!("100 bars. Pine/native indicators initialize on the loaded historical dataset; running bots initialize on the latest 300 bars. Stateful/cumulative scripts can differ from forward paper.");
+    let id:i64=sqlx::query_scalar("INSERT INTO paper_v2.replays(report) VALUES($1) RETURNING id").bind(&report).fetch_one(&a.db).await?;
+    Ok(json!({"id":id,"report":report}))
+ }.await)
 }

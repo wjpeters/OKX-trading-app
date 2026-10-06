@@ -1,0 +1,43 @@
+{
+  "at": "2026-10-05T21:41:42.505199+00:00",
+  "scope": "Public spot discovery and diagnostics only; Live remains EUR-only",
+  "public_markets": 1143,
+  "running_gateway_filtered_eur_markets": 270,
+  "policy_revision": 2,
+  "policy_preserved": true,
+  "release_preserved": true,
+  "native_orders_before": 1,
+  "native_orders_after": 1,
+  "native_states": {
+    "FILLED": 1
+  },
+  "native_orders_by_agent": 0,
+  "policy_writes_by_agent": 0,
+  "live_writes_by_agent": 0,
+  "gateway_connected": true,
+  "gateway_reconciled": true,
+  "live_enabled": true,
+  "production_image": "sha256:40901144825741381443e9f7c56e2429f0cf011c2f0c18efa90085c8e462dfc9",
+  "rust_tests_passed": 191,
+  "chart_price_tests_passed": 4,
+  "proposal_gateway_tests_passed": 43,
+  "proposal_applied": false,
+  "private_gateways_restarted": false,
+  "approvals_blocked": [
+    "Broad Live scope expansion without specific market/currency consent",
+    "Restart of the active Live gateway for diagnostics"
+  ],
+  "live_compiler_still_eur_only": true,
+  "max_confirmed_markets_still": 12,
+  "source_sha256": {
+    "backend/src/main.rs": "381a17735f46e3a9208362870b4161b1fa8c23408a042ede34bef93be05955b5",
+    "backend/src/feeds.rs": "70c8a64484fa971e93dad6fae24ce8fb452681c4e5f19b1b69d6c39725d4fb9d",
+    "backend/src/bin/okx-orders.rs": "f33111aefbcd3afd6d3e59e99b3e43054191b1799f086f586444a787898d7471",
+    "frontend/src/App.tsx": "efcdbde4bac1bb94ddffaae61020b648ffd803fc9e2f3cb7ddb7eb9ac13549f5",
+    "frontend/src/OrderTicket.tsx": "9eb0113f86478205d33bdc7ce8d9c80de53ce01b0c85d2b76610926258a355d5",
+    "backend/src/order_risk.rs": "632f89208ce20eb7b3f464e26deed57d16ca73bcff00659b4a080e0d73909c39",
+    "backend/src/order_types.rs": "36200b2afd2e32078e980b9a7125d97339b623b77f5351428188722fc28519a1",
+    "backend/src/order_wallet.rs": "5f42ba6399f7291b1dbe48d5a5ab82a04d6ec60104c72687b6d617410a2d935e",
+    "backend/src/trading.rs": "6416edab3397102837bc2e9b462a2ab2e0a12e47a93f8797540f64e0e079fa6f"
+  }
+}

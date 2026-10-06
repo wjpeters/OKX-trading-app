@@ -32,6 +32,7 @@ try {
    indicator.input[m.name]=value;
  }
  const ctx=await pine.run(indicator);
+ if(Object.keys(ctx.plots||{}).filter(k=>!k.startsWith('__')).length>20)throw Error('Maximaal 20 plots; verminder het aantal reeksen. Signalen worden nooit stil afgekapt.');
  const plots=Object.entries(ctx.plots||{}).filter(([k])=>!k.startsWith('__')).slice(0,20).map(([title,p])=>({title:String(title).slice(0,120),data:(p.data||[]).slice(-5000).map(v=>({time:v.time,value:Number.isFinite(v.value)?v.value:null})),options:{color:typeof p.options?.color==='string'?p.options.color:null}}));
  const intents=plots.filter(p=>p.title==='entry'||p.title==='exit').flatMap(p=>p.data.filter(v=>v.value!==null&&v.value>0).map(v=>({bar_ms:v.time,action:p.title==='entry'?'CONSIDER_ENTRY':'CONSIDER_EXIT',authority:'PROPOSAL_ONLY'})));
  process.stdout.write(JSON.stringify({ok:true,plots,intents,inputs,runtime:'PineTS 0.11.0 / closed-bar profile 1',duration_ms:performance.now()-started,bars:candles.length,diagnostics:[]}));

@@ -1,0 +1,33 @@
+PASS Geen keys: ordergateway meldt ontbrekende aansluiting
+PASS Native contract market
+PASS Native contract limit
+PASS Native contract post_only
+PASS Native contract ioc
+PASS Native contract fok
+PASS Native contract trigger
+PASS Native contract oco
+PASS Native contract move_order_stop
+PASS Native contract smart_iceberg
+PASS Native contract twap
+PASS Live-preview zonder account blijft geblokkeerd
+PASS Directe Live-submit kan de blokkade niet omzeilen
+PASS Caller mag geen risicomachtiging meesturen
+PASS Onjuiste prijsstap afgewezen
+PASS Deel groter dan totaal afgewezen
+PASS Ontbrekende Origin geblokkeerd
+PASS Limieten vereisen persoonlijke bevestiging
+PASS Synthetische accountlimieten in testdatabase geaccepteerd
+PASS Previews reserveren geen saldo
+PASS Twee verkopen kunnen inventaris niet dubbel reserveren
+PASS Herhaalde bevestiging krijgt dezelfde order
+PASS Geen fill bij duurzaam opgeslagen intent
+PASS Order en reservering overleven serverherstart
+PASS Annuleren vóór verzending veilig lokaal afgehandeld
+PASS Verlopen preview kan niet verzonden worden
+PASS Onderbroken private verbinding blokkeert nieuwe order
+PASS Dubbele fill boekt exact eenmaal met basefee
+PASS Beschermde inventaris kan niet opnieuw verkocht worden
+PASS Bevestigde fills en bescherming leesbaar
+PASS Demo- en Live-administratie gescheiden
+PASS Gebruikersrekening en botlimieten behouden
+32 controles geslaagd; nul private OKX-calls

@@ -1,0 +1,108 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.46kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#4 DONE 0.0s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 137B done
+#5 DONE 0.0s
+
+#6 [frontend 1/6] FROM docker.io/library/node@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#6 DONE 0.0s
+
+#7 [stage-3 1/7] FROM docker.io/library/alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
+#7 DONE 0.0s
+
+#8 [backend 1/5] FROM docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#8 DONE 0.0s
+
+#9 [internal] load build context
+#9 transferring context: 13.50kB 0.0s done
+#9 DONE 0.0s
+
+#10 [frontend 3/6] COPY frontend/package*.json ./
+#10 CACHED
+
+#11 [frontend 2/6] WORKDIR /build
+#11 CACHED
+
+#12 [frontend 4/6] RUN npm ci --ignore-scripts
+#12 CACHED
+
+#13 [frontend 5/6] COPY frontend/ ./
+#13 DONE 0.1s
+
+#14 [frontend 6/6] RUN npm run build
+#14 0.324 
+#14 0.324 > okx-tradingterminal-ui@0.4.0 build
+#14 0.324 > tsc --noEmit && vite build
+#14 0.324 
+#14 1.267 vite v8.3.2 building client environment for production...
+#14 1.279 transforming...
+#14 2.089 ✓ 2837 modules transformed.
+#14 2.295 rendering chunks...
+#14 2.852 computing gzip size...
+#14 2.888 dist/index.html                            0.40 kB │ gzip:   0.29 kB
+#14 2.888 dist/assets/editor.worker-DWPaKKV_.js    303.93 kB
+#14 2.888 dist/assets/BotStudio-DLioOiRN.css        15.41 kB │ gzip:   2.56 kB
+#14 2.888 dist/assets/index-CEO9jTbY.css            48.81 kB │ gzip:  10.69 kB
+#14 2.888 dist/assets/Studio-DjpsE8to.css           99.09 kB │ gzip:  14.20 kB
+#14 2.888 dist/assets/BotStudio-CpO0jFLb.js        195.76 kB │ gzip:  63.18 kB
+#14 2.888 dist/assets/index-C1eFaVZM.js            562.05 kB │ gzip: 174.74 kB
+#14 2.888 dist/assets/Studio-BRuLYsy9.js         2,733.04 kB │ gzip: 703.20 kB
+#14 2.888 
+#14 2.890 [plugin builtin:vite-reporter] 
+#14 2.890 (!) Some chunks are larger than 500 kB after minification. Consider:
+#14 2.890 - Using dynamic import() to code-split the application
+#14 2.890 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#14 2.890 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#14 2.892 ✓ built in 1.62s
+#14 DONE 3.1s
+
+#15 [backend 3/5] WORKDIR /build
+#15 CACHED
+
+#16 [backend 4/5] COPY backend/ ./
+#16 CACHED
+
+#17 [backend 5/5] RUN --mount=type=cache,target=/usr/local/cargo/registry --mount=type=cache,target=/build/target,id=okx-musl-target cargo build --release --locked && cp target/release/okx-terminal /okx-terminal && cp target/release/okx-onboarding /okx-onboarding
+#17 CACHED
+
+#18 [stage-3 2/7] RUN apk upgrade --no-cache && apk add --no-cache ca-certificates
+#18 CACHED
+
+#19 [backend 2/5] RUN apk add --no-cache musl-dev gcc make
+#19 CACHED
+
+#20 [stage-3 3/7] RUN mkdir /jobs /archives /onboarding && chown 10001:10001 /jobs /archives /onboarding
+#20 CACHED
+
+#21 [stage-3 4/7] WORKDIR /app
+#21 CACHED
+
+#22 [stage-3 5/7] COPY --from=backend /okx-terminal /app/okx-terminal
+#22 CACHED
+
+#23 [stage-3 6/7] COPY --from=backend /okx-onboarding /app/okx-onboarding
+#23 CACHED
+
+#24 [stage-3 7/7] COPY --from=frontend /build/dist /app/public
+#24 DONE 0.0s
+
+#25 exporting to image
+#25 exporting layers 0.0s done
+#25 writing image sha256:92c929e2efca47ef23cd8954f6765938a83cfd4e099fa306a93cf100385bd8cf done
+#25 naming to docker.io/library/okx-tradingterminal:0.4.0 done
+#25 DONE 0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/s762nl1k5helq4xl1mdn3hkfp

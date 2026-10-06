@@ -1,0 +1,21 @@
+{
+  "backend/src/main.rs": "cb012363519301bd1e449e201c88bff537584b0fa694357220aecca54331f117",
+  "backend/src/exchange.rs": "505462eb801253633ca16f49588a4052996e3aa697e746bf34077b1c1d74632f",
+  "backend/src/order_types.rs": "36200b2afd2e32078e980b9a7125d97339b623b77f5351428188722fc28519a1",
+  "backend/src/order_risk.rs": "aaf634873c27c5e48ee219f444e54fa27c422a396a001618426dee81223c9a48",
+  "backend/src/order_ledger.rs": "449a357bb01dc19776a49f89f333c46713993a32e257cc8ec7d933ab138c96df",
+  "backend/src/order_gateway_ledger.rs": "0454b08897c13563c856f0c186cf8337a7aed78fa6421611cc4d24ec61519b61",
+  "backend/src/trading.rs": "92abeba3847c9095fed4f6af94b782bfd7c4f42e9d72cfe990a8cab3d2d0fabf",
+  "backend/src/bin/okx-orders.rs": "d7892b7d674af1e9769ad9b78d7b5c0ab4c446f860a421278b411e789e14910f",
+  "backend/src/bin/okx-onboarding.rs": "c4d95baef7a8a225cdb8541608de5161659678eb380637bea3a881cf6ff2eb75",
+  "backend/migrations/007_exchange_orders.sql": "d2b280ff356f5c31d35e58e6ac988d2603f40d01e0619509d98347ecd9e7ee73",
+  "frontend/src/OrderTicket.tsx": "09266a3c2ea7ab4531d81814a2ff0de24d17e162201c668972fb1f349df043bf",
+  "frontend/src/orders.css": "0066040e0ba3bb2fd6e2d608436c0ebd2811917cca898844f28c048d30c1e94e",
+  "frontend/src/App.tsx": "d221b6f79b363106f10bdc3f2fdcf8e411f6684512ef57de9d71506af52f9ccb",
+  "Dockerfile": "ac791798fcc827f8beb6a606cd25af6cd3b8253de6d7375ba4061193f90ef087",
+  "compose.yaml": "f21e95b687042aedc82cda22ff591de5b4508c6ab52e717614773c45115b1eb4",
+  "scripts/order_acceptance.py": "74d66e244876d9e47741383dd28cb14ecec57e4e2f9a9d35fec4b216e3830ec5",
+  "docs/ORDERS.md": "167e02f80b5d43ebb30070a0a12c7f172f38cfe98eedc63a9fea5257e00e5cb5",
+  "scripts/start-orders.py": "7850f0c4b68e32158d9ea13df1d3996f6776bb7724873dfed46c9283ce974614",
+  "Start OKX Orders.command": "6e3e867e753b9705e732fa2a888e2d235de69386765ed01fdd44d93dc851a7bc"
+}

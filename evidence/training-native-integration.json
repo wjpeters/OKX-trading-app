@@ -1,0 +1,217 @@
+{
+  "scope": "synthetic qualification/account/candle fixtures only; disposable DB; zero private calls; not real qualification evidence",
+  "checks": [
+    {
+      "check": "native schema and routes migrated",
+      "passed": true
+    },
+    {
+      "check": "cross-origin native activation rejected",
+      "passed": true
+    },
+    {
+      "check": "no native activation without real historical gate",
+      "passed": true
+    },
+    {
+      "check": "no native activation without 30d forward gate",
+      "passed": true
+    },
+    {
+      "check": "manual Live permission cannot substitute for actual Demo proof",
+      "passed": true
+    },
+    {
+      "check": "unconfirmed exact bot release rejected",
+      "passed": true
+    },
+    {
+      "check": "bot drawdown cannot exceed 5%",
+      "passed": true
+    },
+    {
+      "check": "bot cannot enlarge account limits",
+      "passed": true
+    },
+    {
+      "check": "explicit synthetic Demo binding accepted only in test DB",
+      "passed": true
+    },
+    {
+      "check": "one bounded IOC proposal is durable without fictitious fills",
+      "passed": true
+    },
+    {
+      "check": "durable proposal latency below two seconds on fixture",
+      "passed": true
+    },
+    {
+      "check": "duplicate same-candle proposals suppressed",
+      "passed": true
+    },
+    {
+      "check": "pause cancels unsubmitted owned entry",
+      "passed": true
+    },
+    {
+      "check": "Demo acceptance cannot be fabricated from a queued proposal",
+      "passed": true
+    },
+    {
+      "check": "exact release identity is immutable in database",
+      "passed": true
+    },
+    {
+      "check": "revoke exact release succeeds",
+      "passed": true
+    },
+    {
+      "check": "revoked release cannot resume",
+      "passed": true
+    },
+    {
+      "check": "no paper account or exchange fills initialized",
+      "passed": true
+    }
+  ],
+  "at": 1791288311.724289,
+  "latency_fixture": {
+    "fixture": true,
+    "scope": "synthetic qualification and account fixtures; no real Demo evidence",
+    "proposal_reports": [
+      {
+        "fills": 0,
+        "reason": "Gatewayrekening ontbreekt",
+        "holdings": {
+          "EUR": "500"
+        },
+        "activation": {
+          "hidden": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "inputs": [
+            -0.07219985304820736,
+            -0.03880308700809627,
+            8.0,
+            8.0,
+            1.1086787023992961,
+            -8.0,
+            0.3278745344719597,
+            8.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0030013063971656407,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "outputs": [
+            0.00033512536179887447,
+            0.9989946239146037,
+            0.00033512536179887447,
+            0.00033512536179887447
+          ],
+          "selected": 1
+        },
+        "equity_eur": "500",
+        "net_pnl_eur": "0",
+        "drawdown_eur": "0",
+        "last_decision": {
+          "ts": 1791288240000,
+          "action": "wait",
+          "reason": "Entries gepauzeerd",
+          "strategy": "breakout"
+        },
+        "daily_loss_eur": "0",
+        "total_loss_eur": "0",
+        "entries_blocked": true,
+        "proposal_latency_ms": 996
+      },
+      {
+        "fills": 0,
+        "reason": "Gatewayrekening ontbreekt",
+        "holdings": {
+          "EUR": "500"
+        },
+        "activation": {
+          "hidden": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "inputs": [
+            8.0,
+            3.1876136543314906,
+            8.0,
+            0.3021441489853543,
+            1.0431499640185966,
+            0.0,
+            2.624248873170262,
+            -8.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0030013063971656407,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "outputs": [
+            0.00033512536179887447,
+            0.9989946239146037,
+            0.00033512536179887447,
+            0.00033512536179887447
+          ],
+          "selected": 1
+        },
+        "equity_eur": "500",
+        "net_pnl_eur": "0",
+        "drawdown_eur": "0",
+        "last_decision": {
+          "ts": 1791288240000,
+          "action": "propose_buy",
+          "reason": "Gesloten candle en strategiefilter geslaagd",
+          "strategy": "breakout",
+          "client_id": "N87a0fe88600ac4c053798f50"
+        },
+        "daily_loss_eur": "0",
+        "total_loss_eur": "0",
+        "entries_blocked": true,
+        "proposal_latency_ms": 573,
+        "proposal_prepare_ms": 572,
+        "proposal_latency_scope": "closed-candle first receipt to durable queue transaction commit; excludes exchange ACK"
+      }
+    ]
+  }
+}

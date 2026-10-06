@@ -2,7 +2,8 @@
 from pathlib import Path
 import subprocess,json,os
 root=Path(__file__).resolve().parents[1]
-if not (root/'.local/okx_demo.json').is_file():raise SystemExit('Gebruik eerst Configureer Demo.command voor een nieuwe Demo-sleutel.')
+subprocess.run(['rtk','proxy','python3',str(root/'scripts/bootstrap.py')],check=True)
+if not (root/'.local/provider-settings/okx_demo').is_file():raise SystemExit('Sla eerst de OKX Demo-sleutel op via Systeem.')
 args=['rtk','proxy','docker','compose','-f','compose.yaml','-f','compose.demo.yaml','--profile','demo','run','--rm','--no-deps']
 subprocess.run(args+['demo-onboarding'],cwd=root,check=True)
 r=subprocess.run(args+['--entrypoint','cat','demo-onboarding','/onboarding/demo-snapshot.json'],cwd=root,check=True,stdout=subprocess.PIPE)

@@ -9,6 +9,7 @@ use std::{
     time::{Duration, Instant},
 };
 use tokio_tungstenite::{connect_async, tungstenite::Message};
+pub const PREFERRED: [&str;12] = ["BTC-EUR","ETH-EUR","SOL-EUR","XRP-EUR","DOGE-EUR","ADA-EUR","AVAX-EUR","LINK-EUR","BTC-USDC","ETH-USDC","SOL-USDC","SUI-USDC"];
 fn decimal(v: &Value) -> bool {
     v.as_str()
         .and_then(|s| Decimal::from_str(s).ok())
@@ -94,31 +95,17 @@ async fn catalogue(app: &App) -> Result<()> {
     let all = app
         .public_get("/api/v5/public/instruments", &[("instType", "SPOT")])
         .await?;
-    let preferred = [
-        "BTC-EUR", "ETH-EUR", "SOL-EUR", "XRP-EUR", "DOGE-EUR", "ADA-EUR", "AVAX-EUR", "LINK-EUR",
-        "BTC-USDC", "ETH-USDC", "SOL-USDC", "SUI-USDC",
-    ];
-    let instruments: Vec<_> = preferred
-        .iter()
-        .filter_map(|id| {
-            all["data"]
-                .as_array()?
-                .iter()
-                .find(|v| {
-                    v["instId"] == *id
-                        && v["state"] == "live"
-                        && decimal(&v["tickSz"])
-                        && decimal(&v["lotSz"])
-                        && decimal(&v["minSz"])
-                })
-                .cloned()
-        })
-        .collect();
+    let catalogue:Vec<_> = all["data"].as_array().unwrap().iter().filter(|v|v["state"]=="live" && decimal(&v["tickSz"]) && decimal(&v["lotSz"]) && decimal(&v["minSz"]) && v["instId"].as_str().is_some_and(|id| id.len()<=40 && id.bytes().all(|b|b.is_ascii_alphanumeric()||b==b'-'))).cloned().collect();
+    let current:Vec<String>=app.market.read().await.instruments.iter().filter_map(|v|v["instId"].as_str().map(str::to_owned)).collect();
+    let mut selected:Vec<String>=PREFERRED.iter().map(|s|s.to_string()).collect();
+    selected.extend(current.into_iter().filter(|s|!PREFERRED.contains(&s.as_str())));
+    let instruments:Vec<_>=selected.iter().filter_map(|id|catalogue.iter().find(|v|v["instId"]==*id).cloned()).collect();
     if instruments.is_empty() {
         bail!("Geen aangevraagde spotinstrumenten beschikbaar; geen fallback naar andere regio");
     }
     let mut m = app.market.write().await;
     m.instruments = instruments;
+    m.catalogue = catalogue;
     m.metadata_received_ms = Some(now_ms());
     m.clock_offset_ms = Some(ts - (local + end) / 2);
     m.clock_rtt_ms = Some(end - local);
@@ -130,7 +117,7 @@ async fn connection(app: &App) -> Result<()> {
         connect_async("wss://wseea.okx.com/ws/v5/public"),
     )
     .await??;
-    let ids: Vec<String> = app
+    let mut ids: Vec<String> = app
         .market
         .read()
         .await
@@ -159,7 +146,17 @@ async fn connection(app: &App) -> Result<()> {
         m.trades.clear();
     }
     let mut books = std::collections::BTreeMap::<String, crate::book::Book>::new();
+    let mut known:std::collections::BTreeSet<String>=ids.iter().cloned().collect();
     loop {
+        let desired:Vec<String>=app.market.read().await.instruments.iter().filter_map(|v|v["instId"].as_str().map(str::to_owned)).collect();
+        for (op,list) in [("unsubscribe",ids.iter().filter(|id|!desired.contains(id)).cloned().collect::<Vec<_>>()),("subscribe",desired.iter().filter(|id|!ids.contains(id)).cloned().collect::<Vec<_>>())] {
+            if !list.is_empty(){
+                let args:Vec<_>=list.iter().flat_map(|id|["tickers","books","trades"].into_iter().map(move|ch|json!({"channel":ch,"instId":id}))).collect();
+                socket.send(Message::Text(json!({"op":op,"args":args}).to_string().into())).await?;
+                if op=="subscribe" {known.extend(list.iter().cloned());for id in &list{books.remove(id);}}
+            }
+        }
+        ids=desired;
         let incoming = match tokio::time::timeout(Duration::from_secs(20), socket.next()).await {
             Ok(v) => v,
             Err(_) => {
@@ -196,9 +193,10 @@ async fn connection(app: &App) -> Result<()> {
         };
         let id = v["arg"]["instId"].as_str().unwrap_or("");
         let channel = v["arg"]["channel"].as_str().unwrap_or("");
-        if !ids.iter().any(|s| s == id) {
+        if !known.contains(id) {
             bail!("Onbekend WS instrument");
         }
+        if !ids.iter().any(|s|s==id) {continue;}
         let mut market = app.market.write().await;
         for raw in data {
             if !valid(channel, raw) {

@@ -1,0 +1,130 @@
+[
+  {
+    "check": "Five built-in system bots available",
+    "passed": true
+  },
+  {
+    "check": "Examples need no user account",
+    "passed": true
+  },
+  {
+    "check": "SMA 9 / 21 validates without AI",
+    "passed": true
+  },
+  {
+    "check": "SMA 9 / 21 saved as editable copy",
+    "passed": true
+  },
+  {
+    "check": "SMA 9 / 21 backtests actual saved graph",
+    "passed": true
+  },
+  {
+    "check": "EMA 9 / 21 validates without AI",
+    "passed": true
+  },
+  {
+    "check": "EMA 9 / 21 saved as editable copy",
+    "passed": true
+  },
+  {
+    "check": "EMA 9 / 21 backtests actual saved graph",
+    "passed": true
+  },
+  {
+    "check": "RSI 30 / 70 validates without AI",
+    "passed": true
+  },
+  {
+    "check": "RSI 30 / 70 saved as editable copy",
+    "passed": true
+  },
+  {
+    "check": "RSI 30 / 70 backtests actual saved graph",
+    "passed": true
+  },
+  {
+    "check": "MACD 12 / 26 / 9 validates without AI",
+    "passed": true
+  },
+  {
+    "check": "MACD 12 / 26 / 9 saved as editable copy",
+    "passed": true
+  },
+  {
+    "check": "MACD 12 / 26 / 9 backtests actual saved graph",
+    "passed": true
+  },
+  {
+    "check": "Bollinger terugkeer validates without AI",
+    "passed": true
+  },
+  {
+    "check": "Bollinger terugkeer saved as editable copy",
+    "passed": true
+  },
+  {
+    "check": "Bollinger terugkeer backtests actual saved graph",
+    "passed": true
+  },
+  {
+    "check": "Jev rejected when AI is off",
+    "passed": true
+  },
+  {
+    "check": "Jev only allowed with explicit opt-in",
+    "passed": true
+  },
+  {
+    "check": "Zero decline threshold rejected",
+    "passed": true
+  },
+  {
+    "check": "Immutable catalog unchanged after edits",
+    "passed": true
+  },
+  {
+    "check": "No AI configured or spent",
+    "passed": true
+  },
+  {
+    "check": "Backtests did not initialize or trade account",
+    "passed": true
+  },
+  {
+    "check": "User configuration untouched",
+    "passed": true
+  },
+  {
+    "check": "Guard close_pause saved",
+    "passed": true
+  },
+  {
+    "check": "Guard close_pause fires on actual historical candle",
+    "passed": true
+  },
+  {
+    "check": "Guard close_pause remains paused after trigger",
+    "passed": true
+  },
+  {
+    "check": "Guard pause saved",
+    "passed": true
+  },
+  {
+    "check": "Guard pause fires on actual historical candle",
+    "passed": true
+  },
+  {
+    "check": "Guard pause remains paused after trigger",
+    "passed": true
+  },
+  {
+    "check": "Guard close saved",
+    "passed": true
+  },
+  {
+    "check": "Guard close fires on actual historical candle",
+    "passed": true
+  }
+]

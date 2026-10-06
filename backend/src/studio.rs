@@ -1,7 +1,7 @@
 //! Versioned research documents and durable server alerts. No exchange capabilities.
 use crate::{
     App, CandleQuery, candle_result,
-    model::{interval, now_ms},
+    model::{Timeframe, interval, now_ms},
 };
 use anyhow::{Result, bail, ensure};
 use axum::{
@@ -52,7 +52,7 @@ struct Save {
     payload: Value,
 }
 async fn save(State(a): State<App>, Json(r): Json<Save>) -> Response {
-    reply(async{ensure!(["pine","graph","workspace","drawings"].contains(&r.kind.as_str()),"Documenttype ongeldig");ensure!(!r.name.trim().is_empty()&&r.name.len()<=80&&r.payload.to_string().len()<=14000,"Document te groot of naam ongeldig");if r.kind=="graph"{graph_plan(&r.payload)?;}if r.kind=="pine"{ensure!(r.payload["source"].as_str().is_some_and(|s|s.len()<=12000),"Pine-bron ontbreekt");}let mut tx=a.db.begin().await?;sqlx::query("SELECT pg_advisory_xact_lock(478003)").execute(&mut *tx).await?;let v:Option<i64>=sqlx::query_scalar("SELECT max(version) FROM studio.documents WHERE kind=$1 AND name=$2").bind(&r.kind).bind(&r.name).fetch_one(&mut *tx).await?;ensure!(v.unwrap_or(0)==r.base_version,"Een nieuwere versie bestaat; laad die eerst om overschrijven te voorkomen");let version=r.base_version+1;sqlx::query("INSERT INTO studio.documents(kind,name,version,payload,created_ms) VALUES($1,$2,$3,$4,$5)").bind(r.kind).bind(r.name).bind(version).bind(r.payload).bind(now_ms()).execute(&mut *tx).await?;tx.commit().await?;Ok(json!({"version":version}))}.await)
+    reply(async{ensure!(["pine","graph","workspace","drawings"].contains(&r.kind.as_str()),"Documenttype ongeldig");ensure!(!r.name.trim().is_empty()&&r.name.len()<=80&&r.payload.to_string().len()<=14000,"Document te groot of naam ongeldig");if r.kind=="graph"{graph_plan(&r.payload)?;crate::graph::validate_parameters(&r.payload)?;}if r.kind=="pine"{ensure!(r.payload["source"].as_str().is_some_and(|s|s.len()<=12000),"Pine-bron ontbreekt");}let mut tx=a.db.begin().await?;sqlx::query("SELECT pg_advisory_xact_lock(478003)").execute(&mut *tx).await?;let v:Option<i64>=sqlx::query_scalar("SELECT max(version) FROM studio.documents WHERE kind=$1 AND name=$2").bind(&r.kind).bind(&r.name).fetch_one(&mut *tx).await?;ensure!(v.unwrap_or(0)==r.base_version,"Een nieuwere versie bestaat; laad die eerst om overschrijven te voorkomen");let version=r.base_version+1;sqlx::query("INSERT INTO studio.documents(kind,name,version,payload,created_ms) VALUES($1,$2,$3,$4,$5)").bind(r.kind).bind(r.name).bind(version).bind(r.payload).bind(now_ms()).execute(&mut *tx).await?;tx.commit().await?;Ok(json!({"version":version}))}.await)
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -79,7 +79,11 @@ pub async fn run_pine(
     )
     .await?;
     ensure!(data["gaps"] == 0, "Datagat in Pine-historie");
-    let step = interval(bar).ok_or_else(|| anyhow::anyhow!("Timeframe ongeldig"))?;
+    let step = interval(bar).ok_or_else(|| {
+        anyhow::anyhow!(
+            "Pine ondersteunt nog geen maand- of kwartaalcandles; kies een vast interval t/m week"
+        )
+    })?;
     let candles: Vec<_> = data["candles"]
         .as_array()
         .unwrap()
@@ -108,7 +112,11 @@ pub async fn pine_on_candles(
         inputs.is_null() || (inputs.is_object() && inputs.to_string().len() <= 2000),
         "Pine-inputs ongeldig of te groot"
     );
-    let step = interval(bar).ok_or_else(|| anyhow::anyhow!("Timeframe ongeldig"))?;
+    let step = interval(bar).ok_or_else(|| {
+        anyhow::anyhow!(
+            "Pine ondersteunt nog geen maand- of kwartaalcandles; kies een vast interval t/m week"
+        )
+    })?;
     use ring::rand::SecureRandom;
     let mut nonce = [0u8; 16];
     ring::rand::SystemRandom::new()
@@ -193,7 +201,7 @@ fn check_alert(r: &Alert) -> Result<()> {
         !r.name.trim().is_empty() && r.name.len() <= 80,
         "Alertnaam ongeldig"
     );
-    ensure!(interval(&r.bar).is_some(), "Timeframe ongeldig");
+    ensure!(Timeframe::parse(&r.bar).is_some(), "Timeframe ongeldig");
     ensure!(
         !r.field.starts_with("bot_")
             || r.bot_id
@@ -434,7 +442,11 @@ async fn alert_value(a: &App, r: &Alert) -> Result<(f64, i64)> {
                 .drawing
                 .as_ref()
                 .ok_or_else(|| anyhow::anyhow!("Tekening ontbreekt"))?
-                .price_at(ts + interval(&r.bar).unwrap())?
+                .price_at(
+                    Timeframe::parse(&r.bar)
+                        .and_then(|frame| frame.next_open(ts))
+                        .ok_or_else(|| anyhow::anyhow!("Timeframegrens ongeldig"))?,
+                )?
         } else {
             v
         },
@@ -523,8 +535,15 @@ pub fn graph_plan(v: &Value) -> Result<Vec<String>> {
             [
                 "market",
                 "sma_cross",
+                "ema_cross",
+                "macd_cross",
+                "bollinger",
+                "candle_stop",
                 "rsi_range",
                 "condition",
+                "if_else",
+                "not",
+                "action",
                 "and",
                 "or",
                 "time_window",
@@ -550,6 +569,17 @@ pub fn graph_plan(v: &Value) -> Result<Vec<String>> {
             degree.contains_key(from) && degree.contains_key(to) && pairs.insert((from, to)),
             "Ongeldige of dubbele verbinding"
         );
+        if kinds[from] == "if_else" {
+            ensure!(
+                ["true", "false"].contains(&e["sourceHandle"].as_str().unwrap_or("")),
+                "If/else vereist een Ja- of Nee-uitgang"
+            );
+        } else {
+            ensure!(
+                e["sourceHandle"].is_null(),
+                "Alleen if/else heeft benoemde uitgangen"
+            );
+        }
         *degree.get_mut(to).unwrap() += 1;
         adjacency.entry(from).or_default().push(to);
     }
@@ -559,6 +589,17 @@ pub fn graph_plan(v: &Value) -> Result<Vec<String>> {
             && kinds.values().filter(|k| **k == "market").count() == 1,
         "Eén marktbron, intent en vaste risicokern vereist"
     );
+    for (id, kind) in &kinds {
+        if *kind == "if_else" {
+            for handle in ["true", "false"] {
+                ensure!(
+                    es.iter()
+                        .any(|e| e["source"] == *id && e["sourceHandle"] == handle),
+                    "Verbind beide if/else-uitgangen"
+                );
+            }
+        }
+    }
     let gate = *kinds.iter().find(|(_, k)| **k == "risk_gate").unwrap().0;
     let intent = *kinds.iter().find(|(_, k)| **k == "intent").unwrap().0;
     ensure!(
@@ -690,9 +731,9 @@ async fn custom_indicators(State(a): State<App>, Json(r): Json<IndicatorRequest>
             )
             .await?;
             let cs: Vec<crate::model::Candle> = serde_json::from_value(d["candles"].clone())?;
-            d["indicators"] = serde_json::to_value(crate::indicators::calculate_with(
+            d["indicators"] = serde_json::to_value(crate::indicators::calculate_for(
                 &cs,
-                interval(&r.bar).unwrap(),
+                Timeframe::parse(&r.bar).ok_or_else(|| anyhow::anyhow!("Timeframe ongeldig"))?,
                 &r.settings,
             ))?;
             d["indicator_parameters"] = serde_json::to_value(r.settings)?;

@@ -1,0 +1,91 @@
+{
+  "scope": "synthetic fixtures; disposable database on port 4781; no orders or account setup",
+  "at": 1791283615.653437,
+  "checks": [
+    {
+      "check": "real CMA-ES / two Rust evaluator workers / three seeds / six generations",
+      "passed": true
+    },
+    {
+      "check": "resume returns identical finalized candidates",
+      "passed": true
+    },
+    {
+      "check": "short synthetic results rejected as insufficient evidence",
+      "passed": true
+    },
+    {
+      "check": "training schema migrated and overview accessible",
+      "passed": true
+    },
+    {
+      "check": "user budget not initialized in test environment",
+      "passed": true
+    },
+    {
+      "check": "default fixed network is 16 / 16 / 4",
+      "passed": true
+    },
+    {
+      "check": "live release remains unavailable",
+      "passed": true
+    },
+    {
+      "check": "cross-origin mutations rejected",
+      "passed": true
+    },
+    {
+      "check": "real public dataset import starts",
+      "passed": true
+    },
+    {
+      "check": "public candles imported without gaps",
+      "passed": true
+    },
+    {
+      "check": "short datasets cannot start a campaign",
+      "passed": true
+    },
+    {
+      "check": "resource cap rejected before campaign creation",
+      "passed": true
+    },
+    {
+      "check": "duplicate timeframes rejected",
+      "passed": true
+    },
+    {
+      "check": "artifact mutation rejected by database",
+      "passed": true
+    },
+    {
+      "check": "campaign profile mutation rejected by database",
+      "passed": true
+    },
+    {
+      "check": "predeclared holdout family reserved once",
+      "passed": true
+    },
+    {
+      "check": "second attempt on consumed holdout rejected",
+      "passed": true
+    },
+    {
+      "check": "unqualified forward rejected",
+      "passed": true
+    },
+    {
+      "check": "live release rejected even with explicit test consent",
+      "passed": true
+    },
+    {
+      "check": "qualification never initializes a paper account",
+      "passed": true
+    }
+  ],
+  "real_dataset": {
+    "instrument": "BTC-EUR",
+    "rows": 360,
+    "coverage": 1.0
+  }
+}

@@ -1,0 +1,20 @@
+> node --test tests/drawing-model.test.mjs
+✔ all nine tools have explicit placement steps (0.725584ms)
+✔ channel width follows the third point on either side of the slope (0.13825ms)
+✔ long preview defaults to 2:1 and respects a chosen target (0.087625ms)
+✔ short preview projects reward below entry (0.067875ms)
+✔ moving a risk drawing preserves risk/reward distances (0.782083ms)
+✔ moving a channel preserves its signed offset (0.117125ms)
+✔ timestamp projection round trips gaps, fractional bars and future space (0.342709ms)
+✔ single-candle projection remains finite (0.130125ms)
+✔ legacy v1 drawings keep IDs, locks, text and old risk target (0.551958ms)
+✔ malformed saved drawings fail without silently overwriting the source (0.866916ms)
+✔ future monthly drawing anchors follow leap years and quarter boundaries (2.325292ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 137.808041

@@ -15,15 +15,20 @@ import type {
 } from "lightweight-charts";
 import type { Candles, IndicatorKey } from "./types";
 import Drawings from "./Drawings";
+import type { ChartPricePick } from "./chart-price";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "./types";
+import { previewPine } from "./studio-ui";
+import type { Doc } from "./studio-ui";
 import { usePreferences } from "./store";
 export default function Chart({
   data,
   tickSize,
+  onPricePick,
 }: {
   data: Candles;
   tickSize: string;
+  onPricePick?: (pick: ChartPricePick) => void;
 }) {
   const dataRef = useRef(data);
   dataRef.current = data;
@@ -66,7 +71,109 @@ export default function Chart({
   const host = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi | null>(null);
   const view = useRef<{ from: number; to: number } | null>(null);
-  const { chartType, overlay, oscillator, light, timezone } = usePreferences();
+  const { chartType, overlay, oscillator, light, timezone, pineScripts } =
+    usePreferences();
+  const scriptDocs = useQuery({
+    queryKey: ["documents", "pine"],
+    queryFn: () => api<Doc[]>("/api/studio/documents?kind=pine"),
+    enabled: pineScripts.length > 0,
+  });
+  const pine = useQuery({
+    queryKey: [
+      "chart-pine",
+      data.instrument,
+      data.bar,
+      pineScripts,
+      scriptDocs.data?.map((d) => `${d.name}:${d.version}`).join("|"),
+    ],
+    enabled: pineScripts.length > 0 && !!scriptDocs.data,
+    refetchInterval: 60000,
+    retry: 1,
+    retryDelay: 750,
+    queryFn: async () => {
+      const out: {
+        name: string;
+        display: string;
+        plots: {
+          title: string;
+          data: { time: number; value: number | null }[];
+        }[];
+      }[] = [];
+      for (const pin of pineScripts) {
+        const d = scriptDocs.data?.find(
+          (d) => d.name === pin.name && d.version === pin.version,
+        );
+        if (!d) throw Error(`${pin.name} v${pin.version} niet gevonden`);
+        const r = await previewPine<{
+          ok: boolean;
+          plots: {
+            title: string;
+            data: { time: number; value: number | null }[];
+          }[];
+          diagnostics: { message: string }[];
+        }>({
+          source: d.payload.source,
+          inputs: d.payload.inputs,
+          instrument: data.instrument,
+          bar: data.bar,
+        });
+        if (!r.ok) throw Error(r.diagnostics.map((x) => x.message).join(" · "));
+        out.push({
+          name: d.name,
+          display: String(d.payload.display || "overlay"),
+          plots: r.plots,
+        });
+      }
+      return out;
+    },
+  });
+  useEffect(() => {
+    if (
+      !axes ||
+      chart.current !== axes.chart ||
+      !pine.data ||
+      pine.isError ||
+      !pineScripts.length
+    )
+      return;
+    const lines: ISeriesApi<"Line">[] = [];
+    const colors = ["#60cdb6", "#ba9df8", "#f2bc66", "#75b6fb"];
+    let count = 0;
+    for (const script of pine.data) {
+      for (const plot of script.plots) {
+        const signal = plot.title === "entry" || plot.title === "exit";
+        const line = axes.chart.addSeries(
+          LineSeries,
+          {
+            title: `${script.name} · ${plot.title}`,
+            color: colors[count++ % colors.length],
+            lineWidth: 2,
+            priceLineVisible: false,
+          },
+          signal ? 3 : script.display === "pane" ? 4 : 0,
+        );
+        line.setData(
+          plot.data.map((p) =>
+            p.value === null
+              ? { time: (p.time / 1000) as UTCTimestamp }
+              : { time: (p.time / 1000) as UTCTimestamp, value: p.value },
+          ),
+        );
+        lines.push(line);
+      }
+    }
+    axes.chart.panes()[3]?.setStretchFactor(1);
+    axes.chart.panes()[4]?.setStretchFactor(1.5);
+    return () => {
+      // A removed chart must not schedule another draw while its effects clean up.
+      if (chart.current !== axes.chart) return;
+      for (const l of lines) {
+        try {
+          axes.chart.removeSeries(l);
+        } catch {}
+      }
+    };
+  }, [axes, pine.data, pine.isError, pineScripts]);
   useEffect(() => {
     view.current = null;
   }, [data.instrument, data.bar]);
@@ -88,6 +195,7 @@ export default function Chart({
                 : Date.UTC(t.year, t.month - 1, t.day),
           ).toLocaleString("nl-NL", {
             timeZone: timezone || "UTC",
+            year: "numeric",
             month: "short",
             day: "numeric",
             hour: "2-digit",
@@ -129,11 +237,12 @@ export default function Chart({
                 ? t
                 : Date.UTC(t.year, t.month - 1, t.day),
           ).toLocaleString("nl-NL", {
-            timeZone: timezone || "UTC",
-            day: "2-digit",
-            month: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
+            timeZone: /[DWM]/.test(data.bar) ? "UTC" : timezone || "UTC",
+            year: /[DWM]/.test(data.bar) ? "2-digit" : undefined,
+            day: /M/.test(data.bar) ? undefined : "2-digit",
+            month: /M/.test(data.bar) ? "short" : "2-digit",
+            hour: /[DWM]/.test(data.bar) ? undefined : "2-digit",
+            minute: /[DWM]/.test(data.bar) ? undefined : "2-digit",
           }),
       },
       crosshair: {
@@ -313,7 +422,7 @@ export default function Chart({
     updateData.current?.(data);
   }, [data]);
   useEffect(() => {
-    if (!axes) return;
+    if (!axes || chart.current !== axes.chart) return;
     const lines: ReturnType<typeof axes.series.createPriceLine>[] = [];
     for (const p of Object.values(paper.data?.account?.positions || {})) {
       if (p.instrument !== data.instrument || +p.quantity <= 0) continue;
@@ -336,6 +445,8 @@ export default function Chart({
       }
     }
     return () => {
+      // A removed chart must not schedule another draw while its effects clean up.
+      if (chart.current !== axes.chart) return;
       for (const l of lines) {
         try {
           axes.series.removePriceLine(l);
@@ -345,6 +456,15 @@ export default function Chart({
   }, [axes, paper.data, data.instrument]);
   return (
     <div className="chart-with-tools">
+      {!!pineScripts.length && (
+        <div className="pine-chart-status" role="status">
+          {pine.isError || scriptDocs.isError
+            ? `Pine: ${pine.error?.message || scriptDocs.error?.message}`
+            : pine.isFetching
+              ? "Pine berekenen…"
+              : `${pineScripts.length} Pine-script(s) · gesloten candles`}
+        </div>
+      )}
       <div
         className="chart-canvas"
         ref={host}
@@ -357,6 +477,7 @@ export default function Chart({
           series={axes.series}
           data={data}
           tickSize={tickSize}
+          onPricePick={onPricePick}
         />
       )}
     </div>

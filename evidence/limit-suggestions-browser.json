@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-05T20:36:58.359Z",
+  "url": "http://127.0.0.1:4780/",
+  "example500": {
+    "Dagverlieslimiet (EUR, UTC)": "15",
+    "Maximaal bedrag per order (EUR)": "50",
+    "Maximaal open orders": "3",
+    "Maximaal orders per minuut": "2",
+    "Maximaal risico per order (EUR)": "5",
+    "Maximale blootstelling per munt (EUR)": "125",
+    "Maximale drawdown (EUR)": "50",
+    "Maximale spread (basispunten)": "20",
+    "Totaal handelsbudget (EUR)": "500",
+    "Totaalverlieslimiet (EUR)": "50"
+  },
+  "realAccountSaved": false,
+  "changedBudget": {
+    "capital": "1000",
+    "order": "100",
+    "personalRisk": "3"
+  },
+  "resetRestoresAutomaticRisk": true,
+  "modeSwitchClearsDraft": true,
+  "confirmationRequired": true
+}

@@ -1,0 +1,162 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.55kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/node@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#3 DONE 0.1s
+
+#4 [internal] load metadata for docker.io/library/alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
+#4 DONE 0.1s
+
+#5 [internal] load .dockerignore
+#5 transferring context:
+#5 transferring context: 137B 0.0s done
+#5 DONE 0.0s
+
+#6 [backend 1/5] FROM docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#6 DONE 0.0s
+
+#7 [backend 2/5] RUN apk add --no-cache musl-dev gcc make
+#7 CACHED
+
+#8 [backend 3/5] WORKDIR /build
+#8 CACHED
+
+#9 [stage-3 1/8] FROM docker.io/library/alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
+#9 DONE 0.0s
+
+#10 [frontend 1/6] FROM docker.io/library/node@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#10 DONE 0.0s
+
+#11 [internal] load build context
+#11 transferring context: 625.51kB 0.1s done
+#11 DONE 0.2s
+
+#12 [backend 4/5] COPY backend/ ./
+#12 DONE 0.1s
+
+#13 [backend 5/5] RUN --mount=type=cache,target=/usr/local/cargo/registry --mount=type=cache,target=/build/target,id=okx-musl-target cargo build --release --locked && cp target/release/okx-terminal /okx-terminal && cp target/release/okx-onboarding /okx-onboarding && cp target/release/okx-orders /okx-orders
+#13 1.762    Compiling okx-terminal v0.4.0 (/build)
+#13 3.829 warning: unused import: `Value`
+#13 3.829   --> src/settings.rs:11:18
+#13 3.829    |
+#13 3.829 11 | use serde_json::{Value, json};
+#13 3.829    |                  ^^^^^
+#13 3.829    |
+#13 3.829    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+#13 3.829 
+#13 4.788 warning: function `configured` is never used
+#13 4.788   --> src/bin/../secrets.rs:48:14
+#13 4.788    |
+#13 4.788 48 | pub async fn configured(purpose: &str) -> bool {
+#13 4.788    |              ^^^^^^^^^^
+#13 4.788    |
+#13 4.788    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#13 4.788 
+#13 4.791 warning: function `encrypt` is never used
+#13 4.791   --> src/bin/../secrets.rs:51:8
+#13 4.791    |
+#13 4.791 51 | pub fn encrypt(plain: &[u8], key: &[u8], purpose: &str) -> Result<Vec<u8>> {
+#13 4.791    |        ^^^^^^^
+#13 4.791 
+#13 4.791 warning: function `write` is never used
+#13 4.791   --> src/bin/../secrets.rs:75:14
+#13 4.791    |
+#13 4.791 75 | pub async fn write(purpose: &str, value: &str) -> Result<()> {
+#13 4.791    |              ^^^^^
+#13 4.791 
+#13 5.836 warning: methods `inventory` and `postings` are never used
+#13 5.836   --> src/bin/../order_ledger.rs:51:12
+#13 5.836    |
+#13 5.836 26 | impl Fill {
+#13 5.836    | --------- methods in this implementation
+#13 5.836 ...
+#13 5.836 51 |     pub fn inventory(&self, base: &str) -> D {
+#13 5.836    |            ^^^^^^^^^
+#13 5.836 ...
+#13 5.836 64 |     pub fn postings(&self, base: &str, quote: &str) -> BTreeMap<String, D> {
+#13 5.836    |            ^^^^^^^^
+#13 5.836    |
+#13 5.836    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#13 5.836 
+#13 13.17 warning: method `payload` is never used
+#13 13.19    --> src/order_risk.rs:129:12
+#13 13.19     |
+#13 13.19 116 | impl AuthorizedOrder {
+#13 13.19     | -------------------- method in this implementation
+#13 13.19 ...
+#13 13.19 129 |     pub fn payload(&self) -> &Value {
+#13 13.19     |            ^^^^^^^
+#13 13.19     |
+#13 13.19     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#13 13.19 
+#13 13.19 warning: function `authorize_protection` is never used
+#13 13.19    --> src/order_risk.rs:134:8
+#13 13.19     |
+#13 13.19 134 | pub fn authorize_protection(
+#13 13.19     |        ^^^^^^^^^^^^^^^^^^^^
+#13 13.19 
+#13 21.97 warning: `okx-terminal` (bin "okx-onboarding") generated 3 warnings
+#13 80.22 warning: `okx-terminal` (bin "okx-orders") generated 1 warning
+#13 249.9 warning: `okx-terminal` (bin "okx-terminal") generated 3 warnings (run `cargo fix --bin "okx-terminal" -p okx-terminal` to apply 1 suggestion)
+#13 249.9     Finished `release` profile [optimized] target(s) in 4m 09s
+#13 DONE 251.5s
+
+#14 [stage-3 2/8] RUN apk upgrade --no-cache && apk add --no-cache ca-certificates
+#14 CACHED
+
+#15 [stage-3 3/8] RUN mkdir /jobs /archives /onboarding && chown 10001:10001 /jobs /archives /onboarding
+#15 CACHED
+
+#16 [stage-3 4/8] WORKDIR /app
+#16 CACHED
+
+#17 [backend 4/5] COPY backend/ ./
+#17 CACHED
+
+#18 [backend 5/5] RUN --mount=type=cache,target=/usr/local/cargo/registry --mount=type=cache,target=/build/target,id=okx-musl-target cargo build --release --locked && cp target/release/okx-terminal /okx-terminal && cp target/release/okx-onboarding /okx-onboarding && cp target/release/okx-orders /okx-orders
+#18 CACHED
+
+#19 [stage-3 5/8] COPY --from=backend /okx-terminal /app/okx-terminal
+#19 ...
+
+#20 [frontend 3/6] COPY frontend/package*.json ./
+#20 CACHED
+
+#21 [frontend 4/6] RUN npm ci --ignore-scripts
+#21 CACHED
+
+#22 [frontend 5/6] COPY frontend/ ./
+#22 CACHED
+
+#23 [frontend 2/6] WORKDIR /build
+#23 CACHED
+
+#24 [frontend 6/6] RUN npm run build
+#24 CACHED
+
+#19 [stage-3 5/8] COPY --from=backend /okx-terminal /app/okx-terminal
+#19 DONE 0.8s
+
+#25 [stage-3 6/8] COPY --from=backend /okx-onboarding /app/okx-onboarding
+#25 DONE 0.5s
+
+#26 [stage-3 7/8] COPY --from=backend /okx-orders /app/okx-orders
+#26 DONE 0.5s
+
+#27 [stage-3 8/8] COPY --from=frontend /build/dist /app/public
+#27 DONE 0.4s
+
+#28 exporting to image
+#28 exporting layers
+#28 exporting layers 0.5s done
+#28 writing image sha256:728cfdc0065180b20a74cfccc546b0850f805fd0948890e311d7e6e585424b9d 0.0s done
+#28 naming to docker.io/library/okx-tradingterminal:0.4.0 0.1s done
+#28 DONE 0.7s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/5wx2zwx6p5waozlmkpdb4rxxf

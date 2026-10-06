@@ -61,3 +61,14 @@ export function download(
   a.click();
   URL.revokeObjectURL(u);
 }
+
+// All charts share the single isolated Pine worker. Queue browser previews so
+// a four-chart workspace does not submit four simultaneous worker jobs.
+let pineQueue: Promise<unknown> = Promise.resolve();
+export function previewPine<T>(body: unknown): Promise<T> {
+  const request = pineQueue
+    .catch(() => undefined)
+    .then(() => post<T>("/api/studio/pine", body));
+  pineQueue = request;
+  return request;
+}

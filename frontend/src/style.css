@@ -567,6 +567,7 @@ small {
 }
 .timeframes {
   display: flex;
+  flex-wrap: wrap;
   gap: 1px;
 }
 .timeframes button {
@@ -971,16 +972,16 @@ th:first-child {
   line-height: 1.8;
 }
 .system {
-  max-width: 1240px;
-  margin: 15px auto;
+  width: 100%;
+  margin: 15px 0;
 }
 .system-heading {
   margin: 24px 0;
 }
 .system-heading h2 {
-  font-size: 28px;
-  font-weight: 400;
-  letter-spacing: -0.7px;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
   margin: 10px 0;
 }
 .system-heading p {
@@ -1400,4 +1401,31 @@ th:first-child {
   .palette {
     width: calc(100vw - 30px);
   }
+}
+
+.chart-toolbar .timeframe-select {
+  max-width: 155px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 5px;
+  color: var(--text);
+  font-size: 10px;
+}
+
+/* Give bot execution the room its live tables and activity need. */
+.terminal-grid.bot-monitor {
+  grid-template-rows: minmax(493px, calc(100vh - 412px)) auto;
+}
+.terminal-grid.bot-monitor .watchlist,
+.terminal-grid.bot-monitor .right-panels {
+  grid-row: 1;
+}
+.terminal-grid.bot-monitor .bottom-panel {
+  grid-column: 1/-1;
+  grid-row: 2;
+  min-height: 420px;
+}
+.terminal-grid.bot-monitor .terminal-bots {
+  height: auto;
+  overflow: visible;
 }

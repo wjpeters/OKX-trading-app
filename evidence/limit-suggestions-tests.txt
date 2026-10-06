@@ -1,0 +1,16 @@
+✔ EUR 500 produces a complete, coherent example profile (2.142167ms)
+✔ money ratios preserve decimal precision, including cents (0.189708ms)
+✔ a budget change updates automatic fields and preserves personal overrides (0.146292ms)
+✔ cleared or invalid budgets cannot leave stale automatic amounts (0.125083ms)
+✔ explicit profile reset replaces overrides only in the unsaved draft (0.170542ms)
+✔ saved account limits remain personal choices on budget changes (0.11925ms)
+✔ explicitly clearing an override preserves the cleared field for validation (0.078583ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 135.681
+

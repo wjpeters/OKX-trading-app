@@ -168,12 +168,12 @@ pub async fn dataset(a: &App, instrument: &str, bar: &str) -> Result<Vec<Candle>
     .await?;
     ensure!(data["gaps"] == 0, "Datagat in actuele dataset");
     let current: Vec<Candle> = serde_json::from_value(data["candles"].clone())?;
-    let paths:Vec<String>=sqlx::query_scalar("SELECT path FROM studio.history_parts WHERE instrument=$1 AND bar=$2 ORDER BY last_ms DESC LIMIT 34").bind(instrument).bind(bar).fetch_all(&a.db).await?;
+    let paths:Vec<String>=sqlx::query_scalar("SELECT path FROM studio.history_parts WHERE instrument=$1 AND bar=$2 ORDER BY last_ms DESC").bind(instrument).bind(bar).fetch_all(&a.db).await?;
     let cs=tokio::task::spawn_blocking(move || -> Result<Vec<Candle>> {
         let mut all=std::collections::BTreeMap::new();
         for path in paths {for c in decode(&path)? {all.insert(c.ts,c);}}
         for c in current.into_iter().filter(|c|c.closed&&c.ts+step<=now_ms()) {all.insert(c.ts,c);}
-        let cs:Vec<_>=all.into_values().rev().take(10000).collect::<Vec<_>>().into_iter().rev().collect();
+        let cs:Vec<_>=all.into_values().collect();
         ensure!(cs.windows(2).all(|w|w[1].ts-w[0].ts==step),"Datagat tussen archief en actuele candles. Ververs eerst de recente historie; er worden geen prijzen aangevuld.");
         Ok(cs)
     }).await??;

@@ -1,0 +1,165 @@
+{
+  "scope": "disposable database; synthetic credentials; no paid AI calls or orders",
+  "checks": [
+    {
+      "check": "Settings load with missing keys",
+      "passed": true
+    },
+    {
+      "check": "Default provider preserves OpenRouter behavior",
+      "passed": true
+    },
+    {
+      "check": "Missing provider key blocks activation",
+      "passed": true
+    },
+    {
+      "check": "No Origin cannot write credentials",
+      "passed": true
+    },
+    {
+      "check": "Foreign Origin cannot write credentials",
+      "passed": true
+    },
+    {
+      "check": "No CSRF header cannot write credentials",
+      "passed": true
+    },
+    {
+      "check": "Unknown destination rejected",
+      "passed": true
+    },
+    {
+      "check": "Partial OKX credentials rejected",
+      "passed": true
+    },
+    {
+      "check": "Whitespace credentials rejected",
+      "passed": true
+    },
+    {
+      "check": "Unexpected fields rejected without echo",
+      "passed": true
+    },
+    {
+      "check": "openrouter_key saves without echo",
+      "passed": true
+    },
+    {
+      "check": "openrouter_key encrypted on disk with private mode",
+      "passed": true
+    },
+    {
+      "check": "typesafe_key saves without echo",
+      "passed": true
+    },
+    {
+      "check": "typesafe_key encrypted on disk with private mode",
+      "passed": true
+    },
+    {
+      "check": "okx_demo saves without echo",
+      "passed": true
+    },
+    {
+      "check": "okx_demo encrypted on disk with private mode",
+      "passed": true
+    },
+    {
+      "check": "okx_live saves without echo",
+      "passed": true
+    },
+    {
+      "check": "okx_live encrypted on disk with private mode",
+      "passed": true
+    },
+    {
+      "check": "Only configured flags returned",
+      "passed": true
+    },
+    {
+      "check": "Credential save does not enable AI",
+      "passed": true
+    },
+    {
+      "check": "Explicit budget activation works",
+      "passed": true
+    },
+    {
+      "check": "Unknown provider rejected",
+      "passed": true
+    },
+    {
+      "check": "Choose direct Jev",
+      "passed": true
+    },
+    {
+      "check": "Provider switch disables AI without resetting costs",
+      "passed": true
+    },
+    {
+      "check": "Research follows selected provider",
+      "passed": true
+    },
+    {
+      "check": "Activate direct provider explicitly",
+      "passed": true
+    },
+    {
+      "check": "Replace AI key",
+      "passed": true
+    },
+    {
+      "check": "Key replacement disables AI",
+      "passed": true
+    },
+    {
+      "check": "Provider and credential status persist after restart",
+      "passed": true
+    },
+    {
+      "check": "Delete selected provider key",
+      "passed": true
+    },
+    {
+      "check": "Deleted key is absent; other providers intact",
+      "passed": true
+    },
+    {
+      "check": "Deleted selected key prevents enablement",
+      "passed": true
+    },
+    {
+      "check": "Tampered envelope is not configured",
+      "passed": true
+    },
+    {
+      "check": "Remove openrouter_key",
+      "passed": true
+    },
+    {
+      "check": "Remove okx_demo",
+      "passed": true
+    },
+    {
+      "check": "Remove okx_live",
+      "passed": true
+    },
+    {
+      "check": "Logs do not contain credential input",
+      "passed": true
+    },
+    {
+      "check": "No account, orders or provider decisions created",
+      "passed": true
+    },
+    {
+      "check": "User account unchanged",
+      "passed": true
+    },
+    {
+      "check": "Nonzero spent and reserved costs survive provider switching",
+      "passed": true
+    }
+  ]
+}

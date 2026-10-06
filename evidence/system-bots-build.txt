@@ -1,0 +1,151 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [terminal internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.46kB 0.0s done
+#1 DONE 0.0s
+
+#2 [terminal internal] load metadata for docker.io/library/node@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#2 DONE 0.0s
+
+#3 [terminal internal] load metadata for docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#3 DONE 0.0s
+
+#4 [terminal internal] load metadata for docker.io/library/alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
+#4 DONE 1.0s
+
+#5 [terminal backend 1/5] FROM docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#5 DONE 0.0s
+
+#6 [terminal backend 2/5] RUN apk add --no-cache musl-dev gcc make
+#6 CACHED
+
+#7 [terminal backend 3/5] WORKDIR /build
+#7 CACHED
+
+#8 [terminal internal] load .dockerignore
+#8 transferring context: 137B 0.0s done
+#8 DONE 0.0s
+
+#9 [terminal stage-3 1/7] FROM docker.io/library/alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
+#9 DONE 0.0s
+
+#10 [terminal frontend 1/6] FROM docker.io/library/node@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#10 DONE 0.0s
+
+#11 [terminal internal] load build context
+#11 transferring context: 439.40kB 0.1s done
+#11 DONE 0.1s
+
+#12 [terminal backend 4/5] COPY backend/ ./
+#12 DONE 0.1s
+
+#13 [terminal frontend 2/6] WORKDIR /build
+#13 CACHED
+
+#14 [terminal frontend 3/6] COPY frontend/package*.json ./
+#14 CACHED
+
+#15 [terminal frontend 4/6] RUN npm ci --ignore-scripts
+#15 CACHED
+
+#16 [terminal backend 5/5] RUN --mount=type=cache,target=/usr/local/cargo/registry --mount=type=cache,target=/build/target,id=okx-musl-target cargo build --release --locked && cp target/release/okx-terminal /okx-terminal && cp target/release/okx-onboarding /okx-onboarding
+#16 2.140 warning: function `configured` is never used
+#16 2.140   --> src/bin/../secrets.rs:48:14
+#16 2.140    |
+#16 2.140 48 | pub async fn configured(purpose: &str) -> bool {
+#16 2.140    |              ^^^^^^^^^^
+#16 2.140    |
+#16 2.140    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+#16 2.140 
+#16 2.140 warning: function `encrypt` is never used
+#16 2.140   --> src/bin/../secrets.rs:51:8
+#16 2.140    |
+#16 2.140 51 | pub fn encrypt(plain: &[u8], key: &[u8], purpose: &str) -> Result<Vec<u8>> {
+#16 2.140    |        ^^^^^^^
+#16 2.140 
+#16 2.140 warning: function `write` is never used
+#16 2.140   --> src/bin/../secrets.rs:75:14
+#16 2.140    |
+#16 2.140 75 | pub async fn write(purpose: &str, value: &str) -> Result<()> {
+#16 2.140    |              ^^^^^
+#16 2.140 
+#16 2.141    Compiling okx-terminal v0.4.0 (/build)
+#16 2.141 warning: `okx-terminal` (bin "okx-onboarding") generated 3 warnings
+#16 4.944 warning: unused import: `Value`
+#16 4.944   --> src/settings.rs:11:18
+#16 4.944    |
+#16 4.944 11 | use serde_json::{Value, json};
+#16 4.944    |                  ^^^^^
+#16 4.944    |
+#16 4.944    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+#16 4.944 
+#16 ...
+
+#17 [terminal frontend 5/6] COPY frontend/ ./
+#17 DONE 0.2s
+
+#18 [terminal frontend 6/6] RUN npm run build
+#18 0.813 
+#18 0.813 > okx-tradingterminal-ui@0.4.0 build
+#18 0.813 > tsc --noEmit && vite build
+#18 0.813 
+#18 7.800 vite v8.3.2 building client environment for production...
+#18 7.869 transforming...
+#18 11.45 ✓ 2838 modules transformed.
+#18 13.22 rendering chunks...
+#18 16.35 computing gzip size...
+#18 16.48 dist/index.html                            0.40 kB │ gzip:   0.29 kB
+#18 16.48 dist/assets/editor.worker-DWPaKKV_.js    303.93 kB
+#18 16.48 dist/assets/BotStudio-DLioOiRN.css        15.41 kB │ gzip:   2.56 kB
+#18 16.48 dist/assets/index-Bvm5NxUJ.css            52.31 kB │ gzip:  11.27 kB
+#18 16.48 dist/assets/Studio-DjpsE8to.css           99.09 kB │ gzip:  14.20 kB
+#18 16.48 dist/assets/BotStudio-DFcFpZFX.js        207.86 kB │ gzip:  66.89 kB
+#18 16.48 dist/assets/index-D1aWPlN0.js            572.38 kB │ gzip: 177.57 kB
+#18 16.48 dist/assets/Studio-D_N5GrLw.js         2,733.04 kB │ gzip: 703.19 kB
+#18 16.48 
+#18 16.49 [plugin builtin:vite-reporter] 
+#18 16.49 (!) Some chunks are larger than 500 kB after minification. Consider:
+#18 16.49 - Using dynamic import() to code-split the application
+#18 16.49 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#18 16.49 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#18 16.50 ✓ built in 8.70s
+#18 DONE 17.4s
+
+#16 [terminal backend 5/5] RUN --mount=type=cache,target=/usr/local/cargo/registry --mount=type=cache,target=/build/target,id=okx-musl-target cargo build --release --locked && cp target/release/okx-terminal /okx-terminal && cp target/release/okx-onboarding /okx-onboarding
+#16 141.2 warning: `okx-terminal` (bin "okx-terminal") generated 1 warning (run `cargo fix --bin "okx-terminal" -p okx-terminal` to apply 1 suggestion)
+#16 141.2     Finished `release` profile [optimized] target(s) in 2m 20s
+#16 DONE 141.6s
+
+#19 [terminal stage-3 2/7] RUN apk upgrade --no-cache && apk add --no-cache ca-certificates
+#19 CACHED
+
+#20 [terminal stage-3 3/7] RUN mkdir /jobs /archives /onboarding && chown 10001:10001 /jobs /archives /onboarding
+#20 CACHED
+
+#21 [terminal stage-3 4/7] WORKDIR /app
+#21 CACHED
+
+#22 [terminal backend 4/5] COPY backend/ ./
+#22 CACHED
+
+#23 [terminal backend 5/5] RUN --mount=type=cache,target=/usr/local/cargo/registry --mount=type=cache,target=/build/target,id=okx-musl-target cargo build --release --locked && cp target/release/okx-terminal /okx-terminal && cp target/release/okx-onboarding /okx-onboarding
+#23 CACHED
+
+#24 [terminal stage-3 5/7] COPY --from=backend /okx-terminal /app/okx-terminal
+#24 DONE 0.1s
+
+#25 [terminal stage-3 6/7] COPY --from=backend /okx-onboarding /app/okx-onboarding
+#25 DONE 0.1s
+
+#26 [terminal stage-3 7/7] COPY --from=frontend /build/dist /app/public
+#26 DONE 0.2s
+
+#27 [terminal] exporting to image
+#27 exporting layers 0.1s done
+#27 writing image sha256:5db960fbc988aa37e5bf0856e2b20e78befd6c0b652d7b0fa4581bca9af45fb1 done
+#27 naming to docker.io/library/okx-tradingterminal:0.4.0 done
+#27 DONE 0.1s
+
+#28 [terminal] resolving provenance for metadata file
+#28 DONE 0.0s
+ terminal  Built

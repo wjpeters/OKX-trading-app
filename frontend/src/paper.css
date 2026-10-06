@@ -1,7 +1,7 @@
 .paper-workspace {
   padding: 22px 24px 14px;
   min-width: 0;
-  max-width: 1700px;
+  max-width: none;
   margin: auto;
 }
 .paper-heading {

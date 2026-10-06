@@ -1,0 +1,13 @@
+/usr/local/lib/python3.13/site-packages/cma/s.py:16: UserWarning: Could not import matplotlib.pyplot, therefore ``cma.plot()`` etc. is not available
+  _warnings.warn('Could not import matplotlib.pyplot, therefore'
+test_atomic_checkpoint_preserves_complete_record (test_worker.TrainingTests.test_atomic_checkpoint_preserves_complete_record) ... ok
+test_cma_checkpoint_rng_replays_next_population (test_worker.TrainingTests.test_cma_checkpoint_rng_replays_next_population) ... ok
+test_fixed_walk_forward_never_enters_holdout (test_worker.TrainingTests.test_fixed_walk_forward_never_enters_holdout) ... ok
+test_holm_step_down_corrects_family (test_worker.TrainingTests.test_holm_step_down_corrects_family) ... ok
+test_search_bounds_exclude_account_limits (test_worker.TrainingTests.test_search_bounds_exclude_account_limits) ... ok
+test_uncertain_and_negative_results_rejected (test_worker.TrainingTests.test_uncertain_and_negative_results_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.332s
+
+OK

@@ -4,9 +4,20 @@ mod comparison;
 mod feeds;
 mod graph;
 mod history;
+mod neuro;
+mod native_bot_risk;
+mod native_bots;
+mod neuro_data;
+mod training;
+mod training_transfer;
+mod training_feed;
 mod indicators;
 mod model;
 mod operations;
+mod order_types;
+mod order_risk;
+mod order_wallet;
+mod trading;
 mod paper;
 #[allow(dead_code)]
 mod proposal;
@@ -14,6 +25,7 @@ mod providers;
 #[allow(dead_code)]
 mod risk;
 mod secrets;
+mod settings;
 mod studio;
 use anyhow::{Result, bail};
 use axum::{
@@ -27,7 +39,7 @@ use axum::{
     response::{IntoResponse, Response},
     routing::get,
 };
-use model::{interval, normalize, now_ms};
+use model::{Timeframe, normalize, now_ms};
 use serde::Deserialize;
 use serde_json::{Value, json};
 use sqlx::{
@@ -60,6 +72,8 @@ pub struct App {
 #[derive(Default, serde::Serialize)]
 pub struct Market {
     pub instruments: Vec<Value>,
+    #[serde(skip_serializing)]
+    pub catalogue: Vec<Value>,
     pub metadata_received_ms: Option<i64>,
     pub tickers: BTreeMap<String, Value>,
     pub books: BTreeMap<String, Value>,
@@ -108,6 +122,26 @@ impl App {
         Ok(body)
     }
 }
+async fn market_catalogue(State(app):State<App>)->Json<Value>{
+    let m=app.market.read().await;Json(json!({"instruments":m.catalogue,"received_ms":m.metadata_received_ms}))
+}
+#[derive(Deserialize)]
+struct WatchMarket { instrument:String }
+async fn watch_market(State(app):State<App>,Json(request):Json<WatchMarket>)->Response {
+    studio::reply(async {
+        let mut m=app.market.write().await;
+        let meta=m.catalogue.iter().find(|i|i["instId"]==request.instrument).cloned().ok_or_else(||anyhow::anyhow!("Spotmarkt niet beschikbaar"))?;
+        if !m.instruments.iter().any(|i|i["instId"]==request.instrument) {
+            if m.instruments.len()>=44 {
+                if let Some(index)=m.instruments.iter().position(|i|!feeds::PREFERRED.contains(&i["instId"].as_str().unwrap_or(""))) {
+                    let old=m.instruments.remove(index);if let Some(id)=old["instId"].as_str(){m.books.remove(id);m.tickers.remove(id);m.trades.remove(id);}
+                }
+            }
+            m.instruments.push(meta);
+        }
+        Ok(json!({"ok":true,"instrument":request.instrument}))
+    }.await)
+}
 #[derive(Deserialize)]
 struct CandleQuery {
     instrument: String,
@@ -125,16 +159,17 @@ async fn candles(State(app): State<App>, Query(q): Query<CandleQuery>) -> Respon
     }
 }
 async fn candle_result(app: &App, q: &CandleQuery) -> Result<Value> {
-    let step = interval(&q.bar).ok_or_else(|| anyhow::anyhow!("Timeframe niet ondersteund"))?;
+    let timeframe =
+        Timeframe::parse(&q.bar).ok_or_else(|| anyhow::anyhow!("Timeframe niet ondersteund"))?;
     if !app
         .market
         .read()
         .await
-        .instruments
+        .catalogue
         .iter()
         .any(|v| v["instId"] == q.instrument)
     {
-        bail!("Instrument niet in gecontroleerde watchlist");
+        bail!("Spotmarkt niet in gecontroleerde catalogus");
     }
     if q.after.is_some_and(|v| v <= 0 || v > now_ms()) {
         bail!("Ongeldige historische cursor");
@@ -174,17 +209,20 @@ async fn candle_result(app: &App, q: &CandleQuery) -> Result<Value> {
     };
     let raw = app.public_get(endpoint, &query).await?;
     let received_at_ms = now_ms();
-    let (cs, gaps) = normalize(raw["data"].as_array().unwrap(), step)?;
+    let (cs, gaps) = normalize(raw["data"].as_array().unwrap(), timeframe)?;
     if cs.is_empty() {
         bail!("Geen candles beschikbaar");
     }
     let calc = Instant::now();
-    let points = indicators::calculate(&cs, step);
+    let points = indicators::calculate_for(&cs, timeframe, &indicators::Settings::default());
     let calculation_ms = calc.elapsed().as_secs_f64() * 1000.0;
     let fresh = q.after.is_none()
-        && cs
-            .last()
-            .is_some_and(|c| c.ts <= received_at_ms + 3000 && c.ts + step + 15000 > received_at_ms);
+        && cs.last().is_some_and(|c| {
+            c.ts <= received_at_ms + 3000
+                && timeframe
+                    .next_open(c.ts)
+                    .is_some_and(|end| end + 15000 > received_at_ms)
+        });
     let payload = json!({"instrument":q.instrument,"bar":q.bar,"source":"OKX EEA","received_at_ms":received_at_ms,"candles":cs,"indicators":points,"gaps":gaps,"fresh":fresh,"historical":q.after.is_some(),"rest_roundtrip_ms":start.elapsed().as_secs_f64()*1000.0,"calculation_ms":calculation_ms,"indicator_parameters":{"sma":20,"ema":20,"rsi":14,"macd":[12,26,9],"atr":14,"bb":[20,2],"vwap":"UTC day, partial if history starts intraday","stochastic":14,"adx":14,"obv":"relative to loaded history"}});
     sqlx::query("INSERT INTO market_cache(instrument,timeframe,received_at_ms,payload) VALUES($1,$2,$3,$4) ON CONFLICT(instrument,timeframe) DO UPDATE SET received_at_ms=$3,payload=$4").bind(&q.instrument).bind(&cache_key).bind(received_at_ms).bind(&payload).execute(&app.db).await?;
     Ok(payload)
@@ -239,7 +277,13 @@ async fn status(State(app): State<App>) -> Json<Value> {
         .ok()
         .flatten()
         .unwrap_or(false);
-    let jev_state = if !std::path::Path::new("/run/secrets/openrouter_key").is_file() {
+    let provider = settings::selected(&app).await.ok();
+    let configured = if let Some(p) = provider {
+        secrets::configured(p.key()).await
+    } else {
+        false
+    };
+    let jev_state = if !configured {
         "KEY_REQUIRED"
     } else if jev_enabled {
         "PROPOSALS_ENABLED"
@@ -257,7 +301,7 @@ async fn status(State(app): State<App>) -> Json<Value> {
         }
     };
     Json(
-        json!({"version":"0.4.0","phase":4,"mode":"PAPER_LOCAL","execution_enabled":worker_alive&&account.is_some(),"risk_state":risk_state,"risk_reason":account.as_ref().map(|p|p["ledger"]["reason"].clone()),"account":"Virtuele EUR-rekening","account_region":"UNVERIFIED","public_region":"EEA","database":db_ok,"public_ws":m.feed_connected,"last_message_ms":m.last_message_ms,"feed_error":m.feed_error,"reconnects":m.reconnects,"validated_messages":m.validated_messages,"instruments":m.instruments.len(),"clock_offset_ms":m.clock_offset_ms,"clock_rtt_ms":m.clock_rtt_ms,"active_bots":active_bots,"jev":{"state":jev_state,"model":"typesafe/jev-1.13","authority":"PROPOSALS_ONLY"},"processing_ms":{"p50":percentile(0.5),"p95":percentile(0.95),"p99":percentile(0.99),"samples":samples.len(),"scope":"WS validation + in-memory update; no order route"},"server_time_ms":now_ms()}),
+        json!({"version":"0.4.0","phase":4,"mode":"PAPER_LOCAL","execution_enabled":worker_alive&&account.is_some(),"risk_state":risk_state,"risk_reason":account.as_ref().map(|p|p["ledger"]["reason"].clone()),"account":"Virtuele EUR-rekening","account_region":"UNVERIFIED","public_region":"EEA","database":db_ok,"public_ws":m.feed_connected,"last_message_ms":m.last_message_ms,"feed_error":m.feed_error,"reconnects":m.reconnects,"validated_messages":m.validated_messages,"instruments":m.instruments.len(),"clock_offset_ms":m.clock_offset_ms,"clock_rtt_ms":m.clock_rtt_ms,"active_bots":active_bots,"jev":{"state":jev_state,"model":provider.map(|p|p.model()),"provider":provider.map(|p|p.id()),"authority":"PROPOSALS_ONLY"},"processing_ms":{"p50":percentile(0.5),"p95":percentile(0.95),"p99":percentile(0.99),"samples":samples.len(),"scope":"WS validation + in-memory update; no order route"},"server_time_ms":now_ms()}),
     )
 }
 async fn health() -> Json<Value> {
@@ -459,6 +503,8 @@ async fn main() -> Result<()> {
     tokio::spawn(studio::run(app.clone()));
     tokio::spawn(providers::run(app.clone()));
     tokio::spawn(operations::watch(app.clone()));
+    tokio::spawn(training::run(app.clone()));
+    tokio::spawn(native_bots::run(app.clone()));
     let static_dir = std::env::var("STATIC_DIR").unwrap_or_else(|_| "/app/public".into());
     let router = Router::new()
         .merge(auth::router())
@@ -466,7 +512,13 @@ async fn main() -> Result<()> {
         .merge(studio::router())
         .merge(graph::router())
         .merge(history::router())
+        .merge(training::router())
+        .merge(native_bots::router())
         .merge(operations::router())
+        .merge(settings::router())
+        .merge(trading::router())
+        .route("/api/markets", get(market_catalogue))
+        .route("/api/markets/watch", axum::routing::post(watch_market))
         .merge(providers::router())
         .merge(comparison::router())
         .route("/api/status", get(status))

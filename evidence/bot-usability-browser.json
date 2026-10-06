@@ -1,0 +1,35 @@
+{
+  "scope": "Browser on disposable test database at 127.0.0.1:4781",
+  "screens": {
+    "Alerts": 1184,
+    "Screener": 1184,
+    "Pine Editor": 1184,
+    "Bot Studio": 1184,
+    "Nieuws": 1184,
+    "Systeem": 1184,
+    "Systeem status": 1184
+  },
+  "viewport_width": 1280,
+  "horizontal_overflow": false,
+  "checks": [
+    "Start & volg applies saved Pine bot version 2 and starts paper on live data",
+    "Studio displays BUY decision, order, actual paper fill and open position",
+    "Terminal displays same bot version, fill, costs and position",
+    "Pause via Terminal stops strategy; positions remain visible",
+    "Node search pine filters palette",
+    "Real-money design start disabled with explanatory warning",
+    "Light and dark styles checked",
+    "Open-position chart survives page and theme changes without console errors",
+    "Page navigation returns to top",
+    "Production first-start form visible; setup disabled until explicit confirmation; no browser console errors"
+  ],
+  "note": "Test data only. Production account not initialized or traded.",
+  "local_release": {
+    "health": {
+      "alive": true
+    },
+    "worker_alive": true,
+    "account_unchanged": true,
+    "account_initialized": false
+  }
+}

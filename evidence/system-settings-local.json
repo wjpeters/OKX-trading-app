@@ -1,0 +1,40 @@
+{
+  "local_url": "http://127.0.0.1:4780",
+  "health": "healthy",
+  "settings": {
+    "budget_usd": "0",
+    "credentials": {
+      "okx_demo": {
+        "configured": false
+      },
+      "okx_live": {
+        "configured": false
+      },
+      "openrouter_key": {
+        "configured": false
+      },
+      "typesafe_key": {
+        "configured": false
+      }
+    },
+    "enabled": false,
+    "model": "typesafe/jev-1.13",
+    "provider": "openrouter",
+    "reserved_usd": "0",
+    "spent_usd": "0",
+    "storage_ready": true
+  },
+  "user_account_created": false,
+  "browser_checks": [
+    "Settings visible in production",
+    "Save synthetic key only on disposable instance",
+    "Input cleared after saving",
+    "Provider selection and persistence",
+    "Separate Demo and Live fields",
+    "Removal confirmation and cancellation",
+    "Status and protection tab",
+    "Light and dark theme",
+    "No production console errors"
+  ],
+  "external_provider_calls_performed": false
+}

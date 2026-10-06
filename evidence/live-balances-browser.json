@@ -1,0 +1,13 @@
+{
+  "testedAt": "2026-10-05T18:13:35.779Z",
+  "url": "http://127.0.0.1:4780/",
+  "liveSellPercent": 50,
+  "liveSellQuantity": "[Personal account quantity omitted from public evidence]",
+  "liveSellCalculation": "[Personal account quantity omitted from public evidence]",
+  "usdcUnsupportedFormFieldCount": 0,
+  "realOrdersPlaced": false,
+  "manualInputClearsPercentage": true,
+  "sideChangeClearsQuantity": true,
+  "missingDemoKeyDisablesSlider": true,
+  "public_redaction": "Personal account quantities and balance calculations omitted. Original verification retained locally outside Git."
+}

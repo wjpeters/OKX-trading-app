@@ -172,6 +172,7 @@ impl Ledger {
         }
     }
 }
+fn default_bar() -> String { "1m".into() }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Bot {
     pub id: String,
@@ -181,6 +182,8 @@ pub struct Bot {
     pub limits: Limits,
     pub ledger: Ledger,
     pub running: bool,
+    #[serde(default = "default_bar")]
+    pub bar: String,
     pub last_bar: i64,
     pub last_signal: String,
     pub fast: usize,
@@ -308,6 +311,8 @@ pub struct Paper {
     pub heartbeat_ms: i64,
     pub last_mark_ms: i64,
     pub flatten: bool,
+    #[serde(default)]
+    pub bot_exits: std::collections::BTreeSet<String>,
 }
 #[derive(Clone, Debug)]
 pub struct Quote {
@@ -379,6 +384,7 @@ impl Paper {
             heartbeat_ms: now,
             last_mark_ms: now,
             flatten: false,
+            bot_exits: Default::default(),
         };
         s.bots.insert(
             "manual".into(),
@@ -390,6 +396,7 @@ impl Paper {
                 ledger: Ledger::new(manual.capital, now),
                 limits: manual,
                 running: false,
+                bar: "1m".into(),
                 last_bar: 0,
                 last_signal: "Nog geen opdracht".into(),
                 fast: 20,
@@ -510,6 +517,10 @@ impl Paper {
             .bots
             .get(&i.bot_id)
             .ok_or_else(|| anyhow::anyhow!("Onbekende bot"))?;
+        ensure!(
+            i.side != Side::Buy || !self.bot_exits.contains(&i.bot_id),
+            "BOT_EXIT_IN_PROGRESS"
+        );
         ensure!(
             q.fresh(now, self.limits.data_age_ms.min(b.limits.data_age_ms)),
             "STALE_MARKET"
@@ -951,6 +962,10 @@ impl Paper {
         now: i64,
     ) -> Result<()> {
         self.mark(quotes, now);
+        ensure!(
+            !running || !self.bot_exits.contains(id),
+            "Wacht tot de candle-stop de open positie volledig heeft afgebouwd"
+        );
         let b = self
             .bots
             .get_mut(id)
@@ -990,7 +1005,39 @@ impl Paper {
         );
         Ok(())
     }
+    pub fn candle_halt(&mut self, id: &str, close: bool, pause: bool, now: i64) -> Result<()> {
+        let b = self
+            .bots
+            .get_mut(id)
+            .ok_or_else(|| anyhow::anyhow!("Bot ontbreekt"))?;
+        if pause {
+            b.running = false;
+        }
+        if close {
+            self.bot_exits.insert(id.into());
+        }
+        let ids: Vec<_> = self
+            .orders
+            .values()
+            .filter(|o| o.intent.bot_id == id && o.intent.side == Side::Buy && o.state.open())
+            .map(|o| o.id.clone())
+            .collect();
+        for oid in ids {
+            self.request_cancel(&oid, now)?;
+        }
+        self.event(now,"BOT_CANDLE_STOP",id,if close && pause {"Candle-daling bereikt: bot gepauzeerd; positie wordt afgebouwd zodra verse prijzen beschikbaar zijn"} else if close {"Candle-daling bereikt: positie wordt afgebouwd; bot blijft actief"} else {"Candle-daling bereikt: bot gepauzeerd; bestaande positie behoudt stop-loss en take-profit"});
+        Ok(())
+    }
     fn protection(&mut self, quotes: &Quotes, now: i64) {
+        self.bot_exits.retain(|id| {
+            self.positions
+                .values()
+                .any(|p| &p.bot_id == id && p.quantity > zero())
+                || self
+                    .orders
+                    .values()
+                    .any(|o| &o.intent.bot_id == id && o.state.open())
+        });
         let positions: Vec<_> = self
             .positions
             .values()
@@ -1001,7 +1048,7 @@ impl Paper {
             let Some(q) = quotes.get(&p.instrument) else {
                 continue;
             };
-            let emergency = self.flatten;
+            let emergency = self.flatten || self.bot_exits.contains(&p.bot_id);
             if !emergency && q.bid > p.stop && p.target.is_none_or(|t| q.bid < t) {
                 continue;
             }

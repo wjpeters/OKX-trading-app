@@ -1,0 +1,139 @@
+{
+  "scope": "disposable database on port 4781",
+  "checks": [
+    {
+      "check": "Fresh isolated account",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Setup disposable paper account",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "If/else graph validates",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Missing branch handle rejected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Bot settings saved with graph",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Optimistic version conflict rejected",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Reload preserves branch handles and settings",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Atomic install creates pinned paused bot",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Live design can be saved",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Live installation blocked",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Legacy deployment cannot bypass saved mode",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Full graph backtest executes and preserves limits",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Backtest records both branches",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "No fill before signal candle closes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Backtest has no paper side effects",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Saved backtest reloads",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Pine numerical input and chart plot compute",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "Pine exact version saves",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Pine graph saves",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Pine node backtest uses exact script and inputs",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Pine bot compile-checked before installation",
+      "passed": true,
+      "detail": {
+        "bot_id": "pine-workflow",
+        "ok": true,
+        "running": false
+      }
+    },
+    {
+      "check": "Pine indicator plot node saves",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Pine indicator output usable as node condition",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Excess plots fail instead of dropping signals",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "Invalid budget rejected before saving",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "User account remains unchanged",
+      "passed": true,
+      "detail": null
+    }
+  ]
+}

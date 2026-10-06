@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Chart from "./Chart";
+import type { ChartPricePick } from "./chart-price";
+import { timeframeLabel } from "./timeframes";
 import { api } from "./types";
 import type { Candles } from "./types";
 import { usePreferences } from "./store";
@@ -10,10 +12,12 @@ function Extra({
   symbol,
   bar,
   tickSize,
+  onPricePick,
 }: {
   symbol: string;
   bar: string;
   tickSize: string;
+  onPricePick?: (pick: ChartPricePick) => void;
 }) {
   const q = useQuery({
     queryKey: ["candles", symbol, bar],
@@ -23,12 +27,12 @@ function Extra({
   return (
     <div>
       {q.data ? (
-        <Chart data={q.data} tickSize={tickSize} />
+        <Chart data={q.data} tickSize={tickSize} onPricePick={onPricePick} />
       ) : (
         <p>{q.error?.message || "Chart laden…"}</p>
       )}
       <span className="mini-label">
-        {symbol} · {bar}
+        {symbol} · {timeframeLabel(bar)}
       </span>
     </div>
   );
@@ -36,9 +40,11 @@ function Extra({
 export default function ChartWorkspace({
   data,
   tickSize,
+  onPricePick,
 }: {
   data: Candles;
   tickSize: string;
+  onPricePick?: (pick: ChartPricePick) => void;
 }) {
   const pref = usePreferences();
   const qc = useQueryClient();
@@ -73,6 +79,10 @@ export default function ChartWorkspace({
   const q = useQuery({
     queryKey: ["documents", "workspace"],
     queryFn: () => api<Doc[]>("/api/studio/documents?kind=workspace"),
+  });
+  const pineDocs = useQuery({
+    queryKey: ["documents", "pine"],
+    queryFn: () => api<Doc[]>("/api/studio/documents?kind=pine"),
   });
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -144,8 +154,51 @@ export default function ChartWorkspace({
           ))}
         </select>
         <button onClick={() => setInputs(!inputs)}>Indicatorinputs</button>
+        <select
+          aria-label="Pine-script op chart"
+          value=""
+          onChange={(e) => {
+            const d =
+              e.target.value === ""
+                ? undefined
+                : pineDocs.data?.[+e.target.value];
+            if (d)
+              pref.set({
+                pineScripts: [
+                  ...pref.pineScripts.filter((p) => p.name !== d.name),
+                  { name: d.name, version: d.version },
+                ],
+              });
+          }}
+        >
+          <option value="">+ Mijn Pine-script</option>
+          {pineDocs.data?.map((d, i) => (
+            <option key={i} value={i}>
+              {d.name} · v{d.version}
+            </option>
+          ))}
+        </select>
         <span title={msg}>{msg.slice(0, 45)}</span>
       </div>
+      {!!pref.pineScripts.length && (
+        <div className="workspace-tools pine-chips">
+          {pref.pineScripts.map((p) => (
+            <button
+              key={p.name}
+              title="Verwijder script van de chart"
+              onClick={() =>
+                pref.set({
+                  pineScripts: pref.pineScripts.filter(
+                    (x) => x.name !== p.name,
+                  ),
+                })
+              }
+            >
+              {p.name} v{p.version} ×
+            </button>
+          ))}
+        </div>
+      )}
       {inputs && (
         <form
           className="workspace-tools"
@@ -195,10 +248,11 @@ export default function ChartWorkspace({
                 : data
             }
             tickSize={tickSize}
+            onPricePick={onPricePick}
           />
           {count > 1 && (
             <span className="mini-label">
-              {data.instrument} · {data.bar}
+              {data.instrument} · {timeframeLabel(data.bar)}
             </span>
           )}
         </div>
@@ -208,6 +262,7 @@ export default function ChartWorkspace({
             symbol={data.instrument}
             bar={bar}
             tickSize={tickSize}
+            onPricePick={onPricePick}
           />
         ))}
       </div>

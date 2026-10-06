@@ -59,6 +59,28 @@ pub fn sign(secret: &str, timestamp: &str, method: &str, path: &str, body: &str)
         .as_ref(),
     )
 }
+
+/// OKX control messages have no arg/data fields and are never subscription ACKs.
+fn connection_control(v: &Value, channels: &[&str]) -> Result<bool> {
+    ensure!(
+        v["event"] != "channel-conn-count-error",
+        "Private kanaal verbroken wegens verbindingslimiet"
+    );
+    if v["event"] != "channel-conn-count" {
+        return Ok(false);
+    }
+    let channel = v["channel"].as_str().unwrap_or("");
+    let count = v["connCount"]
+        .as_str()
+        .and_then(|s| s.parse::<u32>().ok())
+        .unwrap_or(0);
+    ensure!(
+        channels.contains(&channel) && (1..=30).contains(&count),
+        "Onverwachte private verbindingsteller"
+    );
+    Ok(true)
+}
+
 fn allowed(method: &str, path: &str) -> bool {
     let p = path.split('?').next().unwrap_or("");
     match method {
@@ -67,11 +89,18 @@ fn allowed(method: &str, path: &str) -> bool {
             "/api/v5/account/instruments",
             "/api/v5/account/trade-fee",
             "/api/v5/account/balance",
+            "/api/v5/asset/balances",
             "/api/v5/account/positions",
             "/api/v5/trade/orders-pending",
             "/api/v5/trade/fills",
             "/api/v5/trade/order",
             "/api/v5/trade/orders-algo-pending",
+            "/api/v5/trade/order-algo",
+            "/api/v5/trade/orders-algo-history",
+            "/api/v5/trade/orders-history",
+            "/api/v5/account/bills",
+            "/api/v5/market/books",
+            "/api/v5/market/tickers",
             "/api/v5/public/time",
         ]
         .contains(&p),
@@ -86,6 +115,20 @@ fn allowed(method: &str, path: &str) -> bool {
         .contains(&p),
         _ => false,
     }
+}
+fn response_error(method: &str, path: &str, status: u16, value: &Value) -> String {
+    let code = value["code"].as_str().filter(|c| c.len() <= 12 && !c.is_empty() && c.bytes().all(|b| b.is_ascii_digit())).unwrap_or("onbekend");
+    let endpoint = path.split('?').next().unwrap_or("");
+    let detail = match code {
+        "50110" => "OKX weigert het huidige IP-adres; controleer de IP-lijst van deze API-key.",
+        "50101" => "API-key hoort bij een andere handelsomgeving.",
+        "50119" => "API-key niet gevonden voor de Europese OKX-omgeving.",
+        "50105" => "OKX heeft de API-passphrase afgewezen.",
+        "50113" => "OKX heeft de ondertekening afgewezen.",
+        _ => "OKX-verzoek afgewezen.",
+    };
+    let retry = if method == "POST" { " Eerst orderstatus synchroniseren; niet opnieuw verzenden." } else { "" };
+    format!("EXCHANGE_HTTP_ERROR {method} {endpoint} (HTTP {status}, OKX {code}): {detail}{retry}")
 }
 pub struct Okx {
     mode: Mode,
@@ -116,6 +159,7 @@ impl Okx {
         let mut throttle = self.requests.lock().await;
         tokio::time::sleep(Duration::from_millis(250).saturating_sub(throttle.elapsed())).await;
         *throttle = Instant::now();
+        drop(throttle);
         let ts = chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Millis, true);
         let body = payload.map(Value::to_string).unwrap_or_default();
         let signature = sign(&self.credentials.secret, &ts, method, path, &body);
@@ -139,11 +183,8 @@ impl Okx {
         let mut response = request
             .send()
             .await
-            .map_err(|_| anyhow::anyhow!("EXCHANGE_TRANSPORT_UNKNOWN: reconcile before retry"))?
-            .error_for_status()
-            .map_err(|_| {
-                anyhow::anyhow!("EXCHANGE_HTTP_ERROR: reconcile mutating request before retry")
-            })?;
+            .map_err(|_| anyhow::anyhow!("EXCHANGE_TRANSPORT_UNKNOWN: reconcile before retry"))?;
+        let status = response.status();
         let mut bytes = vec![];
         while let Some(chunk) = response.chunk().await? {
             ensure!(
@@ -152,8 +193,75 @@ impl Okx {
             );
             bytes.extend(chunk);
         }
-        let v: Value = serde_json::from_slice(&bytes)?;
-        ensure!(v["code"] == "0", "OKX response code {}", v["code"]);
+        let parsed = serde_json::from_slice::<Value>(&bytes);
+        if !status.is_success() {
+            anyhow::bail!("{}", response_error(method, path, status.as_u16(), &parsed.unwrap_or(Value::Null)));
+        }
+        let v = parsed?;
+        ensure!(v["code"] == "0", "{}", response_error(method, path, status.as_u16(), &v));
+        Ok(v)
+    }
+    /// Read-only access for the isolated gateway. No arbitrary URL is accepted.
+    pub async fn get(&self, path: &str) -> Result<Value> {
+        self.request("GET", path, None).await
+    }
+    /// Capability must be minted by the deterministic kernel immediately before sending.
+    pub async fn send_authorized(
+        &self,
+        order: &crate::order_risk::AuthorizedOrder,
+    ) -> Result<Value> {
+        ensure!(
+            chrono::Utc::now().timestamp_millis() <= order.expires_ms(),
+            "Uitvoeringsmachtiging verlopen"
+        );
+        let v = self
+            .request("POST", &order.compiled().endpoint, Some(order.payload()))
+            .await?;
+        let row = v["data"]
+            .as_array()
+            .and_then(|v| v.first())
+            .ok_or_else(|| anyhow::anyhow!("EXCHANGE_RESPONSE_UNKNOWN"))?;
+        ensure!(row["sCode"] == "0", "OKX_REJECTED:{}", row["sCode"]);
+        let id = if order.compiled().algo {
+            "algoId"
+        } else {
+            "ordId"
+        };
+        ensure!(
+            row[id].as_str().is_some_and(|s| !s.is_empty()),
+            "EXCHANGE_RESPONSE_UNKNOWN: geen order-id"
+        );
+        Ok(v)
+    }
+    pub async fn cancel_native(&self, instrument: &str, id: &str, algo: bool) -> Result<Value> {
+        ensure!(
+            instrument.len() <= 40
+                && instrument
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || b == b'-')
+                && !id.is_empty()
+                && id.len() <= 80
+                && id.bytes().all(|b| b.is_ascii_alphanumeric()),
+            "Ongeldige orderidentiteit"
+        );
+        let (path, payload) = if algo {
+            (
+                "/api/v5/trade/cancel-algos",
+                json!([{"instId":instrument,"algoId":id}]),
+            )
+        } else {
+            (
+                "/api/v5/trade/cancel-order",
+                json!({"instId":instrument,"ordId":id}),
+            )
+        };
+        let v = self.request("POST", path, Some(&payload)).await?;
+        ensure!(
+            v["data"]
+                .as_array()
+                .is_some_and(|v| !v.is_empty() && v.iter().all(|r| r["sCode"] == "0")),
+            "Annulering niet bevestigd door OKX"
+        );
         Ok(v)
     }
     pub async fn snapshot(&self) -> Result<Value> {
@@ -215,6 +323,121 @@ impl Okx {
         let ts = chrono::Utc::now().timestamp().to_string();
         json!({"op":"login","args":[{"apiKey":self.credentials.api_key,"passphrase":self.credentials.passphrase,"timestamp":ts,"sign":sign(&self.credentials.secret,&ts,"GET","/users/self/verify","")}]})
     }
+    /// Continuous bounded private feed. Events wake the REST reconciler; no WS ACK
+    /// is interpreted as a fill. Both private and business subscriptions are required.
+    pub async fn stream(
+        &self,
+        business: bool,
+        healthy: &std::sync::atomic::AtomicBool,
+        wake: &tokio::sync::Notify,
+    ) -> Result<()> {
+        use futures_util::{SinkExt, StreamExt};
+        use std::sync::atomic::Ordering;
+        use tokio_tungstenite::{
+            connect_async_with_config,
+            tungstenite::{Message, protocol::WebSocketConfig},
+        };
+        healthy.store(false, Ordering::SeqCst);
+        wake.notify_one();
+        let url = if business {
+            match self.mode {
+                Mode::OkxDemo => "wss://wseeapap.okx.com/ws/v5/business",
+                Mode::Live => "wss://wseea.okx.com/ws/v5/business",
+            }
+        } else {
+            self.websocket_url()
+        };
+        let config = WebSocketConfig::default()
+            .max_message_size(Some(512_000))
+            .max_frame_size(Some(512_000));
+        let (mut ws, _) = tokio::time::timeout(
+            Duration::from_secs(5),
+            connect_async_with_config(url, Some(config), false),
+        )
+        .await??;
+        ws.send(Message::Text(self.websocket_login().to_string().into()))
+            .await?;
+        let login = tokio::time::timeout(Duration::from_secs(5), ws.next())
+            .await?
+            .ok_or_else(|| anyhow::anyhow!("Private verbinding gesloten"))??;
+        let v: Value = serde_json::from_str(login.to_text()?)?;
+        ensure!(
+            v["event"] == "login" && v["code"] == "0",
+            "Private login afgewezen (code {})",
+            v["code"]
+                .as_str()
+                .filter(|c| c.len() <= 12 && c.bytes().all(|b| b.is_ascii_digit()))
+                .unwrap_or("onbekend")
+        );
+        let channels = if business {
+            ["orders-algo", "algo-advance"]
+        } else {
+            ["orders", "account"]
+        };
+        let args = if business {
+            json!([{"channel":"orders-algo","instType":"SPOT"},{"channel":"algo-advance","instType":"SPOT"}])
+        } else {
+            json!([{"channel":"orders","instType":"SPOT"},{"channel":"account"}])
+        };
+        ws.send(Message::Text(
+            json!({"op":"subscribe","args":args}).to_string().into(),
+        ))
+        .await?;
+        let mut subscribed = std::collections::BTreeSet::new();
+        let mut pong_pending = false;
+        loop {
+            match tokio::time::timeout(Duration::from_secs(20), ws.next()).await {
+                Err(_) => {
+                    ensure!(!pong_pending, "Private heartbeat verloren");
+                    ws.send(Message::Text("ping".into())).await?;
+                    pong_pending = true;
+                }
+                Ok(msg) => {
+                    let msg =
+                        msg.ok_or_else(|| anyhow::anyhow!("Private verbinding gesloten"))??;
+                    match msg {
+                        Message::Text(t) => {
+                            if t == "pong" {
+                                pong_pending = false;
+                                continue;
+                            }
+                            let v: Value = serde_json::from_str(&t)?;
+                            ensure!(
+                                v["event"] != "error",
+                                "Private kanaal afgewezen (code {})",
+                                v["code"]
+                                    .as_str()
+                                    .filter(
+                                        |c| c.len() <= 12 && c.bytes().all(|b| b.is_ascii_digit())
+                                    )
+                                    .unwrap_or("onbekend")
+                            );
+                            if connection_control(&v, &channels)? {
+                                continue;
+                            }
+                            let channel = v["arg"]["channel"]
+                                .as_str()
+                                .ok_or_else(|| anyhow::anyhow!("Private schema onbekend"))?;
+                            ensure!(channels.contains(&channel), "Onverwacht privaat kanaal");
+                            if v["event"] == "subscribe" {
+                                subscribed.insert(channel.to_owned());
+                                healthy.store(subscribed.len() == 2, Ordering::SeqCst);
+                            } else {
+                                ensure!(
+                                    v["data"].as_array().is_some_and(|a| a.len() <= 1000),
+                                    "Private buffer/schema ongeldig"
+                                );
+                            }
+                            wake.notify_one();
+                        }
+                        Message::Ping(p) => ws.send(Message::Pong(p)).await?,
+                        Message::Close(_) => anyhow::bail!("Private verbinding gesloten"),
+                        _ => {}
+                    }
+                }
+            }
+        }
+    }
     // The transport has no public general POST method. A sealed approval is required.
     /// A bounded read-only capability probe. It grants no execution permission.
     pub async fn private_probe(&self) -> Result<Value> {
@@ -239,7 +462,11 @@ impl Okx {
         let v: Value = serde_json::from_str(login.to_text()?)?;
         ensure!(
             v["event"] == "login" && v["code"] == "0",
-            "Private login afgewezen"
+            "Private login afgewezen (code {})",
+            v["code"]
+                .as_str()
+                .filter(|c| c.len() <= 12 && c.bytes().all(|b| b.is_ascii_digit()))
+                .unwrap_or("onbekend")
         );
         ws.send(Message::Text(json!({"op":"subscribe","args":[{"channel":"orders","instType":"SPOT"},{"channel":"account"},{"channel":"positions","instType":"ANY"}]}).to_string().into())).await?;
         let mut channels = std::collections::BTreeSet::new();
@@ -381,6 +608,15 @@ impl Reconciler {
 mod tests {
     use super::*;
     #[test]
+    fn rejected_request_explains_ip_without_echoing_exchange_secrets() {
+        let error=response_error("GET", "/api/v5/account/config?private=secret", 401, &json!({"code":"50110","msg":"secret"}));
+        assert!(error.contains("IP-adres") && error.contains("HTTP 401, OKX 50110"));
+        assert!(!error.contains("secret") && !error.contains("opnieuw verzenden"));
+        let unknown=response_error("POST", "/api/v5/trade/order", 503, &json!({"code":"secret","msg":"secret"}));
+        assert!(unknown.contains("OKX onbekend") && unknown.contains("niet opnieuw verzenden"));
+        assert!(!unknown.contains("secret"));
+    }
+    #[test]
     fn withdraw_never_allowed() {
         assert!(!allowed("POST", "/api/v5/asset/withdrawal"));
         assert!(!allowed("POST", "https://evil.invalid/api/v5/trade/order"));
@@ -465,5 +701,32 @@ mod tests {
             .unwrap()
         );
         assert_eq!(r.cumulative_fill["a"], "2");
+    }
+}
+
+#[cfg(test)]
+mod connection_control_tests {
+    use super::*;
+    #[test]
+    fn counter_is_valid_control_and_never_a_subscription_ack() {
+        let v = json!({"event":"channel-conn-count","channel":"orders","connCount":"2","connId":"fixture"});
+        assert!(connection_control(&v, &["orders", "account"]).unwrap());
+        assert!(
+            !connection_control(
+                &json!({"event":"subscribe","arg":{"channel":"orders"}}),
+                &["orders", "account"]
+            )
+            .unwrap()
+        );
+    }
+    #[test]
+    fn count_error_unknown_channel_and_bad_count_fail_closed() {
+        for v in [
+            json!({"event":"channel-conn-count-error","channel":"orders","connCount":"30"}),
+            json!({"event":"channel-conn-count","channel":"unknown","connCount":"2"}),
+            json!({"event":"channel-conn-count","channel":"orders","connCount":"bad"}),
+        ] {
+            assert!(connection_control(&v, &["orders", "account"]).is_err());
+        }
     }
 }

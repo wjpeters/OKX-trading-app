@@ -1,0 +1,428 @@
+warning: function `configured` is never used
+  --> src/bin/../secrets.rs:48:14
+   |
+48 | pub async fn configured(purpose: &str) -> bool {
+   |              ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `write` is never used
+  --> src/bin/../secrets.rs:75:14
+   |
+75 | pub async fn write(purpose: &str, value: &str) -> Result<()> {
+   |              ^^^^^
+
+   Compiling okx-terminal v0.4.0 (/Users/wp/WPOS-local/projects/okx-tradingterminal/backend)
+warning: unnecessary parentheses around assigned value
+   --> src/bin/../neuro.rs:170:15
+    |
+170 |    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+    |               ^                                           ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+170 -    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+170 +    self.cash-=costs.other_cost_per_roundtrip*costs.stress;self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+    |
+
+warning: unnecessary parentheses around assigned value
+   --> src/bin/../neuro.rs:170:79
+    |
+170 |    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+    |                                                                               ^                                           ^
+    |
+help: remove these parentheses
+    |
+170 -    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+170 +    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=costs.other_cost_per_roundtrip*costs.stress;
+    |
+
+warning: function `now_ms` is never used
+  --> src/bin/../model.rs:11:8
+   |
+11 | pub fn now_ms() -> i64 {
+   |        ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `LABELS` is never used
+  --> src/bin/../neuro.rs:15:11
+   |
+15 | pub const LABELS: [&str; INPUTS] = ["Rendement 1", "Rendement 5", "Volatiliteit", "Trend", "RSI", "Volume", "Bollinger z", "ATR", "P...
+   |           ^^^^^^
+
+warning: function `hash` is never used
+ --> src/bin/../neuro_data.rs:5:8
+  |
+5 | pub fn hash(bytes:&[u8])->String {ring::digest::digest(&ring::digest::SHA256,bytes).as_ref().iter().map(|b|format!("{b:02x}")).collec...
+  |        ^^^^
+
+warning: function `encode` is never used
+ --> src/bin/../neuro_data.rs:6:8
+  |
+6 | pub fn encode(cs:&[Candle])->Result<Vec<u8>> {
+  |        ^^^^^^
+
+warning: `okx-terminal` (bin "okx-onboarding" test) generated 2 warnings
+warning: `okx-terminal` (bin "okx-evaluator" test) generated 6 warnings (run `cargo fix --bin "okx-evaluator" -p okx-terminal --tests` to apply 2 suggestions)
+warning: unnecessary parentheses around assigned value
+   --> src/neuro.rs:170:15
+    |
+170 |    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+    |               ^                                           ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+170 -    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+170 +    self.cash-=costs.other_cost_per_roundtrip*costs.stress;self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+    |
+
+warning: unnecessary parentheses around assigned value
+   --> src/neuro.rs:170:79
+    |
+170 |    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+    |                                                                               ^                                           ^
+    |
+help: remove these parentheses
+    |
+170 -    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=(costs.other_cost_per_roundtrip*costs.stress);
+170 +    self.cash-=(costs.other_cost_per_roundtrip*costs.stress);self.other_costs+=costs.other_cost_per_roundtrip*costs.stress;
+    |
+
+warning: unused import: `Value`
+  --> src/settings.rs:11:18
+   |
+11 | use serde_json::{Value, json};
+   |                  ^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> src/paper.rs:970:13
+    |
+970 |         let mut cs=crate::history::dataset(&a,&r.config.instrument,&r.config.bar).await?;
+    |             ----^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+    --> src/paper.rs:1006:9
+     |
+1006 |     let mut cs=crate::history::dataset(&a,&config.instrument,&config.bar).await?;
+     |         ----^^
+     |         |
+     |         help: remove this `mut`
+
+warning: function `evaluate` is never used
+   --> src/neuro.rs:239:8
+    |
+239 | pub fn evaluate(s:&Series,a:&Artifact,costs:&Costs,start:i64,end:i64,mode:&str)->Result<Value>{
+    |        ^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `load` is never used
+  --> src/neuro_data.rs:18:8
+   |
+18 | pub fn load(path:&Path,bar:&str)->Result<neuro::Series> {let cs=decode(path)?;let step=crate::model::interval(bar).ok_or_else(||anyh...
+   |        ^^^^
+
+warning: function `laya_map` is never used
+  --> src/neuro_data.rs:19:8
+   |
+19 | pub fn laya_map(value:&serde_json::Value)->Result<BTreeMap<i64,[f64;4]>> {let mut out=BTreeMap::new();for r in value.as_array().ok_o...
+   |        ^^^^^^^^
+
+warning: method `payload` is never used
+   --> src/order_risk.rs:234:12
+    |
+221 | impl AuthorizedOrder {
+    | -------------------- method in this implementation
+...
+234 |     pub fn payload(&self) -> &Value {
+    |            ^^^^^^^
+
+warning: function `authorize_protection` is never used
+   --> src/order_risk.rs:239:8
+    |
+239 | pub fn authorize_protection(
+    |        ^^^^^^^^^^^^^^^^^^^^
+
+warning: `okx-terminal` (bin "okx-terminal" test) generated 10 warnings (run `cargo fix --bin "okx-terminal" -p okx-terminal --tests` to apply 5 suggestions)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.80s
+     Running unittests src/bin/okx-evaluator.rs (target/debug/deps/okx_evaluator-95f37cd664a07819)
+
+running 20 tests
+test model::tests::synthetic_timeframes_rejected ... ok
+test model::tests::new_intraday_intervals_and_monthly_fixed_duration_guard ... ok
+test model::tests::quarters_start_in_january_april_july_october ... ok
+test model::tests::month_calendar_including_leap_year ... ok
+test model::tests::utc_weeks_start_on_monday_not_unix_epoch_thursday ... ok
+test model::tests::bad_prices_fail ... ok
+test model::tests::malformed_confirm_fails ... ok
+test model::tests::exact_decimals ... ok
+test model::tests::gaps_are_not_filled ... ok
+test model::tests::monthly_normalization_counts_real_gaps_only ... ok
+test neuro::tests::aggregation_closed_complete ... ok
+test neuro::tests::missing_candle_rejected ... ok
+test neuro::tests::frozen_exit_and_partial_inventory ... ok
+test neuro::tests::laya_failure_blocks_only_entries ... ok
+test neuro::tests::normalized_training_only ... ok
+test neuro::tests::replay_forward_identical_and_deduplicated ... ok
+test neuro::tests::protective_exit_survives_entry_block ... ok
+test neuro::tests::no_future_features ... ok
+test neuro::tests::bounded_forward_window_has_identical_features ... ok
+test neuro::tests::costs_both_sides_basefees_and_rebates ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running unittests src/bin/okx-onboarding.rs (target/debug/deps/okx_onboarding-2b80445f1acb01f0)
+
+running 33 tests
+test exchange::tests::withdraw_never_allowed ... ok
+test exchange::tests::live_readiness_missing_acceptance_fails ... ok
+test exchange::connection_control_tests::counter_is_valid_control_and_never_a_subscription_ack ... ok
+test exchange::connection_control_tests::count_error_unknown_channel_and_bad_count_fail_closed ... ok
+test exchange::tests::rejected_request_explains_ip_without_echoing_exchange_secrets ... ok
+test exchange::tests::external_order_blocks ... ok
+test exchange::tests::signing_fixture ... ok
+test exchange::tests::accepted_timeout_never_resubmits ... ok
+test exchange::tests::old_fill_ignored ... ok
+test order_risk::tests::live_cannot_be_enabled_by_client_mode_or_flags ... ok
+test order_risk::tests::inverse_conversion_and_stale_fx_do_not_assume_stablecoin_parity ... ok
+test exchange::tests::known_filled_order_never_resubmitted ... ok
+test order_risk::tests::owned_exit_survives_entry_release_loss_but_never_borrows_inventory ... ok
+test order_risk::tests::release_is_bound_to_account_revision_and_current_private_readiness ... ok
+test order_risk::tests::simultaneous_sell_claims_never_double_spend_inventory ... ok
+test order_risk::tests::total_parent_quantity_reserved_for_iceberg_not_one_slice ... ok
+test order_risk::tests::sell_inventory_is_shared_between_eur_and_usdc_markets ... ok
+test order_risk::tests::markets_are_not_limited_to_twelve_and_syntax_stays_spot_only ... ok
+test order_risk::tests::different_instruments_spending_the_same_currency_share_claims ... ok
+test order_risk::tests::new_snapshots_need_fees_for_the_exact_selected_market ... ok
+test order_risk::tests::entries_fail_closed_on_losses_and_unprotected_fills ... ok
+test order_risk::tests::missing_protection_and_stale_or_unreconciled_state_fail ... ok
+test order_types::tests::current_iceberg_api_not_deprecated_iceberg ... ok
+test order_risk::tests::usdc_buys_use_native_reserve_but_eur_limits_and_current_fx ... ok
+test order_types::tests::iceberg_rsi_fields_and_fresh_trigger_execution ... ok
+test order_types::tests::limit_policies_are_exact_and_spot_has_no_leverage_fields ... ok
+test order_types::tests::native_market_qty_is_base_and_never_silently_reduced ... ok
+test order_types::tests::slice_and_callback_bounds ... ok
+test order_types::tests::oco_never_degrades_to_conditional_that_ignores_tp ... ok
+test order_types::tests::malformed_or_unsupported_payloads_fail ... ok
+test secrets::tests::plaintext_credentials_rejected ... ok
+test secrets::tests::encrypted_fixture_is_authenticated_and_scoped ... ok
+test secrets::tests::fresh_encryption_uses_unique_nonces_and_scope ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/bin/okx-orders.rs (target/debug/deps/okx_orders-93d98b0aa9b53a3a)
+
+running 47 tests
+test exchange::tests::live_readiness_missing_acceptance_fails ... ok
+test exchange::connection_control_tests::count_error_unknown_channel_and_bad_count_fail_closed ... ok
+test exchange::tests::withdraw_never_allowed ... ok
+test exchange::connection_control_tests::counter_is_valid_control_and_never_a_subscription_ack ... ok
+test exchange::tests::rejected_request_explains_ip_without_echoing_exchange_secrets ... ok
+test exchange::tests::signing_fixture ... ok
+test exchange::tests::external_order_blocks ... ok
+test exchange::tests::known_filled_order_never_resubmitted ... ok
+test exchange::tests::old_fill_ignored ... ok
+test exchange::tests::accepted_timeout_never_resubmits ... ok
+test order_ledger::tests::cancel_with_partial_children_is_not_final_before_children ... ok
+test order_ledger::tests::effective_trigger_is_not_a_fill ... ok
+test native_bot_risk::tests::bot_cannot_expand_account_or_drawdown ... ok
+test order_ledger::tests::fee_adjusted_partial_fill_dust_is_never_oversold ... ok
+test order_ledger::tests::base_fee_changes_protectable_quantity ... ok
+test order_ledger::tests::duplicate_fill_identity_can_only_post_once ... ok
+test order_ledger::tests::impossible_protection_and_unknown_state_fail ... ok
+test order_ledger::tests::quote_fee_and_rebate_are_booked_in_correct_currency ... ok
+test order_risk::tests::entries_fail_closed_on_losses_and_unprotected_fills ... ok
+test order_risk::tests::inverse_conversion_and_stale_fx_do_not_assume_stablecoin_parity ... ok
+test order_risk::tests::different_instruments_spending_the_same_currency_share_claims ... ok
+test order_risk::tests::live_cannot_be_enabled_by_client_mode_or_flags ... ok
+test order_risk::tests::missing_protection_and_stale_or_unreconciled_state_fail ... ok
+test order_risk::tests::new_snapshots_need_fees_for_the_exact_selected_market ... ok
+test order_risk::tests::owned_exit_survives_entry_release_loss_but_never_borrows_inventory ... ok
+test order_risk::tests::release_is_bound_to_account_revision_and_current_private_readiness ... ok
+test order_risk::tests::sell_inventory_is_shared_between_eur_and_usdc_markets ... ok
+test order_risk::tests::simultaneous_sell_claims_never_double_spend_inventory ... ok
+test order_risk::tests::total_parent_quantity_reserved_for_iceberg_not_one_slice ... ok
+test order_types::tests::current_iceberg_api_not_deprecated_iceberg ... ok
+test order_risk::tests::usdc_buys_use_native_reserve_but_eur_limits_and_current_fx ... ok
+test order_types::tests::iceberg_rsi_fields_and_fresh_trigger_execution ... ok
+test order_types::tests::limit_policies_are_exact_and_spot_has_no_leverage_fields ... ok
+test order_types::tests::malformed_or_unsupported_payloads_fail ... ok
+test order_risk::tests::markets_are_not_limited_to_twelve_and_syntax_stays_spot_only ... ok
+test order_types::tests::oco_never_degrades_to_conditional_that_ignores_tp ... ok
+test order_types::tests::native_market_qty_is_base_and_never_silently_reduced ... ok
+test order_wallet::tests::buy_includes_fee_slippage_and_floors_lots ... ok
+test order_types::tests::slice_and_callback_bounds ... ok
+test order_wallet::tests::parses_all_assets_and_rejects_duplicate_or_malformed ... ok
+test order_wallet::tests::rejects_stale_wrong_mode_unbounded_and_missing_fee ... ok
+test order_wallet::tests::sell_sizes_free_base_after_claims_without_trade_permission ... ok
+test order_wallet::tests::zero_is_preview_only_and_missing_available_is_unknown ... ok
+test native_bot_risk::tests::manual_release_never_authorizes_bot_and_code_revision_is_bound ... ok
+test secrets::tests::plaintext_credentials_rejected ... ok
+test secrets::tests::encrypted_fixture_is_authenticated_and_scoped ... ok
+test secrets::tests::fresh_encryption_uses_unique_nonces_and_scope ... ok
+
+test result: ok. 47 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/okx_terminal-8bc8bf3ffa8dfa39)
+
+running 148 tests
+test auth::tests::malformed_hash_fails ... ok
+test book::tests::delta_requires_snapshot ... ok
+test feeds::tests::snapshots_accept_empty_book ... ok
+test feeds::tests::bad_books_rejected ... ok
+test book::tests::empty_heartbeat_accepted ... ok
+test book::tests::gap_is_rejected_without_changing_state ... ok
+test book::tests::reset_with_continuity_accepted ... ok
+test book::tests::deletion_applied ... ok
+test comparison::tests::parameter_change_is_not_same_strategy ... ok
+test comparison::tests::only_ai_filter_removed_from_comparison ... ok
+test graph::tests::both_if_else_paths_must_be_connected ... ok
+test graph::tests::branches_are_exclusive_and_roundtrip_preserves_handles ... ok
+test graph::tests::cooldown_uses_order_time_and_does_not_block_exit ... ok
+test graph::tests::exit_wins_for_pine_and_plot_comparison_is_explicit ... ok
+test graph::tests::explicit_ai_permission_is_required ... ok
+test graph::tests::comparison_boundary_is_false ... ok
+test graph::tests::missing_or_unknown_branch_handles_rejected ... ok
+test graph::tests::standard_crosses_and_warmup ... ok
+test graph::tests::not_cannot_activate_unchosen_branch ... ok
+test graph::tests::candle_stop_threshold_and_priority ... ok
+test graph::tests::system_catalog_is_valid_and_has_no_external_filters ... ok
+test graph::tests::unknown_action_rejected ... ok
+test graph::tests::warmup_cannot_invent_branch ... ok
+test indicators::tests::open_candle_does_not_commit ... ok
+test indicators::tests::gaps_reset_warmup ... ok
+test indicators::tests::warmup_is_missing ... ok
+test indicators::tests::rising_reference ... ok
+test indicators::tests::flat_rsi_defined ... ok
+test model::tests::exact_decimals ... ok
+test indicators::tests::zero_volume_has_no_vwap ... ok
+test model::tests::bad_prices_fail ... ok
+test model::tests::gaps_are_not_filled ... ok
+test model::tests::malformed_confirm_fails ... ok
+test indicators::tests::variable_length_months_preserve_indicator_warmup_and_reset_on_real_gap ... ok
+test model::tests::month_calendar_including_leap_year ... ok
+test model::tests::utc_weeks_start_on_monday_not_unix_epoch_thursday ... ok
+test model::tests::synthetic_timeframes_rejected ... ok
+test model::tests::new_intraday_intervals_and_monthly_fixed_duration_guard ... ok
+test model::tests::monthly_normalization_counts_real_gaps_only ... ok
+test model::tests::quarters_start_in_january_april_july_october ... ok
+test native_bot_risk::tests::bot_cannot_expand_account_or_drawdown ... ok
+test neuro::tests::missing_candle_rejected ... ok
+test neuro::tests::aggregation_closed_complete ... ok
+test native_bot_risk::tests::manual_release_never_authorizes_bot_and_code_revision_is_bound ... ok
+test operations::tests::full_storage_and_unavailable_probe_block_entries ... ok
+test history::tests::parquet_is_readable_and_exact ... ok
+test order_risk::tests::entries_fail_closed_on_losses_and_unprotected_fills ... ok
+test order_risk::tests::different_instruments_spending_the_same_currency_share_claims ... ok
+test order_risk::tests::inverse_conversion_and_stale_fx_do_not_assume_stablecoin_parity ... ok
+test order_risk::tests::live_cannot_be_enabled_by_client_mode_or_flags ... ok
+test order_risk::tests::markets_are_not_limited_to_twelve_and_syntax_stays_spot_only ... ok
+test order_risk::tests::missing_protection_and_stale_or_unreconciled_state_fail ... ok
+test order_risk::tests::new_snapshots_need_fees_for_the_exact_selected_market ... ok
+test order_risk::tests::owned_exit_survives_entry_release_loss_but_never_borrows_inventory ... ok
+test order_risk::tests::release_is_bound_to_account_revision_and_current_private_readiness ... ok
+test order_risk::tests::sell_inventory_is_shared_between_eur_and_usdc_markets ... ok
+test neuro::tests::normalized_training_only ... ok
+test neuro::tests::laya_failure_blocks_only_entries ... ok
+test order_risk::tests::simultaneous_sell_claims_never_double_spend_inventory ... ok
+test order_risk::tests::total_parent_quantity_reserved_for_iceberg_not_one_slice ... ok
+test order_types::tests::current_iceberg_api_not_deprecated_iceberg ... ok
+test neuro::tests::frozen_exit_and_partial_inventory ... ok
+test order_risk::tests::usdc_buys_use_native_reserve_but_eur_limits_and_current_fx ... ok
+test order_types::tests::iceberg_rsi_fields_and_fresh_trigger_execution ... ok
+test order_types::tests::limit_policies_are_exact_and_spot_has_no_leverage_fields ... ok
+test order_types::tests::malformed_or_unsupported_payloads_fail ... ok
+test order_types::tests::native_market_qty_is_base_and_never_silently_reduced ... ok
+test order_types::tests::oco_never_degrades_to_conditional_that_ignores_tp ... ok
+test order_types::tests::slice_and_callback_bounds ... ok
+test order_wallet::tests::buy_includes_fee_slippage_and_floors_lots ... ok
+test order_wallet::tests::parses_all_assets_and_rejects_duplicate_or_malformed ... ok
+test order_wallet::tests::sell_sizes_free_base_after_claims_without_trade_permission ... ok
+test order_wallet::tests::rejects_stale_wrong_mode_unbounded_and_missing_fee ... ok
+test order_wallet::tests::zero_is_preview_only_and_missing_available_is_unknown ... ok
+test paper::replay_tests::dataset_gap_is_rejected ... ok
+test paper::replay_tests::insufficient_history_is_rejected ... ok
+test paper::replay_tests::candle_close_signal_only_fills_next_bar ... ok
+test proposal::tests::ai_cannot_raise_limits ... ok
+test paper::replay_tests::stop_wins_when_low_and_high_both_hit ... ok
+test proposal::tests::changed_state_rejected ... ok
+test paper::replay_tests::replay_is_reproducible_and_separate_mode ... ok
+test proposal::tests::future_reply_rejected ... ok
+test proposal::tests::late_decision_rejected ... ok
+test proposal::tests::missing_confidence_rejected ... ok
+test proposal::tests::unknown_output_fields_fail ... ok
+test proposal::tests::valid_proposal_is_not_permission ... ok
+test providers::tests::direct_provider_uses_its_schema_and_explicit_calculated_cost ... ok
+test providers::tests::missing_cost_fails ... ok
+test providers::tests::invented_action_fails ... ok
+test providers::tests::missing_probability_fails ... ok
+test providers::tests::provider_shape ... ok
+test providers::tests::unpinned_model_fails ... ok
+test risk::tests::aggregated_underlying_exposure_across_bots ... ok
+test risk::tests::account_loss_stop_latched_and_not_reset_by_restart ... ok
+test risk::tests::all_loss_limits_are_latched ... ok
+test risk::tests::cancel_holds_reserve_until_ack ... ok
+test risk::tests::candle_close_only_keeps_bot_running_and_old_storage_still_loads ... ok
+test risk::tests::daily_boundary_uses_previous_equity_and_keeps_highwater ... ok
+test neuro::tests::replay_forward_identical_and_deduplicated ... ok
+test risk::tests::candle_pause_keeps_position_and_cancels_pending_entry ... ok
+test risk::tests::candle_exit_is_durable_retries_stale_quotes_and_blocks_entries ... ok
+test risk::tests::crossed_book_and_currency_block ... ok
+test risk::tests::deterministic_sma_has_warmup_and_no_future_access ... ok
+test risk::tests::distinct_position_count_includes_pending_entries ... ok
+test risk::tests::duplicate_intent_is_idempotent ... ok
+test risk::tests::duplicate_and_out_of_order_fill_rejected ... ok
+test risk::tests::emergency_is_persistent_even_when_loss_reason_changes ... ok
+test risk::tests::equity_includes_unrealized_and_both_fees_no_double_reserve ... ok
+test risk::tests::explicit_limits_required ... ok
+test risk::tests::fill_before_ack_and_overfill_rejected ... ok
+test risk::tests::frequency_and_order_count_limits ... ok
+test risk::tests::inventory_cannot_be_sold_twice ... ok
+test risk::tests::limit_touch_does_not_fill ... ok
+test neuro::tests::no_future_features ... ok
+test risk::tests::missing_stop_or_bad_lot_rejected ... ok
+test risk::tests::original_slippage_cap_never_expands ... ok
+test risk::tests::new_snapshot_partial_completion ... ok
+test risk::tests::no_execution_on_preview ... ok
+test risk::tests::old_snapshot_does_not_reset_liquidity ... ok
+test risk::tests::no_live_or_demo_mode ... ok
+test risk::tests::partial_entry_rest_canceled_before_stop_exit ... ok
+test risk::tests::partial_fills_keep_unused_reserve_and_protect_quantity ... ok
+test risk::tests::reserve_before_ack_not_fill ... ok
+test risk::tests::rejected_exit_does_not_disable_position_protection ... ok
+test risk::tests::stale_and_future_quotes_block ... ok
+test risk::tests::spread_and_trade_risk_limits ... ok
+test risk::tests::reserve_and_limits_survive_serialized_restart ... ok
+test risk::tests::reserve_prevents_double_spending ... ok
+test risk::tests::time_reversal_pauses_entries ... ok
+test risk::tests::unknown_intent_fields_fail ... ok
+test risk::tests::unknown_holds_reserve_never_retries ... ok
+test risk::tests::stale_position_freezes_valuation_and_other_entries ... ok
+test risk::tests::same_snapshot_liquidity_not_reused ... ok
+test risk::tests::stop_survives_entry_pause_and_closes_with_inventory_bound ... ok
+test secrets::tests::encrypted_fixture_is_authenticated_and_scoped ... ok
+test secrets::tests::fresh_encryption_uses_unique_nonces_and_scope ... ok
+test secrets::tests::plaintext_credentials_rejected ... ok
+test studio::tests::drawing_alert_projects_time_not_screen_pixels ... ok
+test settings::tests::provider_destinations_are_fixed_and_distinct ... ok
+test settings::tests::incomplete_or_injected_secrets_are_rejected ... ok
+test studio::tests::alert_intrabar_indicators_rejected ... ok
+test studio::tests::cycles_rejected ... ok
+test studio::tests::graph_gate_required ... ok
+test tests::dns_rebinding_denied ... ok
+test neuro::tests::protective_exit_survives_entry_block ... ok
+test neuro::tests::bounded_forward_window_has_identical_features ... ok
+test neuro::tests::costs_both_sides_basefees_and_rebates ... ok
+test risk::tests::native_strategy_risk_benchmark ... ok
+
+test result: ok. 148 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+

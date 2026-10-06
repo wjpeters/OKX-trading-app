@@ -1,0 +1,26 @@
+PASS USDC native contract market
+PASS USDC native contract limit
+PASS USDC native contract post_only
+PASS USDC native contract ioc
+PASS USDC native contract fok
+PASS USDC native contract trigger
+PASS USDC native contract oco
+PASS USDC native contract move_order_stop
+PASS USDC native contract smart_iceberg
+PASS USDC native contract twap
+PASS More than twelve account-allowed EUR/USDC markets can be confirmed
+PASS Other quote currency cannot be confirmed
+PASS Scope change still requires personal Live release
+PASS Synthetic personal release accepted only in disposable DB
+PASS USDC buy produces a USDC reserve with current EUR conversion
+PASS EUR budget threshold accepts native amount only after FX
+PASS EUR-valued limit is distinct from USDC notional
+PASS Stale FX prevents USDC purchase
+PASS Missing per-market fee prevents USDC purchase
+PASS Slider spends USDC rather than the larger EUR balance
+PASS Selected EUR/USDC market requests an isolated refresh
+PASS Both currency-sharing drafts are individually valid
+PASS Concurrent buy and sale cannot double spend USDC
+PASS Fixture intents use native reserve currencies without exchange fills
+PASS User account and paper-bot limits remain unchanged
+25 EUR/USDC integration checks passed

@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-05",
+  "source_sha256": {
+    "backend/migrations/008_live_balances.sql": "d1db9bf35ef2b8a5481317aa89c2fe35bc407b21d437ac668216bd8dc8262601",
+    "backend/src/trading.rs": "6416edab3397102837bc2e9b462a2ab2e0a12e47a93f8797540f64e0e079fa6f",
+    "backend/src/order_risk.rs": "632f89208ce20eb7b3f464e26deed57d16ca73bcff00659b4a080e0d73909c39",
+    "backend/src/order_wallet.rs": "5f42ba6399f7291b1dbe48d5a5ab82a04d6ec60104c72687b6d617410a2d935e",
+    "backend/src/exchange.rs": "b441a0d64a07784ed65f6529c7a8a145c3b287ab7286b6fb406027a58117cc00",
+    "backend/src/bin/okx-orders.rs": "6565037b716dcae160fbaa0b85c66ec412533e6309a7fcf9f241fb2fdcfdaa3f",
+    "frontend/src/OrderTicket.tsx": "2aac1efa98e97de48a07888a699c044112269603ca8d1adeb5822f1dc1cb46b8",
+    "frontend/src/orders.css": "40cc64e9a687eab944bacf1b7e9a653eeb289d6a3a9caccdd127896b0f11b1dc",
+    "frontend/src/App.tsx": "2f47b43a45f0d1b56de8d0f4ba9a27fb66a1b31672ab18bf19c164c0f19e87e5",
+    "frontend/src/SystemSettings.tsx": "d6add500e090f997070a513add51082dd48ecf0c8f54e826c48e1e0745e5ccc0",
+    "compose.yaml": "e2b36a2c498a9b23795851b7b033cd2e74868b53daf7e618962e3646f3849b83",
+    "scripts/start-orders.py": "d7a7a3d89a2520f256881094b21a43a382c78ca2b26774f8a486af5163a865b0",
+    "scripts/live_balance_acceptance.py": "8d61ab0041cc16ced336b0863d8906353f3ef7b228ea047311e6c42e552f562e"
+  },
+  "usdc_execution": "not applied; awaiting explicit approval",
+  "rust_test_executions": 191,
+  "isolated_http_db_checks": 58,
+  "latest_ui_image": "sha256:b86e400c0191366acdcf648b1c43df49136c6cccba8005f4388f77e324ae92be",
+  "final_source_sha256": {
+    "frontend/src/orders.css": "1a6cf74fe7e6b915aee02c99210a4b399630a587f3c426106240e7542c86fd16",
+    "frontend/src/OrderTicket.tsx": "2aac1efa98e97de48a07888a699c044112269603ca8d1adeb5822f1dc1cb46b8",
+    "backend/src/exchange.rs": "b441a0d64a07784ed65f6529c7a8a145c3b287ab7286b6fb406027a58117cc00",
+    "backend/src/bin/okx-orders.rs": "6565037b716dcae160fbaa0b85c66ec412533e6309a7fcf9f241fb2fdcfdaa3f",
+    "docs/ACCEPTANCE.md": "ce7d7ad15f84813ca6a1182d2381b531c06e43089c98d1d3b8764aefed6fab06",
+    "docs/ORDERS.md": "ea7db43446c2d2202ceb431f44301e9242043f8bea1bc68333982493700d182b",
+    "STATUS.md": "0984b1ebbb44e447c346024d6cbedc67392c85875788eeab39dab003a47a7c7b"
+  }
+}

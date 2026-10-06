@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-05",
+  "scope": "interactive disposable-browser workflow plus production smoke",
+  "checks": {
+    "if_else_forms_and_copy_save": true,
+    "saved_status_after_reload": true,
+    "live_design_historical_backtest": true,
+    "numeric_pine_input_5_to_10": true,
+    "pine_editor_to_chart": true,
+    "pine_editor_to_selected_node_v3": true,
+    "four_charts_with_pine": 4,
+    "terminal_bot_overview": true,
+    "browser_console_errors": 0
+  },
+  "production": {
+    "healthy": true,
+    "account_uninitialized": true,
+    "user_bots_started": 0
+  }
+}

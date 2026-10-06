@@ -1,0 +1,63 @@
+{
+  "at": "2026-10-05T20:56:36.985Z",
+  "buyPick": {
+    "notice": "Grafiekprijs overgenomen: € 77.404,4",
+    "price": "77404.4",
+    "quantity": "0.001",
+    "stop": "70000"
+  },
+  "lowerPick": "74626.9",
+  "nonPricePanesAndDrag": {
+    "price": "74626.9",
+    "quantity": "0.001"
+  },
+  "drawingGuard": {
+    "drawings": "Sleep de vorm of de ronde punten1 tekening",
+    "price": "74626.9"
+  },
+  "drawingAfterUndo": 0,
+  "sellPick": {
+    "notice": "Grafiekprijs overgenomen: € 76.945,4",
+    "price": "76945.4",
+    "quantity": "0.001",
+    "side": "Verkopen"
+  },
+  "percentagePick": {
+    "percentage": "0",
+    "price": "75169.8",
+    "quantity": "[Personal account quantity omitted from public evidence]",
+    "side": "Verkopen"
+  },
+  "percentQuantityBefore": "[Personal account quantity omitted from public evidence]",
+  "afterMarketClick": {
+    "notice": "Klik in de koersgrafiek om je limietprijs te kiezen.",
+    "price": "75169.8",
+    "quantity": "[Personal account quantity omitted from public evidence]"
+  },
+  "triggerPick": {
+    "price": "76057.6",
+    "quantity": "[Personal account quantity omitted from public evidence]",
+    "trigger": "78000"
+  },
+  "marketReset": {
+    "market": "ETH-EUR",
+    "price": "",
+    "quantity": ""
+  },
+  "multiPick": {
+    "notice": "Grafiekprijs overgenomen: € 76.415,2",
+    "price": "76415.2",
+    "quantity": "0.001"
+  },
+  "final": {
+    "notice": "Grafiekprijs overgenomen: € 76.809,2",
+    "price": "76809.2",
+    "quantity": "0.001",
+    "side": "Verkopen"
+  },
+  "logs": [],
+  "orderSubmissions": 0,
+  "policyWrites": 0,
+  "liveReleaseWrites": 0,
+  "public_redaction": "Personal account quantities and balance calculations omitted. Original verification retained locally outside Git."
+}

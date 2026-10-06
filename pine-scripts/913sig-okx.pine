@@ -1,0 +1,49 @@
+//@version=5
+indicator("913sig OKX", shorttitle="913sig", overlay=false)
+
+// Lokale OKX-versie: twee numerieke signaalplots in een eigen paneel.
+// 0 = geen label; 7/8/9/11/12/13 = het oorspronkelijke labelnummer.
+// Geen entry/exit-plots: dit blijft een indicator.
+
+lookbackSetup = 4
+lookbackBonusSetup = 2
+
+var int setupCountF = 0
+var int setupCountR = 0
+var int bonusCountF = 0
+var int bonusCountR = 0
+
+setupPhaseF = close < close[lookbackSetup]
+setupPhaseR = close > close[lookbackSetup]
+bonusPhaseF = close < close[lookbackBonusSetup]
+bonusPhaseR = close > close[lookbackBonusSetup]
+
+// Een onderbreking zet de teller terug op 0 in plaats van na.
+// De eerstvolgende geldige candle start daardoor weer op 1.
+if setupPhaseF
+    setupCountF := setupCountF + 1
+else
+    setupCountF := 0
+
+if setupPhaseR
+    setupCountR := setupCountR + 1
+else
+    setupCountR := 0
+
+// Bonus telt alleen zolang setup > 9 EN de 2-candlevergelijking klopt.
+// Ook een onderbreking van alleen de bonusvoorwaarde reset de bonus.
+if setupCountF > 9 and bonusPhaseF
+    bonusCountF := bonusCountF + 1
+else
+    bonusCountF := 0
+
+if setupCountR > 9 and bonusPhaseR
+    bonusCountR := bonusCountR + 1
+else
+    bonusCountR := 0
+
+signalF = setupCountF == 7 ? 7 : setupCountF == 8 ? 8 : setupCountF == 9 ? 9 : bonusCountF == 2 ? 11 : bonusCountF == 3 ? 12 : bonusCountF == 4 ? 13 : 0
+signalR = setupCountR == 7 ? 7 : setupCountR == 8 ? 8 : setupCountR == 9 ? 9 : bonusCountR == 2 ? 11 : bonusCountR == 3 ? 12 : bonusCountR == 4 ? 13 : 0
+
+plot(signalF, title="Dalend signaal", color=color.blue, linewidth=2)
+plot(signalR, title="Stijgend signaal", color=color.red, linewidth=2)

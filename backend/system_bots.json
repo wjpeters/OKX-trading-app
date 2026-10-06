@@ -1,0 +1,462 @@
+[
+  {
+    "id": "sma",
+    "name": "SMA 9 / 21",
+    "description": "Koopt bij een opwaartse SMA-kruising en verkoopt bij een neerwaartse kruising.",
+    "graph": {
+      "schema": 1,
+      "nodes": [
+        {
+          "id": "n0",
+          "kind": "market",
+          "params": {},
+          "position": {
+            "x": 0,
+            "y": 100
+          }
+        },
+        {
+          "id": "n1",
+          "kind": "sma_cross",
+          "params": {
+            "fast": 9,
+            "slow": 21
+          },
+          "position": {
+            "x": 220,
+            "y": 100
+          }
+        },
+        {
+          "id": "n2",
+          "kind": "candle_stop",
+          "params": {
+            "drop_pct": 1,
+            "action": "close_pause"
+          },
+          "position": {
+            "x": 440,
+            "y": 100
+          }
+        },
+        {
+          "id": "n3",
+          "kind": "sizing",
+          "params": {},
+          "position": {
+            "x": 660,
+            "y": 100
+          }
+        },
+        {
+          "id": "n4",
+          "kind": "intent",
+          "params": {},
+          "position": {
+            "x": 880,
+            "y": 100
+          }
+        },
+        {
+          "id": "n5",
+          "kind": "risk_gate",
+          "params": {},
+          "position": {
+            "x": 1100,
+            "y": 100
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "n0",
+          "target": "n1"
+        },
+        {
+          "source": "n1",
+          "target": "n2"
+        },
+        {
+          "source": "n2",
+          "target": "n3"
+        },
+        {
+          "source": "n3",
+          "target": "n4"
+        },
+        {
+          "source": "n4",
+          "target": "n5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "ema",
+    "name": "EMA 9 / 21",
+    "description": "Koopt bij een opwaartse EMA-kruising en verkoopt bij een neerwaartse kruising.",
+    "graph": {
+      "schema": 1,
+      "nodes": [
+        {
+          "id": "n0",
+          "kind": "market",
+          "params": {},
+          "position": {
+            "x": 0,
+            "y": 100
+          }
+        },
+        {
+          "id": "n1",
+          "kind": "ema_cross",
+          "params": {
+            "fast": 9,
+            "slow": 21
+          },
+          "position": {
+            "x": 220,
+            "y": 100
+          }
+        },
+        {
+          "id": "n2",
+          "kind": "candle_stop",
+          "params": {
+            "drop_pct": 1,
+            "action": "close_pause"
+          },
+          "position": {
+            "x": 440,
+            "y": 100
+          }
+        },
+        {
+          "id": "n3",
+          "kind": "sizing",
+          "params": {},
+          "position": {
+            "x": 660,
+            "y": 100
+          }
+        },
+        {
+          "id": "n4",
+          "kind": "intent",
+          "params": {},
+          "position": {
+            "x": 880,
+            "y": 100
+          }
+        },
+        {
+          "id": "n5",
+          "kind": "risk_gate",
+          "params": {},
+          "position": {
+            "x": 1100,
+            "y": 100
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "n0",
+          "target": "n1"
+        },
+        {
+          "source": "n1",
+          "target": "n2"
+        },
+        {
+          "source": "n2",
+          "target": "n3"
+        },
+        {
+          "source": "n3",
+          "target": "n4"
+        },
+        {
+          "source": "n4",
+          "target": "n5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "rsi",
+    "name": "RSI 30 / 70",
+    "description": "Koopt onder RSI 30 en verkoopt boven RSI 70. RSI gebruikt 14 candles.",
+    "graph": {
+      "schema": 1,
+      "nodes": [
+        {
+          "id": "n0",
+          "kind": "market",
+          "params": {},
+          "position": {
+            "x": 0,
+            "y": 100
+          }
+        },
+        {
+          "id": "n1",
+          "kind": "rsi_range",
+          "params": {
+            "low": 30,
+            "high": 70
+          },
+          "position": {
+            "x": 220,
+            "y": 100
+          }
+        },
+        {
+          "id": "n2",
+          "kind": "candle_stop",
+          "params": {
+            "drop_pct": 1,
+            "action": "close_pause"
+          },
+          "position": {
+            "x": 440,
+            "y": 100
+          }
+        },
+        {
+          "id": "n3",
+          "kind": "sizing",
+          "params": {},
+          "position": {
+            "x": 660,
+            "y": 100
+          }
+        },
+        {
+          "id": "n4",
+          "kind": "intent",
+          "params": {},
+          "position": {
+            "x": 880,
+            "y": 100
+          }
+        },
+        {
+          "id": "n5",
+          "kind": "risk_gate",
+          "params": {},
+          "position": {
+            "x": 1100,
+            "y": 100
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "n0",
+          "target": "n1"
+        },
+        {
+          "source": "n1",
+          "target": "n2"
+        },
+        {
+          "source": "n2",
+          "target": "n3"
+        },
+        {
+          "source": "n3",
+          "target": "n4"
+        },
+        {
+          "source": "n4",
+          "target": "n5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "macd",
+    "name": "MACD 12 / 26 / 9",
+    "description": "Koopt als MACD de signaallijn opwaarts kruist en verkoopt bij een neerwaartse kruising.",
+    "graph": {
+      "schema": 1,
+      "nodes": [
+        {
+          "id": "n0",
+          "kind": "market",
+          "params": {},
+          "position": {
+            "x": 0,
+            "y": 100
+          }
+        },
+        {
+          "id": "n1",
+          "kind": "macd_cross",
+          "params": {
+            "fast": 12,
+            "slow": 26
+          },
+          "position": {
+            "x": 220,
+            "y": 100
+          }
+        },
+        {
+          "id": "n2",
+          "kind": "candle_stop",
+          "params": {
+            "drop_pct": 1,
+            "action": "close_pause"
+          },
+          "position": {
+            "x": 440,
+            "y": 100
+          }
+        },
+        {
+          "id": "n3",
+          "kind": "sizing",
+          "params": {},
+          "position": {
+            "x": 660,
+            "y": 100
+          }
+        },
+        {
+          "id": "n4",
+          "kind": "intent",
+          "params": {},
+          "position": {
+            "x": 880,
+            "y": 100
+          }
+        },
+        {
+          "id": "n5",
+          "kind": "risk_gate",
+          "params": {},
+          "position": {
+            "x": 1100,
+            "y": 100
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "n0",
+          "target": "n1"
+        },
+        {
+          "source": "n1",
+          "target": "n2"
+        },
+        {
+          "source": "n2",
+          "target": "n3"
+        },
+        {
+          "source": "n3",
+          "target": "n4"
+        },
+        {
+          "source": "n4",
+          "target": "n5"
+        }
+      ]
+    }
+  },
+  {
+    "id": "bollinger",
+    "name": "Bollinger terugkeer",
+    "description": "Koopt onder de onderste Bollinger-band en verkoopt bij terugkeer naar het gemiddelde.",
+    "graph": {
+      "schema": 1,
+      "nodes": [
+        {
+          "id": "n0",
+          "kind": "market",
+          "params": {},
+          "position": {
+            "x": 0,
+            "y": 100
+          }
+        },
+        {
+          "id": "n1",
+          "kind": "bollinger",
+          "params": {
+            "period": 20,
+            "deviations": 2
+          },
+          "position": {
+            "x": 220,
+            "y": 100
+          }
+        },
+        {
+          "id": "n2",
+          "kind": "candle_stop",
+          "params": {
+            "drop_pct": 1,
+            "action": "close_pause"
+          },
+          "position": {
+            "x": 440,
+            "y": 100
+          }
+        },
+        {
+          "id": "n3",
+          "kind": "sizing",
+          "params": {},
+          "position": {
+            "x": 660,
+            "y": 100
+          }
+        },
+        {
+          "id": "n4",
+          "kind": "intent",
+          "params": {},
+          "position": {
+            "x": 880,
+            "y": 100
+          }
+        },
+        {
+          "id": "n5",
+          "kind": "risk_gate",
+          "params": {},
+          "position": {
+            "x": 1100,
+            "y": 100
+          }
+        }
+      ],
+      "edges": [
+        {
+          "source": "n0",
+          "target": "n1"
+        },
+        {
+          "source": "n1",
+          "target": "n2"
+        },
+        {
+          "source": "n2",
+          "target": "n3"
+        },
+        {
+          "source": "n3",
+          "target": "n4"
+        },
+        {
+          "source": "n4",
+          "target": "n5"
+        }
+      ]
+    }
+  }
+]

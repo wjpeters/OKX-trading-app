@@ -1,0 +1,136 @@
+{
+  "coverage": [
+    {
+      "bar": "1m",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1791126180000,
+      "last": 1791144120000,
+      "ema_ready": true
+    },
+    {
+      "bar": "3m",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1791090180000,
+      "last": 1791144000000,
+      "ema_ready": true
+    },
+    {
+      "bar": "5m",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1791054300000,
+      "last": 1791144000000,
+      "ema_ready": true
+    },
+    {
+      "bar": "15m",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1790874900000,
+      "last": 1791144000000,
+      "ema_ready": true
+    },
+    {
+      "bar": "30m",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1790605800000,
+      "last": 1791144000000,
+      "ema_ready": true
+    },
+    {
+      "bar": "1H",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1790067600000,
+      "last": 1791144000000,
+      "ema_ready": true
+    },
+    {
+      "bar": "2H",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1788991200000,
+      "last": 1791144000000,
+      "ema_ready": true
+    },
+    {
+      "bar": "4H",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1786838400000,
+      "last": 1791144000000,
+      "ema_ready": true
+    },
+    {
+      "bar": "6Hutc",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1784678400000,
+      "last": 1791136800000,
+      "ema_ready": true
+    },
+    {
+      "bar": "12Hutc",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1778198400000,
+      "last": 1791115200000,
+      "ema_ready": true
+    },
+    {
+      "bar": "1Dutc",
+      "candles": 300,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1765238400000,
+      "last": 1791072000000,
+      "ema_ready": true
+    },
+    {
+      "bar": "1Wutc",
+      "candles": 150,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1700438400000,
+      "last": 1790553600000,
+      "ema_ready": true
+    },
+    {
+      "bar": "1Mutc",
+      "candles": 36,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1698796800000,
+      "last": 1790812800000,
+      "ema_ready": true
+    },
+    {
+      "bar": "3Mutc",
+      "candles": 13,
+      "gaps": 0,
+      "fresh": true,
+      "first": 1696118400000,
+      "last": 1790812800000,
+      "ema_ready": false
+    }
+  ],
+  "historical_pagination": [
+    "1Wutc",
+    "1Mutc"
+  ],
+  "source": "Local API using public OKX EEA data",
+  "writes": "market cache only"
+}

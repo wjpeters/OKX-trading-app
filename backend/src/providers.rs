@@ -1,4 +1,5 @@
 //! Slow, allowlisted sources and untrusted Jev decisions. No execution adapter.
+use crate::settings::{self, Provider};
 use crate::{App, CandleQuery, candle_result, model::now_ms, studio::reply};
 use anyhow::{Result, bail, ensure};
 use axum::{
@@ -83,7 +84,7 @@ async fn cycle(a: &App) -> Result<()> {
     Ok(())
 }
 async fn research(State(a): State<App>) -> Response {
-    reply(async{let rows=sqlx::query("SELECT name,payload,received_ms,error FROM studio.providers").fetch_all(&a.db).await?;let news=sqlx::query("SELECT provider,title,url,published_ms,first_seen_ms,assets FROM studio.news ORDER BY published_ms DESC LIMIT 100").fetch_all(&a.db).await?;let budget=sqlx::query("SELECT budget::text,spent::text,reserved::text,enabled,failures,blocked_until FROM studio.ai_budget WHERE id=1").fetch_one(&a.db).await?;let decisions=sqlx::query("SELECT id,created_ms,payload FROM studio.decisions ORDER BY id DESC LIMIT 30").fetch_all(&a.db).await?;let configured=std::path::Path::new("/run/secrets/openrouter_key").is_file();Ok(json!({"providers":rows.iter().map(|r|json!({"name":r.get::<String,_>("name"),"data":r.get::<Value,_>("payload"),"received_ms":r.get::<i64,_>("received_ms"),"error":r.get::<Option<String>,_>("error")})).collect::<Vec<_>>(),"news":news.iter().map(|r|json!({"provider":r.get::<String,_>("provider"),"title":r.get::<String,_>("title"),"url":r.get::<String,_>("url"),"published_ms":r.get::<i64,_>("published_ms"),"first_seen_ms":r.get::<i64,_>("first_seen_ms"),"assets":r.get::<Value,_>("assets")})).collect::<Vec<_>>(),"restricted":[{"name":"CryptoPanic","state":"ACCOUNT_PLAN_REQUIRED","reason":"API-plan, gebruiksrechten en sleutel nog niet bevestigd"},{"name":"CoinGecko","state":"ACCOUNT_PLAN_REQUIRED","reason":"Demo/Pro-plan en quota nog niet bevestigd"},{"name":"DeMARK","state":"LICENSE_REQUIRED","reason":"Geen gelicentieerde Sequential/Combo-implementatie beschikbaar"}],"jev":{"model":MODEL,"configured":configured,"enabled":budget.get::<bool,_>("enabled"),"budget_usd":budget.get::<String,_>("budget"),"spent_usd":budget.get::<String,_>("spent"),"reserved_usd":budget.get::<String,_>("reserved"),"failures":budget.get::<i32,_>("failures"),"blocked_until":budget.get::<i64,_>("blocked_until"),"authority":"PROPOSALS_ONLY"},"decisions":decisions.iter().map(|r|json!({"id":r.get::<i64,_>("id"),"created_ms":r.get::<i64,_>("created_ms"),"envelope":r.get::<Value,_>("payload")})).collect::<Vec<_>>()}))}.await)
+    reply(async{let rows=sqlx::query("SELECT name,payload,received_ms,error FROM studio.providers").fetch_all(&a.db).await?;let news=sqlx::query("SELECT provider,title,url,published_ms,first_seen_ms,assets FROM studio.news ORDER BY published_ms DESC LIMIT 100").fetch_all(&a.db).await?;let budget=sqlx::query("SELECT budget::text,spent::text,reserved::text,enabled,failures,blocked_until FROM studio.ai_budget WHERE id=1").fetch_one(&a.db).await?;let decisions=sqlx::query("SELECT id,created_ms,payload FROM studio.decisions ORDER BY id DESC LIMIT 30").fetch_all(&a.db).await?;let provider=settings::selected(&a).await?;let configured=crate::secrets::configured(provider.key()).await;Ok(json!({"providers":rows.iter().map(|r|json!({"name":r.get::<String,_>("name"),"data":r.get::<Value,_>("payload"),"received_ms":r.get::<i64,_>("received_ms"),"error":r.get::<Option<String>,_>("error")})).collect::<Vec<_>>(),"news":news.iter().map(|r|json!({"provider":r.get::<String,_>("provider"),"title":r.get::<String,_>("title"),"url":r.get::<String,_>("url"),"published_ms":r.get::<i64,_>("published_ms"),"first_seen_ms":r.get::<i64,_>("first_seen_ms"),"assets":r.get::<Value,_>("assets")})).collect::<Vec<_>>(),"restricted":[{"name":"CryptoPanic","state":"ACCOUNT_PLAN_REQUIRED","reason":"API-plan, gebruiksrechten en sleutel nog niet bevestigd"},{"name":"CoinGecko","state":"ACCOUNT_PLAN_REQUIRED","reason":"Demo/Pro-plan en quota nog niet bevestigd"},{"name":"DeMARK","state":"LICENSE_REQUIRED","reason":"Geen gelicentieerde Sequential/Combo-implementatie beschikbaar"}],"jev":{"model":provider.model(),"provider":provider.id(),"configured":configured,"enabled":budget.get::<bool,_>("enabled"),"budget_usd":budget.get::<String,_>("budget"),"spent_usd":budget.get::<String,_>("spent"),"reserved_usd":budget.get::<String,_>("reserved"),"failures":budget.get::<i32,_>("failures"),"blocked_until":budget.get::<i64,_>("blocked_until"),"authority":"PROPOSALS_ONLY"},"decisions":decisions.iter().map(|r|json!({"id":r.get::<i64,_>("id"),"created_ms":r.get::<i64,_>("created_ms"),"envelope":r.get::<Value,_>("payload")})).collect::<Vec<_>>()}))}.await)
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -100,11 +101,13 @@ async fn config(State(a): State<App>, Json(r): Json<Config>) -> Response {
                 r.budget_usd >= D::ZERO && r.budget_usd <= D::from(100),
                 "AI-budget moet tussen 0 en 100 USD liggen"
             );
-            ensure!(
-                !r.enabled || std::path::Path::new("/run/secrets/openrouter_key").is_file(),
-                "OpenRouter-sleutel ontbreekt; gebruik de lokale sleutelsetup"
-            );
             let mut tx = a.db.begin().await?;
+            settings::lock(&mut tx).await?;
+            let provider = settings::selected(&a).await?;
+            ensure!(
+                !r.enabled || crate::secrets::configured(provider.key()).await,
+                "Sleutel van de gekozen Jev-provider ontbreekt; stel deze in bij Systeem"
+            );
             let used: String = sqlx::query_scalar(
                 "SELECT (spent+reserved)::text FROM studio.ai_budget WHERE id=1 FOR UPDATE",
             )
@@ -191,6 +194,37 @@ pub fn parse_decision(v: &Value) -> Result<Value> {
         json!({"decision_id":v["id"],"model_id":model,"answer":choice,"probabilities":answer["probabilities"],"confidence":confidence.to_string(),"cost_usd":cost.to_string(),"usage":v["usage"]}),
     )
 }
+// TypeSafe supplies token usage but no billed USD amount or request id.
+// Keep calculated cost explicitly labelled with the pinned public tariff (2026-10-05).
+fn parse_provider_decision(raw: &Value, provider: Provider, call_id: i64) -> Result<Value> {
+    if provider == Provider::OpenRouter {
+        let mut env = parse_decision(raw)?;
+        env["provider"] = json!(provider.id());
+        env["cost_basis"] = json!("provider_reported");
+        return Ok(env);
+    }
+    ensure!(
+        raw["model"] == provider.model(),
+        "Provider retourneerde een andere modelversie"
+    );
+    let tokens = raw["usage"]["input_tokens"]
+        .as_u64()
+        .filter(|n| *n > 0 && *n <= 64000)
+        .ok_or_else(|| anyhow::anyhow!("Inputtokengebruik ontbreekt of is ongeldig"))?;
+    let output_tokens = raw["usage"]["output_tokens"]
+        .as_u64()
+        .ok_or_else(|| anyhow::anyhow!("Outputtokengebruik ontbreekt"))?;
+    let cost = D::from(tokens) * D::new(42, 9);
+    let normalized = json!({"model":MODEL,"id":format!("typesafe-local-{call_id}"),
+        "answers":raw["answers"],"usage":{"input_tokens":tokens,"output_tokens":output_tokens,"cost":cost.to_string()}});
+    let mut env = parse_decision(&normalized)?;
+    env["model_id"] = json!(provider.model());
+    env["provider"] = json!(provider.id());
+    env["cost_basis"] = json!("calculated_public_tariff_2026-10-05");
+    env["input_usd_per_million_tokens"] = json!("0.042");
+    env["decision_id_source"] = json!("local");
+    Ok(env)
+}
 pub async fn decide(
     a: &App,
     instrument: &str,
@@ -219,9 +253,14 @@ async fn decision_call(
     strategy: &str,
     expected_revision: Option<u64>,
 ) -> Result<Value> {
-    let key = crate::secrets::read("openrouter_key")
+    let provider = settings::selected(a).await?;
+    let key = crate::secrets::read(provider.key())
         .await
-        .map_err(|_| anyhow::anyhow!("OpenRouter-sleutel ontbreekt"))?;
+        .map_err(|_| anyhow::anyhow!("Sleutel van de gekozen Jev-provider ontbreekt"))?;
+    ensure!(
+        !key.trim().is_empty(),
+        "Sleutel van de gekozen Jev-provider ontbreekt"
+    );
     let data = candle_result(
         a,
         &CandleQuery {
@@ -318,10 +357,10 @@ async fn decision_call(
         .bind(reserve.to_string())
         .execute(&mut *tx)
         .await?;
-    let call_id:i64=sqlx::query_scalar("INSERT INTO studio.decisions(created_ms,payload) VALUES($1,$2) RETURNING id").bind(now_ms()).bind(json!({"state":"PENDING","input":input,"reserved_usd":reserve.to_string(),"authority":"PROPOSALS_ONLY"})).fetch_one(&mut *tx).await?;
+    let call_id:i64=sqlx::query_scalar("INSERT INTO studio.decisions(created_ms,payload) VALUES($1,$2) RETURNING id").bind(now_ms()).bind(json!({"state":"PENDING","provider":provider.id(),"model_id":provider.model(),"input":input,"reserved_usd":reserve.to_string(),"authority":"PROPOSALS_ONLY"})).fetch_one(&mut *tx).await?;
     tx.commit().await?;
     let started = Instant::now();
-    let call=async{let r=a.http.post("https://openrouter.ai/api/alpha/decisions").bearer_auth(key.trim()).timeout(Duration::from_millis(2500)).json(&json!({"model":MODEL,"state":input,"questions":{"action":{"type":"choice","instructions":"Select a conservative proposal from the supplied closed-bar state. HOLD if evidence is insufficient. Never change risk settings.","criteria":{"HOLD":"No new exposure justified by this state","CONSIDER_ENTRY":"Trend evidence supports asking the deterministic risk engine to consider an entry","REDUCE":"Evidence supports reducing existing exposure"}}}})).send().await?;let raw=bounded(r).await?;parse_decision(&raw)}.await;
+    let call=async{let r=a.http.post(provider.endpoint()).bearer_auth(key.trim()).timeout(Duration::from_millis(2500)).json(&json!({"model":provider.model(),"state":input,"questions":{"action":{"type":"choice","instructions":"Select a conservative proposal from the supplied closed-bar state. HOLD if evidence is insufficient. Never change risk settings.","criteria":{"HOLD":"No new exposure justified by this state","CONSIDER_ENTRY":"Trend evidence supports asking the deterministic risk engine to consider an entry","REDUCE":"Evidence supports reducing existing exposure"}}}})).send().await?;let raw=bounded(r).await?;parse_provider_decision(&raw, provider, call_id)}.await;
     match call {
         Ok(mut env) => {
             let cost = decimal(&env["cost_usd"])?;
@@ -376,6 +415,22 @@ mod tests {
     use super::*;
     fn valid() -> Value {
         json!({"id":"fixture-1","model":"typesafe/jev-1.13-20260917","answers":{"action":{"type":"choice","choice":"HOLD","confidence":0.9,"probabilities":{"HOLD":0.9,"CONSIDER_ENTRY":0.05,"REDUCE":0.05}}},"usage":{"cost":0.00002}})
+    }
+    #[test]
+    fn direct_provider_uses_its_schema_and_explicit_calculated_cost() {
+        let mut v = valid();
+        v["model"] = json!("jev-1.13.0");
+        v["usage"] = json!({"input_tokens":1000,"output_tokens":20});
+        v.as_object_mut().unwrap().remove("id");
+        let env = parse_provider_decision(&v, Provider::TypeSafe, 7).unwrap();
+        assert_eq!(env["model_id"], "jev-1.13.0");
+        assert_eq!(decimal(&env["cost_usd"]).unwrap(), D::new(42, 6));
+        assert_eq!(env["decision_id_source"], "local");
+        assert!(parse_provider_decision(&v, Provider::OpenRouter, 7).is_err());
+        v["usage"]["input_tokens"] = json!(64001);
+        assert!(parse_provider_decision(&v, Provider::TypeSafe, 7).is_err());
+        v["usage"] = Value::Null;
+        assert!(parse_provider_decision(&v, Provider::TypeSafe, 7).is_err());
     }
     #[test]
     fn provider_shape() {

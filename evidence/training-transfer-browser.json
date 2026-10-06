@@ -1,0 +1,33 @@
+{
+  "scope": "synthetic test network only",
+  "interim_network_selected": true,
+  "stored_network_loaded": true,
+  "weight_matrix_cells": 320,
+  "generation_checkpoint_selected": 2,
+  "file_upload_browser_test": "not executed; upload permission declined",
+  "browser_console_errors": [],
+  "actual_downloaded_files": [
+    {
+      "file": "okx-BTC-EUR-5m-seed17-gen2-b72d4f49.json",
+      "generation": 2,
+      "weights_identical": true,
+      "normalizer_identical": true,
+      "source": "checkpoint",
+      "hash": "b72d4f492d929f3e424e12d23922b4518aad5a2a4244e79e98a173d9ece5e401"
+    },
+    {
+      "file": "okx-BTC-EUR-5m-seed17-gen3-8036d736.json",
+      "generation": 3,
+      "weights_identical": true,
+      "normalizer_identical": true,
+      "source": "in_progress",
+      "hash": "8036d7361331ae27e81e76348d9c79c1b55deb7c6d3fdf44b13089ee9718a3c0"
+    }
+  ],
+  "production": {
+    "import_enabled": true,
+    "export_enabled": false,
+    "reason": "first generation not yet computed",
+    "console_errors": []
+  }
+}

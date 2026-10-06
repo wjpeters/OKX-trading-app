@@ -1,0 +1,17 @@
+{
+  "strategy": {
+    "samples": 3400,
+    "scope": "shared Rust strategy step; excludes Laya, database and exchange ACK",
+    "strategy_p95_us": 203
+  },
+  "laya_ms": [
+    5785.203833016567,
+    106.25700000673532,
+    65.54149999283254,
+    94.5195839740336,
+    238.27095900196582,
+    143.4703340055421
+  ],
+  "laya_p95_ms": 5785.203833016567,
+  "scope": "Synthetic two-worker CMA load; strategy timing excludes model, persistence and ACK. Six Laya calls; not a durable native order acceptance test."
+}

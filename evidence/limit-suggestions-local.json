@@ -1,0 +1,39 @@
+{
+  "at": "2026-10-05T20:42:15.793749+00:00",
+  "scope": "Draft example limits only; no account writes, releases or orders by this work",
+  "policy_same_as_before": false,
+  "release_same_as_before": false,
+  "policy_revision_before": 0,
+  "policy_revision_now": 2,
+  "native_order_count": 0,
+  "native_order_count_preserved": true,
+  "connected": true,
+  "reconciled": true,
+  "gateway_fresh": true,
+  "live_release_present": true,
+  "live_enabled": true,
+  "tests_passed": 7,
+  "image": "sha256:3fcdf2b7d14efa6bbfd2ddefb78367894c930257790eb539e84b1e0122449db9",
+  "confirmation_events": [
+    {
+      "kind": "LIVE_ENABLED",
+      "created_ms": 1791232694288
+    },
+    {
+      "kind": "LIMITS_CONFIRMED",
+      "created_ms": 1791232686652
+    },
+    {
+      "kind": "LIMITS_CONFIRMED",
+      "created_ms": 1791232681969
+    }
+  ],
+  "account_writes_by_agent": 0,
+  "source_sha256": {
+    "frontend/src/limit-suggestions.ts": "06f1e37c92be230d42ef263c493d2b49814f1fa4e2f26250c9dc4731a7646a6f",
+    "frontend/src/OrderTicket.tsx": "38b7f8c3fb56e4cab4bd680e184c5761d1f99019dd39dbf24168a869fd4502ee",
+    "frontend/src/orders.css": "1e16f18698ee6f6f4e305b227a715d4a26c5213bee452ae2c6cf551fb39b7860",
+    "frontend/tests/limit-suggestions.test.mjs": "d271ef97945c313af77338ca7283f93dcddb9c0bc347edc08e66cee85c86109a",
+    "frontend/package.json": "d5bb3001c0de130b47d47fe27cad0251d234bea3330a0aa75841f9097e557465"
+  }
+}

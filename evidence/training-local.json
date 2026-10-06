@@ -1,0 +1,71 @@
+{
+  "at_ms": 1791290462491,
+  "datasets": [
+    {
+      "id": "d365d23aef04df76cb2025dd0ec3bee9",
+      "instrument": "ETH-EUR",
+      "status": "READY",
+      "rows": 525600,
+      "coverage": 1.0,
+      "gaps": [],
+      "hash": "81540cedd678112acc77520547cd67a95ceb9a20e3b32f314068664f56393b57"
+    },
+    {
+      "id": "eeb304823add414b60da372590dd3ca5",
+      "instrument": "BTC-EUR",
+      "status": "READY",
+      "rows": 525600,
+      "coverage": 1.0,
+      "gaps": [],
+      "hash": "0206ce364b95f0f4e151918a3a42b6ee641ea5fa32bae1177b9a1fc612a92724"
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "e8cc8c3a1c6f595a6fd08b98ffaf6c08",
+      "status": "LAYA_FEATURES",
+      "desired": "RUNNING",
+      "progress": {
+        "artifacts": [],
+        "compute_seconds": 0,
+        "feature_bar": "1m",
+        "feature_rows": 74144,
+        "history": [],
+        "market": "BTC-EUR",
+        "status": "LAYA_FEATURES"
+      }
+    }
+  ],
+  "worker": {
+    "at_ms": 1791290458011,
+    "credentials": false,
+    "evaluator": "shared Rust kernel",
+    "memory_mb": 90.9140625,
+    "pid": 1,
+    "seconds_today": 4633.464090324036,
+    "status": "online"
+  },
+  "laya": {
+    "checkpoint": "7b928d828b7b0e022f929d9bd2e44165aa270148",
+    "device": "mps",
+    "feature_prompt": "market-regime-v1",
+    "hashes": {
+      "encoder/config.json": "bf3ab80598fdccf414855a2ce80f22859e4492d06ca8a62ddd1cfb63972f8979",
+      "model.safetensors": "891102d372688fc2a094dac56a384bc537b87c63f21f9f3dac0be2b7cbc8d86c",
+      "rl_agent_config.json": "ae287b56bbcf5f8c4f4541ae9dfd00c914c4c48b940b8398c3058af37ba92bbd",
+      "tokenizer/tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30",
+      "tokenizer/tokenizer_config.json": "50044de60daaa73df97d262e15a40d4faf0160e7d742df64b377877a1320dd12"
+    },
+    "memory_limit_mb": 2560,
+    "memory_mb": 2152.671875,
+    "model": "Laya english",
+    "paid_calls": 0,
+    "ready": true,
+    "reason": null,
+    "runtime": "torch2.8-eager-mps-fp32-v1"
+  },
+  "release_ready": false,
+  "native_release_count": 0,
+  "native_run_count": 0,
+  "gateway_update": "installed after explicit user authorization; matching code verified"
+}

@@ -1,0 +1,86 @@
+{
+  "at": 1791291693.5239658,
+  "scope": "synthetic network weights; disposable database; no account, order or private gateway",
+  "checks": [
+    {
+      "check": "empty network archive available",
+      "passed": true
+    },
+    {
+      "check": "no invented trained weights before first generation",
+      "passed": true
+    },
+    {
+      "check": "in-progress export includes complete weights and normalizer",
+      "passed": true
+    },
+    {
+      "check": "explicit earlier generation exports exact checkpoint",
+      "passed": true
+    },
+    {
+      "check": "checkpoint path traversal blocked",
+      "passed": true
+    },
+    {
+      "check": "mid-training network imports into persistent research archive",
+      "passed": true
+    },
+    {
+      "check": "all weights and settings survive database roundtrip exactly",
+      "passed": true
+    },
+    {
+      "check": "floating weight bits preserved across JSON and PostgreSQL",
+      "passed": true
+    },
+    {
+      "check": "repeated import reuses exact stored network",
+      "passed": true
+    },
+    {
+      "check": "network route accepts valid formatted files above global body limit",
+      "passed": true
+    },
+    {
+      "check": "archive lists imported generation and provenance",
+      "passed": true
+    },
+    {
+      "check": "modified weights rejected by content hash",
+      "passed": true
+    },
+    {
+      "check": "claimed qualification cannot be imported",
+      "passed": true
+    },
+    {
+      "check": "trading permission fields rejected",
+      "passed": true
+    },
+    {
+      "check": "unsupported portable file version rejected",
+      "passed": true
+    },
+    {
+      "check": "oversized upload rejected before persistence",
+      "passed": true
+    },
+    {
+      "check": "cross-origin import rejected",
+      "passed": true
+    },
+    {
+      "check": "stored imported content remains immutable",
+      "passed": true
+    },
+    {
+      "check": "immutable candidate export supported without campaign completion",
+      "passed": true
+    },
+    {
+      "check": "import does not create account, orders, evidence or trading release",
+      "passed": true
+    }
+  ]
+}

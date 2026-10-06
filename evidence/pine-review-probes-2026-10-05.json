@@ -1,0 +1,3277 @@
+{
+  "scope": "synthetic probes, same running network-none worker and permission-limited child; wall includes child startup but not broker/API; no orders or database writes",
+  "output": [
+    {
+      "name": "core_ema_rsi_atr",
+      "ok": true,
+      "wall_ms": 383.68954199999996,
+      "duration_ms": 106.539875,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "ema",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": 102
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 397
+            },
+            {
+              "time": 1700017920000,
+              "value": 398
+            },
+            {
+              "time": 1700017980000,
+              "value": 399
+            }
+          ]
+        },
+        {
+          "title": "rsi",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 100
+            },
+            {
+              "time": 1700017920000,
+              "value": 100
+            },
+            {
+              "time": 1700017980000,
+              "value": 100
+            }
+          ]
+        },
+        {
+          "title": "atr",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": 3
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 3
+            },
+            {
+              "time": 1700017920000,
+              "value": 3
+            },
+            {
+              "time": 1700017980000,
+              "value": 3
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "custom_function_array",
+      "ok": true,
+      "wall_ms": 281.7925,
+      "duration_ms": 164.749292,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "result",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 4
+            },
+            {
+              "time": 1700000100000,
+              "value": 4
+            },
+            {
+              "time": 1700000160000,
+              "value": 4
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 4
+            },
+            {
+              "time": 1700017920000,
+              "value": 4
+            },
+            {
+              "time": 1700017980000,
+              "value": 4
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "negative_history",
+      "ok": true,
+      "wall_ms": 288.48524999999995,
+      "duration_ms": 95.66770799999999,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "future",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": null
+            },
+            {
+              "time": 1700017920000,
+              "value": null
+            },
+            {
+              "time": 1700017980000,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "var_600_full",
+      "ok": true,
+      "wall_ms": 307.64812499999994,
+      "duration_ms": 185.83104199999997,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "count",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 1
+            },
+            {
+              "time": 1700000100000,
+              "value": 2
+            },
+            {
+              "time": 1700000160000,
+              "value": 3
+            }
+          ],
+          "last": [
+            {
+              "time": 1700035860000,
+              "value": 598
+            },
+            {
+              "time": 1700035920000,
+              "value": 599
+            },
+            {
+              "time": 1700035980000,
+              "value": 600
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700035860000,
+              "value": 1
+            },
+            {
+              "time": 1700035920000,
+              "value": 1
+            },
+            {
+              "time": 1700035980000,
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "intent_count": 250,
+      "first_intent": {
+        "bar_ms": 1700021040000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "last_intent": {
+        "bar_ms": 1700035980000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "inputs": []
+    },
+    {
+      "name": "var_300_tail",
+      "ok": true,
+      "wall_ms": 302.6765419999999,
+      "duration_ms": 166.46745899999996,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "count",
+          "first": [
+            {
+              "time": 1700018040000,
+              "value": 1
+            },
+            {
+              "time": 1700018100000,
+              "value": 2
+            },
+            {
+              "time": 1700018160000,
+              "value": 3
+            }
+          ],
+          "last": [
+            {
+              "time": 1700035860000,
+              "value": 298
+            },
+            {
+              "time": 1700035920000,
+              "value": 299
+            },
+            {
+              "time": 1700035980000,
+              "value": 300
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700018040000,
+              "value": 0
+            },
+            {
+              "time": 1700018100000,
+              "value": 0
+            },
+            {
+              "time": 1700018160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700035860000,
+              "value": 0
+            },
+            {
+              "time": 1700035920000,
+              "value": 0
+            },
+            {
+              "time": 1700035980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "timeframe_1m",
+      "ok": true,
+      "wall_ms": 198.90479200000004,
+      "duration_ms": 92.867916,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "seconds",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 60
+            },
+            {
+              "time": 1700000100000,
+              "value": 60
+            },
+            {
+              "time": 1700000160000,
+              "value": 60
+            }
+          ],
+          "last": [
+            {
+              "time": 1700002260000,
+              "value": 60
+            },
+            {
+              "time": 1700002320000,
+              "value": 60
+            },
+            {
+              "time": 1700002380000,
+              "value": 60
+            }
+          ]
+        },
+        {
+          "title": "multiplier",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 1
+            },
+            {
+              "time": 1700000100000,
+              "value": 1
+            },
+            {
+              "time": 1700000160000,
+              "value": 1
+            }
+          ],
+          "last": [
+            {
+              "time": 1700002260000,
+              "value": 1
+            },
+            {
+              "time": 1700002320000,
+              "value": 1
+            },
+            {
+              "time": 1700002380000,
+              "value": 1
+            }
+          ]
+        },
+        {
+          "title": "minutes",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 1
+            },
+            {
+              "time": 1700000100000,
+              "value": 1
+            },
+            {
+              "time": 1700000160000,
+              "value": 1
+            }
+          ],
+          "last": [
+            {
+              "time": 1700002260000,
+              "value": 1
+            },
+            {
+              "time": 1700002320000,
+              "value": 1
+            },
+            {
+              "time": 1700002380000,
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "timeframe_15m",
+      "ok": true,
+      "wall_ms": 226.65858300000014,
+      "duration_ms": 99.934792,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "seconds",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 900
+            },
+            {
+              "time": 1700000940000,
+              "value": 900
+            },
+            {
+              "time": 1700001840000,
+              "value": 900
+            }
+          ],
+          "last": [
+            {
+              "time": 1700033340000,
+              "value": 900
+            },
+            {
+              "time": 1700034240000,
+              "value": 900
+            },
+            {
+              "time": 1700035140000,
+              "value": 900
+            }
+          ]
+        },
+        {
+          "title": "multiplier",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 15
+            },
+            {
+              "time": 1700000940000,
+              "value": 15
+            },
+            {
+              "time": 1700001840000,
+              "value": 15
+            }
+          ],
+          "last": [
+            {
+              "time": 1700033340000,
+              "value": 15
+            },
+            {
+              "time": 1700034240000,
+              "value": 15
+            },
+            {
+              "time": 1700035140000,
+              "value": 15
+            }
+          ]
+        },
+        {
+          "title": "minutes",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 1
+            },
+            {
+              "time": 1700000940000,
+              "value": 1
+            },
+            {
+              "time": 1700001840000,
+              "value": 1
+            }
+          ],
+          "last": [
+            {
+              "time": 1700033340000,
+              "value": 1
+            },
+            {
+              "time": 1700034240000,
+              "value": 1
+            },
+            {
+              "time": 1700035140000,
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "timeframe_1H",
+      "ok": true,
+      "wall_ms": 269.78362500000003,
+      "duration_ms": 33.131000000000014,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "seconds",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 3600
+            },
+            {
+              "time": 1700003640000,
+              "value": 3600
+            },
+            {
+              "time": 1700007240000,
+              "value": 3600
+            }
+          ],
+          "last": [
+            {
+              "time": 1700133240000,
+              "value": 3600
+            },
+            {
+              "time": 1700136840000,
+              "value": 3600
+            },
+            {
+              "time": 1700140440000,
+              "value": 3600
+            }
+          ]
+        },
+        {
+          "title": "multiplier",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 60
+            },
+            {
+              "time": 1700003640000,
+              "value": 60
+            },
+            {
+              "time": 1700007240000,
+              "value": 60
+            }
+          ],
+          "last": [
+            {
+              "time": 1700133240000,
+              "value": 60
+            },
+            {
+              "time": 1700136840000,
+              "value": 60
+            },
+            {
+              "time": 1700140440000,
+              "value": 60
+            }
+          ]
+        },
+        {
+          "title": "minutes",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 1
+            },
+            {
+              "time": 1700003640000,
+              "value": 1
+            },
+            {
+              "time": 1700007240000,
+              "value": 1
+            }
+          ],
+          "last": [
+            {
+              "time": 1700133240000,
+              "value": 1
+            },
+            {
+              "time": 1700136840000,
+              "value": 1
+            },
+            {
+              "time": 1700140440000,
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "timeframe_1D",
+      "ok": true,
+      "wall_ms": 297.29025,
+      "duration_ms": 113.8615,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "seconds",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 86400
+            },
+            {
+              "time": 1700086440000,
+              "value": 86400
+            },
+            {
+              "time": 1700172840000,
+              "value": 86400
+            }
+          ],
+          "last": [
+            {
+              "time": 1703196840000,
+              "value": 86400
+            },
+            {
+              "time": 1703283240000,
+              "value": 86400
+            },
+            {
+              "time": 1703369640000,
+              "value": 86400
+            }
+          ]
+        },
+        {
+          "title": "multiplier",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 1
+            },
+            {
+              "time": 1700086440000,
+              "value": 1
+            },
+            {
+              "time": 1700172840000,
+              "value": 1
+            }
+          ],
+          "last": [
+            {
+              "time": 1703196840000,
+              "value": 1
+            },
+            {
+              "time": 1703283240000,
+              "value": 1
+            },
+            {
+              "time": 1703369640000,
+              "value": 1
+            }
+          ]
+        },
+        {
+          "title": "minutes",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700086440000,
+              "value": 0
+            },
+            {
+              "time": 1700172840000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1703196840000,
+              "value": 0
+            },
+            {
+              "time": 1703283240000,
+              "value": 0
+            },
+            {
+              "time": 1703369640000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "timeframe_1W",
+      "ok": true,
+      "wall_ms": 199.76299999999992,
+      "duration_ms": 31.592,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "seconds",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 604800
+            },
+            {
+              "time": 1700604840000,
+              "value": 604800
+            },
+            {
+              "time": 1701209640000,
+              "value": 604800
+            }
+          ],
+          "last": [
+            {
+              "time": 1722377640000,
+              "value": 604800
+            },
+            {
+              "time": 1722982440000,
+              "value": 604800
+            },
+            {
+              "time": 1723587240000,
+              "value": 604800
+            }
+          ]
+        },
+        {
+          "title": "multiplier",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 1
+            },
+            {
+              "time": 1700604840000,
+              "value": 1
+            },
+            {
+              "time": 1701209640000,
+              "value": 1
+            }
+          ],
+          "last": [
+            {
+              "time": 1722377640000,
+              "value": 1
+            },
+            {
+              "time": 1722982440000,
+              "value": 1
+            },
+            {
+              "time": 1723587240000,
+              "value": 1
+            }
+          ]
+        },
+        {
+          "title": "minutes",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700604840000,
+              "value": 0
+            },
+            {
+              "time": 1701209640000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1722377640000,
+              "value": 0
+            },
+            {
+              "time": 1722982440000,
+              "value": 0
+            },
+            {
+              "time": 1723587240000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "metadata",
+      "ok": true,
+      "wall_ms": 212.07816700000012,
+      "duration_ms": 99.438459,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "#0",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": null
+            },
+            {
+              "time": 1700017920000,
+              "value": null
+            },
+            {
+              "time": 1700017980000,
+              "value": null
+            }
+          ]
+        },
+        {
+          "title": "#1",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": null
+            },
+            {
+              "time": 1700017920000,
+              "value": null
+            },
+            {
+              "time": 1700017980000,
+              "value": null
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "offset_negative",
+      "ok": true,
+      "wall_ms": 207.81479100000024,
+      "duration_ms": 90.068916,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 1
+            },
+            {
+              "time": 1700017920000,
+              "value": 1
+            },
+            {
+              "time": 1700017980000,
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "intent_count": 10,
+      "first_intent": {
+        "bar_ms": 1700017440000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "last_intent": {
+        "bar_ms": 1700017980000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "inputs": []
+    },
+    {
+      "name": "offset_positive",
+      "ok": true,
+      "wall_ms": 212.62937499999998,
+      "duration_ms": 99.87341699999999,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 1
+            },
+            {
+              "time": 1700017920000,
+              "value": 1
+            },
+            {
+              "time": 1700017980000,
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "intent_count": 10,
+      "first_intent": {
+        "bar_ms": 1700017440000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "last_intent": {
+        "bar_ms": 1700017980000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "inputs": []
+    },
+    {
+      "name": "twenty_plots_then_entry",
+      "ok": true,
+      "wall_ms": 378.852167,
+      "duration_ms": 186.033542,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "p0",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p1",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p2",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p3",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p4",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p5",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p6",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p7",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p8",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p9",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p10",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p11",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p12",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p13",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p14",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p15",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p16",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p17",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p18",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        },
+        {
+          "title": "p19",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "alerts",
+      "ok": true,
+      "wall_ms": 290.5907500000003,
+      "duration_ms": 102.3355,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "close",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 101
+            },
+            {
+              "time": 1700000100000,
+              "value": 102
+            },
+            {
+              "time": 1700000160000,
+              "value": 103
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 398
+            },
+            {
+              "time": 1700017920000,
+              "value": 399
+            },
+            {
+              "time": 1700017980000,
+              "value": 400
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "numeric_options",
+      "ok": true,
+      "wall_ms": 216.1592499999997,
+      "duration_ms": 112.844167,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "sma",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": 102
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 397
+            },
+            {
+              "time": 1700017920000,
+              "value": 398
+            },
+            {
+              "time": 1700017980000,
+              "value": 399
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": [
+        {
+          "id": "in_0",
+          "name": "Period",
+          "type": "int",
+          "defval": 3,
+          "varId": "n",
+          "title": "Period",
+          "display": "all",
+          "options": [
+            3,
+            5,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "name": "strategy_rejected",
+      "ok": false,
+      "wall_ms": 115.27816699999948,
+      "duration_ms": 0.7270830000000075,
+      "diagnostics": [
+        {
+          "line": 3,
+          "message": "Regel 3: strategy is niet vrijgegeven in closed-bar Pine-profiel 1. Gebruik entry/exit-plots voor voorstellen. Zie compatibiliteitsmatrix."
+        }
+      ],
+      "plots": [],
+      "intent_count": 0
+    },
+    {
+      "name": "security_rejected",
+      "ok": false,
+      "wall_ms": 103.26404199999979,
+      "duration_ms": 0.6833340000000021,
+      "diagnostics": [
+        {
+          "line": 3,
+          "message": "Regel 3: request is niet vrijgegeven in closed-bar Pine-profiel 1. Gebruik entry/exit-plots voor voorstellen. Zie compatibiliteitsmatrix."
+        }
+      ],
+      "plots": [],
+      "intent_count": 0
+    },
+    {
+      "name": "barstate_closed",
+      "ok": true,
+      "wall_ms": 261.18408400000044,
+      "duration_ms": 90.044792,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "confirmed",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 1
+            },
+            {
+              "time": 1700000100000,
+              "value": 1
+            },
+            {
+              "time": 1700000160000,
+              "value": 1
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 1
+            },
+            {
+              "time": 1700017920000,
+              "value": 1
+            },
+            {
+              "time": 1700017980000,
+              "value": 1
+            }
+          ]
+        },
+        {
+          "title": "realtime",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "benchmark_300_0",
+      "ok": true,
+      "wall_ms": 217.49820799999998,
+      "duration_ms": 106.77983300000001,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 394
+            },
+            {
+              "time": 1700017920000,
+              "value": 395
+            },
+            {
+              "time": 1700017980000,
+              "value": 396
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 388
+            },
+            {
+              "time": 1700017920000,
+              "value": 389
+            },
+            {
+              "time": 1700017980000,
+              "value": 390
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "benchmark_300_1",
+      "ok": true,
+      "wall_ms": 387.7877920000001,
+      "duration_ms": 188.661958,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 394
+            },
+            {
+              "time": 1700017920000,
+              "value": 395
+            },
+            {
+              "time": 1700017980000,
+              "value": 396
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 388
+            },
+            {
+              "time": 1700017920000,
+              "value": 389
+            },
+            {
+              "time": 1700017980000,
+              "value": 390
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "benchmark_300_2",
+      "ok": true,
+      "wall_ms": 221.4918749999997,
+      "duration_ms": 102.769375,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 394
+            },
+            {
+              "time": 1700017920000,
+              "value": 395
+            },
+            {
+              "time": 1700017980000,
+              "value": 396
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 388
+            },
+            {
+              "time": 1700017920000,
+              "value": 389
+            },
+            {
+              "time": 1700017980000,
+              "value": 390
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "benchmark_300_3",
+      "ok": true,
+      "wall_ms": 284.8557089999995,
+      "duration_ms": 163.058958,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 394
+            },
+            {
+              "time": 1700017920000,
+              "value": 395
+            },
+            {
+              "time": 1700017980000,
+              "value": 396
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 388
+            },
+            {
+              "time": 1700017920000,
+              "value": 389
+            },
+            {
+              "time": 1700017980000,
+              "value": 390
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "benchmark_300_4",
+      "ok": true,
+      "wall_ms": 296.82529199999954,
+      "duration_ms": 171.924166,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 394
+            },
+            {
+              "time": 1700017920000,
+              "value": 395
+            },
+            {
+              "time": 1700017980000,
+              "value": 396
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 388
+            },
+            {
+              "time": 1700017920000,
+              "value": 389
+            },
+            {
+              "time": 1700017980000,
+              "value": 390
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700017860000,
+              "value": 0
+            },
+            {
+              "time": 1700017920000,
+              "value": 0
+            },
+            {
+              "time": 1700017980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 0,
+      "inputs": []
+    },
+    {
+      "name": "benchmark_5000_0",
+      "ok": true,
+      "wall_ms": 1014.4502919999995,
+      "duration_ms": 775.2380420000001,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 294
+            },
+            {
+              "time": 1700299920000,
+              "value": 295
+            },
+            {
+              "time": 1700299980000,
+              "value": 296
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 288
+            },
+            {
+              "time": 1700299920000,
+              "value": 289
+            },
+            {
+              "time": 1700299980000,
+              "value": 290
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 16,
+      "first_intent": {
+        "bar_ms": 1700037240000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "last_intent": {
+        "bar_ms": 1700288040000,
+        "action": "CONSIDER_EXIT",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "inputs": []
+    },
+    {
+      "name": "benchmark_5000_1",
+      "ok": true,
+      "wall_ms": 686.8637500000004,
+      "duration_ms": 411.417959,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 294
+            },
+            {
+              "time": 1700299920000,
+              "value": 295
+            },
+            {
+              "time": 1700299980000,
+              "value": 296
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 288
+            },
+            {
+              "time": 1700299920000,
+              "value": 289
+            },
+            {
+              "time": 1700299980000,
+              "value": 290
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 16,
+      "first_intent": {
+        "bar_ms": 1700037240000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "last_intent": {
+        "bar_ms": 1700288040000,
+        "action": "CONSIDER_EXIT",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "inputs": []
+    },
+    {
+      "name": "benchmark_5000_2",
+      "ok": true,
+      "wall_ms": 700.140875,
+      "duration_ms": 481.93645799999996,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 294
+            },
+            {
+              "time": 1700299920000,
+              "value": 295
+            },
+            {
+              "time": 1700299980000,
+              "value": 296
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 288
+            },
+            {
+              "time": 1700299920000,
+              "value": 289
+            },
+            {
+              "time": 1700299980000,
+              "value": 290
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 16,
+      "first_intent": {
+        "bar_ms": 1700037240000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "last_intent": {
+        "bar_ms": 1700288040000,
+        "action": "CONSIDER_EXIT",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "inputs": []
+    },
+    {
+      "name": "benchmark_5000_3",
+      "ok": true,
+      "wall_ms": 684.167958,
+      "duration_ms": 469.644041,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 294
+            },
+            {
+              "time": 1700299920000,
+              "value": 295
+            },
+            {
+              "time": 1700299980000,
+              "value": 296
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 288
+            },
+            {
+              "time": 1700299920000,
+              "value": 289
+            },
+            {
+              "time": 1700299980000,
+              "value": 290
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 16,
+      "first_intent": {
+        "bar_ms": 1700037240000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "last_intent": {
+        "bar_ms": 1700288040000,
+        "action": "CONSIDER_EXIT",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "inputs": []
+    },
+    {
+      "name": "benchmark_5000_4",
+      "ok": true,
+      "wall_ms": 611.3457909999997,
+      "duration_ms": 404.43775,
+      "diagnostics": [],
+      "plots": [
+        {
+          "title": "fast",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 294
+            },
+            {
+              "time": 1700299920000,
+              "value": 295
+            },
+            {
+              "time": 1700299980000,
+              "value": 296
+            }
+          ]
+        },
+        {
+          "title": "slow",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": null
+            },
+            {
+              "time": 1700000100000,
+              "value": null
+            },
+            {
+              "time": 1700000160000,
+              "value": null
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 288
+            },
+            {
+              "time": 1700299920000,
+              "value": 289
+            },
+            {
+              "time": 1700299980000,
+              "value": 290
+            }
+          ]
+        },
+        {
+          "title": "entry",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        },
+        {
+          "title": "exit",
+          "first": [
+            {
+              "time": 1700000040000,
+              "value": 0
+            },
+            {
+              "time": 1700000100000,
+              "value": 0
+            },
+            {
+              "time": 1700000160000,
+              "value": 0
+            }
+          ],
+          "last": [
+            {
+              "time": 1700299860000,
+              "value": 0
+            },
+            {
+              "time": 1700299920000,
+              "value": 0
+            },
+            {
+              "time": 1700299980000,
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "intent_count": 16,
+      "first_intent": {
+        "bar_ms": 1700037240000,
+        "action": "CONSIDER_ENTRY",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "last_intent": {
+        "bar_ms": 1700288040000,
+        "action": "CONSIDER_EXIT",
+        "authority": "PROPOSAL_ONLY"
+      },
+      "inputs": []
+    }
+  ]
+}

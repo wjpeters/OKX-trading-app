@@ -93,3 +93,16 @@ test("malformed saved drawings fail without silently overwriting the source", ()
     assert.throws(() => parseDrawings(raw));
   assert.deepEqual(parseDrawings(null), []);
 });
+
+test("future monthly drawing anchors follow leap years and quarter boundaries", () => {
+  const cs = [{ ts: Date.UTC(2024, 0, 1) }, { ts: Date.UTC(2024, 1, 1) }];
+  assert.equal(timeAt(cs, 2, "1Mutc"), Date.UTC(2024, 2, 1));
+  assert.equal(timeAt(cs, 3, "1Mutc"), Date.UTC(2024, 3, 1));
+  for (const i of [-2, -0.5, 0, 0.5, 1, 2, 2.5, 13])
+    assert.ok(
+      Math.abs(indexAt(cs, timeAt(cs, i, "1Mutc"), "1Mutc") - i) < 1e-10,
+    );
+  const qs = [{ ts: Date.UTC(2025, 6, 1) }, { ts: Date.UTC(2025, 9, 1) }];
+  assert.equal(timeAt(qs, 2, "3Mutc"), Date.UTC(2026, 0, 1));
+  assert.equal(indexAt(qs, Date.UTC(2026, 3, 1), "3Mutc"), 3);
+});

@@ -129,25 +129,59 @@ export function translateDrawing(d: Drawing, dt: number, dp: number): Drawing {
     target: d.target === undefined ? undefined : d.target + dp,
   };
 }
-// Interpolate logical bar positions, including the empty space next to the candles.
-export function timeAt(candles: Candle[], index: number): number {
-  if (!candles.length) return NaN;
-  const i = Math.max(0, Math.min(candles.length - 2, Math.floor(index)));
+// Calendar-aware extrapolation keeps future monthly anchors on calendar months.
+function barTime(candles: Candle[], index: number, bar: string): number {
+  if (candles[index]) return candles[index].ts;
+  const baseIndex = index < 0 ? 0 : candles.length - 1;
+  const base = candles[baseIndex].ts;
+  const months = bar === "1Mutc" ? 1 : bar === "3Mutc" ? 3 : 0;
+  if (months) {
+    const date = new Date(base);
+    return Date.UTC(
+      date.getUTCFullYear(),
+      date.getUTCMonth() + (index - baseIndex) * months,
+      1,
+    );
+  }
+  const i = index < 0 ? 0 : Math.max(0, candles.length - 2);
   const step = candles[i + 1] ? candles[i + 1].ts - candles[i].ts : 60000;
-  return candles[i].ts + (index - i) * step;
+  return base + (index - baseIndex) * step;
 }
-export function indexAt(candles: Candle[], time: number): number {
+export function timeAt(candles: Candle[], index: number, bar = ""): number {
   if (!candles.length) return NaN;
+  const i = Math.floor(index),
+    start = barTime(candles, i, bar),
+    end = barTime(candles, i + 1, bar);
+  return start + (index - i) * (end - start);
+}
+export function indexAt(candles: Candle[], time: number, bar = ""): number {
+  if (!candles.length) return NaN;
+  const last = candles.length - 1;
+  const months = bar === "1Mutc" ? 1 : bar === "3Mutc" ? 3 : 0;
+  if (months && (time < candles[0].ts || time >= candles[last].ts)) {
+    const baseIndex = time < candles[0].ts ? 0 : last;
+    const base = new Date(candles[baseIndex].ts),
+      date = new Date(time);
+    const delta =
+      (date.getUTCFullYear() - base.getUTCFullYear()) * 12 +
+      date.getUTCMonth() -
+      base.getUTCMonth();
+    const index = baseIndex + Math.floor(delta / months);
+    const start = barTime(candles, index, bar),
+      end = barTime(candles, index + 1, bar);
+    return index + (time - start) / (end - start);
+  }
   let lo = 0,
-    hi = candles.length - 1;
+    hi = last;
   while (lo < hi) {
     const m = Math.ceil((lo + hi) / 2);
     if (candles[m].ts <= time) lo = m;
     else hi = m - 1;
   }
-  const i = Math.min(lo, Math.max(0, candles.length - 2));
-  const step = candles[i + 1] ? candles[i + 1].ts - candles[i].ts : 60000;
-  return i + (time - candles[i].ts) / step;
+  const i = Math.min(lo, Math.max(0, last - 1));
+  const start = barTime(candles, i, bar),
+    end = barTime(candles, i + 1, bar);
+  return i + (time - start) / (end - start);
 }
 export function parseDrawings(raw: string | null): Drawing[] {
   const value: unknown = JSON.parse(raw || "[]");

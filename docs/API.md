@@ -74,3 +74,33 @@ Een fout geeft een zichtbare reden en HTTP 422 (validatie/risico/afhankelijke op
 Alertfields: price,sma,ema,rsi,macd,atr,bb_upper,bb_lower,vwap,stochastic,adx,obv,risk_paused,bot_running,bot_drawdown,bot_total_loss,drawing_line. comparison=above/below; trigger=close/intrabar; cooldown10–86400s. Indicatoren vereisen close. drawing_line krijgt `{first_ms,second_ms,first_price,second_price}` en value0; vergelijking gebruikt koers minus geprojecteerde lijnprijs. Bekende positieve ankers/tijden vereist, geen schermcoördinaten.
 
 Authpoort blijft lokaal HTTP; cookies zijn daarom niet als remote TLS-config te beschouwen. Health/readiness/authstatus zijn bereikbaar zonder login; overige API/WS vereisen een geldige sessie als auth is ingesteld. Verlopen WS-sessie sluit uiterlijk bij de30s-hercontrole. Geen `/api/live/orders`, private credentials, generieke providerproxy of Jev-executeroute.
+
+## Systeem-instellingen
+
+- `GET /api/settings`: gekozen provider/model, versleutelde-keypresence, opslaggereedheid, AI-budget en kosten. Geen keywaarden.
+- `POST /api/settings/credentials`: `{target, api_key, secret?, passphrase?}`; target is `okx_demo`, `okx_live`, `typesafe_key` of `openrouter_key`. Voor verwijderen: `{target, remove:true}` zonder sleutelvelden. Volledige OKX-set vereist. Maximaal 16 KiB body.
+- `POST /api/settings/provider`: `{provider:"typesafe"|"openrouter"}`. Providerwissel schakelt AI uit; kosten blijven staan.
+- Bestaand `POST /api/jev/config` gebruikt de gekozen provider voor keycontrole. `/api/research` en `/api/status` tonen dezelfde provider.
+
+Deze mutaties vallen onder bestaande sessie-, host-, Origin- en CSRF-controles. Er is geen providerproef of orderbijwerking bij sleutelopslag. Zie [Systeem](SYSTEM_SETTINGS.md).
+
+### Botactiviteit
+
+`GET /api/paper/bots/activity?bot_id=<id>` retourneert maximaal 150 duurzame gebeurtenissen, nieuwste eerst, voor de bot, zijn orders/posities en gedeelde rekeningcontroles. Onbekende bot geeft 422. De response bevat `seq`, `ts`, `kind`, `subject`, `detail`. Dit is alleen lezen; starten/pauzeren blijft via `/api/paper/bots/control`.
+
+### Systeemvoorbeelden
+
+`GET /api/studio/system-bots` retourneert vijf ingebouwde voorbeelden met `id`, `name`, `description` en `graph`. De catalogus is alleen-lezen; eigen kopieën gebruiken de bestaande documentopslag. `bot.ai_enabled` moet expliciet `true` zijn om een Jev-node te bewaren/gebruiken. Nieuwe nodetypen: `ema_cross`, `macd_cross`, `bollinger`, `candle_stop`. De candle-stop gebruikt `drop_pct` (0.01–50) en `action` (`close_pause`, `close`, `pause`). Lopende afbouw staat in `account.bot_exits`; `BOT_CANDLE_STOP` verschijnt in de duurzame activiteit.
+
+
+## Native handmatige orders
+
+`GET /api/trading?mode=OKX_DEMO|LIVE`, `/api/trading/catalog`, `/api/trading/orders?mode=…`, `/api/trading/activity?mode=…`; `POST /api/trading/limits`, `/api/trading/preview`, `/api/trading/submit`, `/api/trading/cancel`. Decimalbedragen als strings. Typed ordervarianten weigeren onbekende velden. POST gebruikt de bestaande lokale sessie/Origin/custom-headercontrole. Preview is geen uitvoeringsmachtiging. Submit vraagt `preview_id` en `confirmed:true`, is idempotent en herautoriseert onder een accountlock. Alleen de afzonderlijke gateway heeft private OKX-transport. Modeadministraties zijn gescheiden; Live kan in deze release niet worden aangezet vanuit de browser. Details: [ORDERS.md](ORDERS.md).
+
+
+### Live-saldi en persoonlijke vrijgave · 2026-10-05
+
+- `GET /api/trading/balances?mode=LIVE|OKX_DEMO`: alle trading/funding-assets als Decimal-strings; aparte vrij/beschikbaarwaarden, ontvangstmoment, freshness en fouten. Ontbrekende velden blijven null.
+- `POST /api/trading/size`: `{mode,instrument,side,percent,order}`. Gehele procenten 0..100, serverrekensom met verse wallet, actuele fee voor buy en lokale claims. Geen reserve, machtiging of exchange-call. Onder minimum: `below_minimum`.
+- `POST /api/trading/live`: `{account_uid,policy_revision,enabled,confirmed}`. Release geldt alleen voor precies die Live-account/limietversie na actuele private readiness. Een wijziging van limieten/key trekt hem in. Pauzeren weigert lokale QUEUED-orders; bestaande native orders/stops worden gevolgd.
+- `/api/trading/preview`, `/submit` en de private gateway controleren de vrijgave elk opnieuw. De user-confirmatie maakt geen `live_technical_accepted` of `live_acceptance_complete` waar.

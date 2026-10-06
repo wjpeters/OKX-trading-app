@@ -1,0 +1,76 @@
+{
+  "at": 1791276762.5278752,
+  "authorization": "Explicit EUR/USDC spot authorization by Willem on 2026-10-06",
+  "before": {
+    "revision": 2,
+    "protection": 0,
+    "policy_hash": "cf9e51cf1b3f2d6d1c1e92e3d2647498",
+    "release_hash": "3d79ec59808a11fce75b508ba7e89f61",
+    "active_orders": 0,
+    "native_orders": 1
+  },
+  "after": {
+    "revision": 2,
+    "protection": 0,
+    "policy_hash": "cf9e51cf1b3f2d6d1c1e92e3d2647498",
+    "release_hash": "3d79ec59808a11fce75b508ba7e89f61",
+    "active_orders": 0,
+    "native_orders": 1
+  },
+  "policy_preserved": true,
+  "release_preserved": true,
+  "agent_private_orders": 0,
+  "terminal_image": "sha256:0796a638f671b1c51e9b69fb78fea1f89bba844a56a4e0fe8ad3f8977af59e84",
+  "gateway_images": [
+    "sha256:0796a638f671b1c51e9b69fb78fea1f89bba844a56a4e0fe8ad3f8977af59e84",
+    "sha256:0796a638f671b1c51e9b69fb78fea1f89bba844a56a4e0fe8ad3f8977af59e84"
+  ],
+  "status": {
+    "status": "PAUSED",
+    "reason": "Ordergateway gepauzeerd: EXCHANGE_HTTP_ERROR GET /api/v5/account/bills (HTTP 401, OKX 50110): OKX weigert het huidige IP-adres; controleer de IP-lijst van deze API-key.",
+    "gateway_fresh": true,
+    "policy_revision": 2
+  },
+  "snapshot_connected": false,
+  "account_list_verified": false,
+  "stale_list_count": 270,
+  "source_sha256": {
+    "backend/src/exchange.rs": "a9ab3e76bcdca68573a90060773288bc02f588c6fc3080aad70b2a3625c79704",
+    "backend/src/bin/okx-orders.rs": "b2d998231e47300fa6b7144eacbbeb1205f07b5c04ecab022a69bedcb4cbb092",
+    "backend/src/order_types.rs": "dc8ce0bb2889ce91796cbb78162f3bc2f5db4c42b5a6aa1fd6a99cfa2ef656ff",
+    "backend/src/order_risk.rs": "16a3bf416d4e3132876f5c5b5d06d7249e7009fc9b584a0bc7d700f850b1d160",
+    "backend/src/order_wallet.rs": "7d575c16b7c4b015adeb9faf8ed579728607bf53a03778034e125c0db1ee51d6",
+    "backend/src/paper.rs": "8736260224860d2ad272b10d68615961d91cc2ed623ce08290fe1de63e0c65d8",
+    "backend/src/trading.rs": "e11b199532104c304eeb332f893e5c0dea5f3aa9e2ebae2ffdb03729545e8780",
+    "backend/migrations/009_market_interest.sql": "975e7b37ee83e566724a5b0ffa24f9a3358f4b8baa0a03046b1621d48f5cc370",
+    "frontend/src/OrderTicket.tsx": "d83aae8a5e5c02ccf84e2c3d495cc8d500a14bbcee72a5baddc26cd0e430f29d",
+    "frontend/src/App.tsx": "efcdbde4bac1bb94ddffaae61020b648ffd803fc9e2f3cb7ddb7eb9ac13549f5",
+    "frontend/src/Chart.tsx": "c4ceb40f3cbedfd66c050a9dbcdd627ac736b84ee8864c6feea58ee08da6aa30",
+    "frontend/src/Drawings.tsx": "bed9aad55a4a5cf758cbe63e398fe983950d35178b7edced01cbb7fe9e023b74",
+    "frontend/src/ChartWorkspace.tsx": "bc105cfba4223d1a49ee9c3ff6099b614e9061443dce15025e48c55a56703040",
+    "frontend/src/orders.css": "569e9cd280c60cd8fdc039215eb829161d38414403c10f1290091388d3e8f5e2",
+    "scripts/eur_usdc_checks.py": "367aca2f8ac94d4d3315063e66b2e07360d0537312e8d58903cda40ef95b53da"
+  },
+  "tests": {
+    "rust": {
+      "onboarding": 32,
+      "gateway": 44,
+      "terminal": 135
+    },
+    "isolated_http": {
+      "native_regression": 32,
+      "eur_usdc": 25
+    },
+    "typescript_production_build": true
+  },
+  "remaining": "Fresh private account verification blocked by OKX 50110 IP restriction; no genuine exchange order acceptance claimed.",
+  "final_status": {
+    "status": "PAUSED",
+    "reason": "Ordergateway gepauzeerd: EXCHANGE_HTTP_ERROR GET /api/v5/account/bills (HTTP 401, OKX 50110): OKX weigert het huidige IP-adres; controleer de IP-lijst van deze API-key.",
+    "gateway_fresh": true,
+    "policy_revision": 2
+  },
+  "final_connected": false,
+  "test_manifest_removed": true,
+  "checked_at": 1791276933.453174
+}

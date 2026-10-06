@@ -1,24 +1,14 @@
-import { post, Spark, download } from "./studio-ui";
+import { post, Spark, download, previewPine } from "./studio-ui";
 import type { Doc } from "./studio-ui";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Editor, { loader } from "@monaco-editor/react";
 import * as monaco from "monaco-editor/editor/editor.api";
 import EditorWorker from "monaco-editor/editor/editor.worker.js?worker";
-import {
-  ReactFlow,
-  Background,
-  Controls,
-  addEdge,
-  applyNodeChanges,
-  applyEdgeChanges,
-} from "@xyflow/react";
-import type { Node, Edge, Connection } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
 import { api } from "./types";
 import type { Market } from "./types";
 import { usePreferences } from "./store";
-import PaperWorkspace from "./Paper";
+import { navigate, readDraft } from "./bot-model";
 import "./studio.css";
 (self as unknown as { MonacoEnvironment: unknown }).MonacoEnvironment = {
   getWorker: () => new EditorWorker(),
@@ -70,7 +60,7 @@ type PineInput = {
   minval?: number;
   maxval?: number;
   step?: number;
-  options?: string[];
+  options?: (string | number)[];
 };
 type PineResult = {
   inputs?: PineInput[];
@@ -85,12 +75,32 @@ type PineResult = {
 export function PineEditor() {
   const { symbol, bar, light } = usePreferences();
   const qc = useQueryClient();
-  const [name, setName] = useState("Mijn trend");
-  const [source, setSource] = useState(pineExample);
+  const [draft] = useState(() =>
+    readDraft("okx-pine-draft-v2", {
+      name: "Mijn trend",
+      source: pineExample,
+      inputs: {} as Record<string, string | number | boolean>,
+      version: 0,
+      display: "overlay",
+      scriptKind: "strategy",
+    }),
+  );
+  const [display, setDisplay] = useState(draft.display);
+  const [scriptKind, setScriptKind] = useState(draft.scriptKind);
+  const [name, setName] = useState(draft.name);
+  const [source, setSource] = useState(draft.source);
   const [inputs, setInputs] = useState<
     Record<string, string | number | boolean>
-  >({});
-  const [version, setVersion] = useState(0);
+  >(draft.inputs);
+  const [version, setVersion] = useState(draft.version);
+  useEffect(() => {
+    localStorage.setItem(
+      "okx-pine-draft-v2",
+      JSON.stringify({ name, source, inputs, version, display, scriptKind }),
+    );
+  }, [name, source, inputs, version, display, scriptKind]);
+  const [computedSource, setComputedSource] = useState("");
+  const [inputMeta, setInputMeta] = useState<PineInput[]>([]);
   const [result, setResult] = useState<PineResult>();
   const [backtest, setBacktest] = useState<{
     report: {
@@ -113,13 +123,15 @@ export function PineEditor() {
     setBusy(true);
     setError("");
     try {
-      const r = await post<PineResult>("/api/studio/pine", {
+      const r = await previewPine<PineResult>({
         source,
         inputs,
         instrument: symbol,
         bar,
       });
       setResult(r);
+      setComputedSource(JSON.stringify({ source, inputs }));
+      if (r.inputs?.length) setInputMeta(r.inputs);
       if (model.current)
         monaco.editor.setModelMarkers(
           model.current,
@@ -139,19 +151,60 @@ export function PineEditor() {
       setBusy(false);
     }
   }
-  async function save() {
+  async function save(destination?: "Terminal" | "Bot Studio") {
+    setBusy(true);
+    setError("");
     try {
+      let checked = result;
+      if (destination) {
+        checked = await previewPine<PineResult>({
+          source,
+          inputs,
+          instrument: symbol,
+          bar,
+        });
+        setResult(checked);
+        setComputedSource(JSON.stringify({ source, inputs }));
+        if (checked.inputs) setInputMeta(checked.inputs);
+        if (!checked.ok)
+          throw Error(checked.diagnostics.map((d) => d.message).join(" · "));
+      }
+      const payload = {
+        source,
+        inputs,
+        profile: "closed-bar-1",
+        display,
+        scriptKind,
+        plots: checked?.plots?.map((p) => p.title) || [],
+      };
       const r = await post<{ version: number }>("/api/studio/documents", {
         kind: "pine",
         name,
         base_version: version,
-        payload: { source, inputs, profile: "closed-bar-1" },
+        payload,
       });
       setVersion(r.version);
-      qc.invalidateQueries({ queryKey: ["documents", "pine"] });
-      setError("Versie opgeslagen.");
+      await qc.invalidateQueries({ queryKey: ["documents", "pine"] });
+      setError(`Script opgeslagen · v${r.version}`);
+      const doc = { name, version: r.version, payload, created_ms: Date.now() };
+      if (destination === "Terminal") {
+        const pref = usePreferences.getState();
+        pref.set({
+          pineScripts: [
+            ...pref.pineScripts.filter((p) => p.name !== name),
+            { name, version: r.version },
+          ],
+        });
+        navigate("Terminal");
+      }
+      if (destination === "Bot Studio") {
+        sessionStorage.setItem("okx-pine-node", JSON.stringify(doc));
+        navigate("Bot Studio");
+      }
     } catch (e) {
       setError(String(e));
+    } finally {
+      setBusy(false);
     }
   }
   return (
@@ -160,11 +213,11 @@ export function PineEditor() {
         <div>
           <h2>Pine Editor</h2>
           <p>
-            Echte Pine-bron · geïsoleerde uitvoering · voorstellen via de vaste
-            risicokern
+            Schrijf je eigen indicator of strategie. Gebruik hem op de chart of
+            in je bot.
           </p>
         </div>
-        <span className="pill">PineTS 0.11.0</span>
+        <span className="pill">Concept automatisch bewaard</span>
       </div>
       <div className="studio-toolbar">
         <input
@@ -179,7 +232,10 @@ export function PineEditor() {
           aria-label="Scriptversie"
           value=""
           onChange={(e) => {
-            const d = versions.data?.[+e.target.value];
+            const d =
+              e.target.value === ""
+                ? undefined
+                : versions.data?.[+e.target.value];
             if (d) {
               setSource(String(d.payload.source));
               setInputs(
@@ -190,6 +246,10 @@ export function PineEditor() {
               );
               setName(d.name);
               setVersion(d.version);
+              setDisplay(String(d.payload.display || "overlay"));
+              setScriptKind(String(d.payload.scriptKind || "strategy"));
+              setResult(undefined);
+              setInputMeta([]);
             }
           }}
         >
@@ -200,7 +260,15 @@ export function PineEditor() {
             </option>
           ))}
         </select>
-        <button onClick={save}>Bewaar v{version + 1}</button>
+        <button disabled={busy} onClick={() => save()}>
+          Script opslaan
+        </button>
+        <button disabled={busy} onClick={() => save("Terminal")}>
+          Opslaan en op chart
+        </button>
+        <button disabled={busy} onClick={() => save("Bot Studio")}>
+          Opslaan en als botnode
+        </button>
         <label className="button">
           Importeer .pine
           <input
@@ -226,44 +294,115 @@ export function PineEditor() {
         </button>
       </div>
       <div className="studio-toolbar">
-        <button
-          disabled={busy || !symbol.endsWith("-EUR")}
-          onClick={async () => {
-            setBusy(true);
-            try {
-              setBacktest(
-                await post("/api/replay/pine", {
-                  source,
-                  inputs,
-                  config: {
-                    instrument: symbol,
-                    bar,
-                    fast: 9,
-                    slow: 21,
-                    capital: "1000",
-                    order_eur: "100",
-                    stop_bps: "100",
-                    target_bps: "200",
-                    spread_bps: "10",
-                    slippage_bps: "5",
-                  },
-                }),
-              );
-              setError("Candle-backtest afgerond.");
-            } catch (e) {
-              setError(String(e));
-            } finally {
-              setBusy(false);
+        <label>
+          Type
+          <select
+            value={scriptKind}
+            onChange={(e) => setScriptKind(e.target.value)}
+          >
+            <option value="indicator">Indicator</option>
+            <option value="strategy">Strategie (entry / exit)</option>
+          </select>
+        </label>
+        <label>
+          Weergave
+          <select value={display} onChange={(e) => setDisplay(e.target.value)}>
+            <option value="overlay">Op de koersgrafiek</option>
+            <option value="pane">Eigen indicatorpaneel</option>
+          </select>
+        </label>
+        <label>
+          Interval
+          <select
+            value={bar}
+            onChange={(e) =>
+              usePreferences.getState().set({ bar: e.target.value })
             }
+          >
+            {[
+              "1m",
+              "3m",
+              "5m",
+              "15m",
+              "30m",
+              "1H",
+              "2H",
+              "4H",
+              "6H",
+              "12H",
+              "1D",
+              "1W",
+            ].map((b) => (
+              <option key={b}>{b}</option>
+            ))}
+          </select>
+        </label>
+        <button
+          onClick={() => {
+            setSource(
+              scriptKind === "strategy"
+                ? pineExample
+                : '//@version=6\nindicator("Mijn indicator", overlay=true)\nperiode = input.int(20, "Periode", minval=2, maxval=100)\nplot(ta.sma(close, periode), "Mijn indicator")\n',
+            );
+            setInputs({});
+            setInputMeta([]);
+            setName("Nieuw script " + new Date().toLocaleTimeString("nl-NL"));
+            setVersion(0);
+            setResult(undefined);
           }}
         >
-          Backtest dit script
+          Nieuw voorbeeld
         </button>
-        <span>
-          Virtueel: €1.000 start · €100/order · stop 1% · target 2% · spread 10
-          bp · slippage 5 bp · fee 10 bp
-        </span>
       </div>
+      {scriptKind === "strategy" && (
+        <p className="panel-note">
+          Schrijf koop- en verkoopsignalen met plot(..., "entry") en plot(...,
+          "exit"). Native strategy.* wordt nog niet ondersteund. Configureer
+          budget, stop en target in Bot Studio; bots gebruiken 1-minuutcandles.
+        </p>
+      )}
+      <details className="studio-card">
+        <summary>Snelle scripttest met voorbeeldbedragen</summary>
+        <div className="studio-toolbar">
+          <button
+            disabled={busy || !symbol.endsWith("-EUR")}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                setBacktest(
+                  await post("/api/replay/pine", {
+                    source,
+                    inputs,
+                    config: {
+                      instrument: symbol,
+                      bar,
+                      fast: 9,
+                      slow: 21,
+                      capital: "1000",
+                      order_eur: "100",
+                      stop_bps: "100",
+                      target_bps: "200",
+                      spread_bps: "10",
+                      slippage_bps: "5",
+                    },
+                  }),
+                );
+                setError("Candle-backtest afgerond.");
+              } catch (e) {
+                setError(String(e));
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            Backtest dit script
+          </button>
+          <span>
+            Virtueel: €1.000 start · €100/order · stop 1% · target 2% · spread
+            10 bp · slippage 5 bp · fee 10 bp
+          </span>
+        </div>
+      </details>
       {backtest && (
         <div className="studio-card">
           <strong>
@@ -311,10 +450,10 @@ export function PineEditor() {
         </div>
         <aside className="studio-card">
           <h3>Resultaat</h3>
-          {!!result?.inputs?.length && (
+          {!!inputMeta.length && (
             <div className="pine-inputs">
               <h4>Scriptparameters</h4>
-              {result.inputs.map((m) => (
+              {inputMeta.map((m) => (
                 <label key={m.id}>
                   {m.title || m.name}
                   {m.type === "bool" ? (
@@ -329,7 +468,14 @@ export function PineEditor() {
                     <select
                       value={String(inputs[m.name] ?? m.defval)}
                       onChange={(e) =>
-                        setInputs({ ...inputs, [m.name]: e.target.value })
+                        setInputs({
+                          ...inputs,
+                          [m.name]: ["int", "float", "price", "time"].includes(
+                            m.type,
+                          )
+                            ? Number(e.target.value)
+                            : e.target.value,
+                        })
                       }
                     >
                       {m.options.map((v) => (
@@ -378,6 +524,12 @@ export function PineEditor() {
           )}
           {result && (
             <>
+              {computedSource !== JSON.stringify({ source, inputs }) && (
+                <p className="warning">
+                  Code of inputs gewijzigd. Voer opnieuw uit om het resultaat te
+                  vernieuwen.
+                </p>
+              )}
               <p>
                 {result.ok ? "Berekening geslaagd" : "Uitvoering geblokkeerd"} ·{" "}
                 {result.duration_ms?.toFixed(1)} ms · {result.bars || 0} candles
@@ -424,346 +576,6 @@ export function PineEditor() {
           een fout; een gedeeltelijk resultaat wordt niet als voorstel gebruikt.
         </p>
       </details>
-    </section>
-  );
-}
-const names: Record<string, string> = {
-  market: "OKX · gesloten candle",
-  sma_cross: "SMA-kruising",
-  rsi_range: "RSI-range",
-  condition: "Voorwaarde",
-  and: "Alle voorwaarden",
-  or: "Eén voorwaarde",
-  time_window: "UTC-tijdvenster",
-  cooldown: "Cooldown",
-  news: "Nieuwsfilter",
-  jev: "Jev-voorstel",
-  pine: "Pine-signaal",
-  sizing: "Positiegrootte",
-  intent: "Ordervoorstel",
-  risk_gate: "VASTE RISICOKERN",
-};
-function template(kind = "trend") {
-  const signal = kind === "range" ? "rsi_range" : "sma_cross";
-  const kinds = [
-    "market",
-    signal,
-    ...(kind === "jev" ? ["jev"] : []),
-    "sizing",
-    "intent",
-    "risk_gate",
-  ];
-  return {
-    schema: 1,
-    nodes: kinds.map((k, i) => ({
-      id: "n" + i,
-      kind: k,
-      params:
-        k === "sma_cross"
-          ? { fast: 9, slow: 21 }
-          : k === "rsi_range"
-            ? { low: 30, high: 70 }
-            : k === "jev"
-              ? { minimum_confidence: 0.8 }
-              : {},
-      position: { x: i * 180, y: 70 },
-    })),
-    edges: kinds
-      .slice(1)
-      .map((_, i) => ({ source: "n" + i, target: "n" + (i + 1) })),
-  };
-}
-type Graph = ReturnType<typeof template>;
-function graphNodes(g: Graph): Node[] {
-  return g.nodes.map((n) => ({
-    id: n.id,
-    position: n.position || { x: 0, y: 0 },
-    data: { label: names[n.kind], kind: n.kind, params: n.params },
-    deletable: n.kind !== "risk_gate",
-    style:
-      n.kind === "risk_gate"
-        ? {
-            border: "2px solid #50bd97",
-            background: "#14372e",
-            color: "#def5ec",
-          }
-        : undefined,
-  }));
-}
-export function BotStudio({ market }: { market: Market }) {
-  const qc = useQueryClient();
-  const [nodes, setNodes] = useState<Node[]>(graphNodes(template()));
-  const [edges, setEdges] = useState<Edge[]>(
-    template().edges.map((e, i) => ({ ...e, id: "e" + i })),
-  );
-  const [name, setName] = useState("Trend v1");
-  const [version, setVersion] = useState(0);
-  const [message, setMessage] = useState("");
-  const [selected, setSelected] = useState<string>();
-  const [code, setCode] = useState("");
-  const [bot, setBot] = useState("");
-  const docs = useQuery({
-    queryKey: ["documents", "graph"],
-    queryFn: () => api<Doc[]>("/api/studio/documents?kind=graph"),
-  });
-  const account = useQuery({
-    queryKey: ["studio-bots"],
-    queryFn: () =>
-      api<{
-        account: { bots: Record<string, { id: string; name: string }> } | null;
-      }>("/api/paper"),
-    refetchInterval: 5000,
-  });
-  function canonical() {
-    return {
-      schema: 1,
-      nodes: nodes.map((n) => ({
-        id: n.id,
-        kind: n.data.kind,
-        params: n.data.params || {},
-        position: n.position,
-      })),
-      edges: edges.map((e) => ({ source: e.source, target: e.target })),
-    };
-  }
-  function load(g: Graph) {
-    setNodes(graphNodes(g));
-    setEdges(g.edges.map((e, i) => ({ ...e, id: "e" + i })));
-    setCode("");
-  }
-  async function action(save: boolean) {
-    try {
-      const payload = canonical();
-      const r = await post<{ plan: string[] }>(
-        "/api/studio/graph/validate",
-        payload,
-      );
-      if (save) {
-        const d = await post<{ version: number }>("/api/studio/documents", {
-          kind: "graph",
-          name,
-          base_version: version,
-          payload,
-        });
-        setVersion(d.version);
-        qc.invalidateQueries({ queryKey: ["documents", "graph"] });
-      }
-      setMessage(
-        `Geldig plan: ${r.plan.join(" → ")}. ${save ? "Versie opgeslagen." : ""}`,
-      );
-    } catch (e) {
-      setMessage(String(e));
-    }
-  }
-  const n = nodes.find((n) => n.id === selected);
-  return (
-    <section className="studio-page">
-      <div className="studio-title">
-        <div>
-          <h2>Bot Studio</h2>
-          <p>
-            Een versieerbare strategie. Elke route eindigt bij de vaste
-            risicokern.
-          </p>
-        </div>
-        <span className="pill">PAPER_LOCAL</span>
-      </div>
-      <div className="studio-toolbar">
-        <input
-          aria-label="Strategienaam"
-          value={name}
-          onChange={(e) => {
-            setName(e.target.value);
-            setVersion(0);
-          }}
-        />
-        <select
-          aria-label="Strategietemplate"
-          defaultValue="trend"
-          onChange={(e) => {
-            load(template(e.target.value));
-            setVersion(0);
-            setName(e.target.value + " strategie");
-          }}
-        >
-          <option value="trend">Trend-following</option>
-          <option value="range">Range / mean reversion</option>
-          <option value="jev">Jev-regimefilter</option>
-        </select>
-        <select
-          aria-label="Strategieversie"
-          value=""
-          onChange={(e) => {
-            const d = docs.data?.[+e.target.value];
-            if (d) {
-              load(d.payload as Graph);
-              setName(d.name);
-              setVersion(d.version);
-            }
-          }}
-        >
-          <option value="">Versie laden / rollback</option>
-          {docs.data?.map((d, i) => (
-            <option key={i} value={i}>
-              {d.name} · v{d.version}
-            </option>
-          ))}
-        </select>
-        <button onClick={() => action(false)}>Valideer</button>
-        <button onClick={() => action(true)}>Bewaar v{version + 1}</button>
-        <button
-          onClick={() => {
-            setName(name + " kopie");
-            setVersion(0);
-          }}
-        >
-          Kloon
-        </button>
-        <button onClick={() => setCode(JSON.stringify(canonical(), null, 2))}>
-          Configuratie
-        </button>
-      </div>
-      <div className="graph-grid">
-        <div className="graph-canvas">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            colorMode="dark"
-            fitView
-            onNodesChange={(changes) =>
-              setNodes((n) => applyNodeChanges(changes, n))
-            }
-            onEdgesChange={(changes) =>
-              setEdges((e) => applyEdgeChanges(changes, e))
-            }
-            onConnect={(c: Connection) => setEdges((e) => addEdge(c, e))}
-            onNodeClick={(_, n) => setSelected(n.id)}
-          >
-            <Background />
-            <Controls />
-          </ReactFlow>
-        </div>
-        <aside className="studio-card">
-          <h3>Nodes</h3>
-          <select
-            aria-label="Node toevoegen"
-            value=""
-            onChange={(e) => {
-              const k = e.target.value;
-              setNodes((ns) => [
-                ...ns,
-                {
-                  id: crypto.randomUUID().slice(0, 8),
-                  position: { x: 200, y: 230 },
-                  data: { label: names[k], kind: k, params: {} },
-                },
-              ]);
-            }}
-          >
-            <option value="">Voeg een node toe</option>
-            {Object.entries(names)
-              .filter(([k]) => !["market", "risk_gate", "intent"].includes(k))
-              .map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
-                </option>
-              ))}
-          </select>
-          {n && (
-            <>
-              <h3>{String(n.data.label)}</h3>
-              <p>Parameters (JSON)</p>
-              <textarea
-                aria-label="Nodeparameters"
-                key={n.id}
-                defaultValue={JSON.stringify(n.data.params, null, 2)}
-                onBlur={(e) => {
-                  try {
-                    const params = JSON.parse(e.target.value);
-                    setNodes((ns) =>
-                      ns.map((x) =>
-                        x.id === n.id
-                          ? { ...x, data: { ...x.data, params } }
-                          : x,
-                      ),
-                    );
-                    setMessage("Parameters bijgewerkt.");
-                  } catch {
-                    setMessage("Ongeldige parameter-JSON");
-                  }
-                }}
-              />
-            </>
-          )}
-          <p className="muted">
-            Budget, stop, target en alle limieten horen bij de deployment
-            hieronder. Een opgeslagen strategie wijzigt geen draaiende bot.
-          </p>
-          <select
-            aria-label="Deploymentbot"
-            value={bot}
-            onChange={(e) => setBot(e.target.value)}
-          >
-            <option value="">Kies gepauzeerde bot</option>
-            {Object.values(account.data?.account?.bots || {})
-              .filter((b) => b.id !== "manual")
-              .map((b) => (
-                <option value={b.id} key={b.id}>
-                  {b.name}
-                </option>
-              ))}
-          </select>
-          <button
-            disabled={!bot || !version}
-            onClick={async () => {
-              try {
-                await post("/api/studio/deploy", {
-                  bot_id: bot,
-                  name,
-                  version,
-                });
-                setMessage(
-                  "Versie gekoppeld. Start de bot hieronder na controle van de limieten.",
-                );
-              } catch (e) {
-                setMessage(String(e));
-              }
-            }}
-          >
-            Koppel opgeslagen versie
-          </button>
-        </aside>
-      </div>
-      {code && (
-        <div className="studio-card">
-          <textarea
-            className="code-json"
-            aria-label="Strategieconfiguratie"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-          <button
-            onClick={() => {
-              try {
-                load(JSON.parse(code));
-                setMessage("Configuratie ingelezen. Valideer en sla op.");
-              } catch {
-                setMessage("Ongeldige JSON");
-              }
-            }}
-          >
-            Neem configuratie over
-          </button>
-          <button onClick={() => download(code, name + ".json")}>
-            Exporteer
-          </button>
-        </div>
-      )}
-      <p role="status" className="panel-note">
-        {message ||
-          "Educatieve templates. Geen winstclaim. Leverage en martingale staan uit."}
-      </p>
-      <PaperWorkspace market={market} view="bots" />
     </section>
   );
 }

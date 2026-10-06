@@ -1,0 +1,111 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [terminal internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.46kB 0.0s done
+#1 DONE 0.0s
+
+#2 [terminal internal] load metadata for docker.io/library/node@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#2 DONE 0.0s
+
+#3 [terminal internal] load metadata for docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#3 DONE 0.0s
+
+#4 [terminal internal] load metadata for docker.io/library/alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
+#4 DONE 0.9s
+
+#5 [terminal internal] load .dockerignore
+#5 transferring context: 137B done
+#5 DONE 0.0s
+
+#6 [terminal frontend 1/6] FROM docker.io/library/node@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#6 DONE 0.0s
+
+#7 [terminal stage-3 1/7] FROM docker.io/library/alpine@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
+#7 DONE 0.0s
+
+#8 [terminal backend 1/5] FROM docker.io/library/rust@sha256:a96ea6d18d4062e38f16cfbadd8b4541d622f2527dd0a5eca1fb36d301da4e88
+#8 DONE 0.0s
+
+#9 [terminal internal] load build context
+#9 transferring context: 359.52kB 0.0s done
+#9 DONE 0.0s
+
+#10 [terminal backend 3/5] WORKDIR /build
+#10 CACHED
+
+#11 [terminal backend 4/5] COPY backend/ ./
+#11 CACHED
+
+#12 [terminal backend 2/5] RUN apk add --no-cache musl-dev gcc make
+#12 CACHED
+
+#13 [terminal backend 5/5] RUN --mount=type=cache,target=/usr/local/cargo/registry --mount=type=cache,target=/build/target,id=okx-musl-target cargo build --release --locked && cp target/release/okx-terminal /okx-terminal && cp target/release/okx-onboarding /okx-onboarding
+#13 CACHED
+
+#14 [terminal frontend 2/6] WORKDIR /build
+#14 CACHED
+
+#15 [terminal frontend 3/6] COPY frontend/package*.json ./
+#15 CACHED
+
+#16 [terminal frontend 4/6] RUN npm ci --ignore-scripts
+#16 CACHED
+
+#17 [terminal frontend 5/6] COPY frontend/ ./
+#17 DONE 0.1s
+
+#18 [terminal frontend 6/6] RUN npm run build
+#18 ...
+
+#19 [terminal stage-3 2/7] RUN apk upgrade --no-cache && apk add --no-cache ca-certificates
+#19 CACHED
+
+#20 [terminal stage-3 3/7] RUN mkdir /jobs /archives /onboarding && chown 10001:10001 /jobs /archives /onboarding
+#20 CACHED
+
+#21 [terminal stage-3 4/7] WORKDIR /app
+#21 CACHED
+
+#22 [terminal stage-3 5/7] COPY --from=backend /okx-terminal /app/okx-terminal
+#22 DONE 0.1s
+
+#23 [terminal stage-3 6/7] COPY --from=backend /okx-onboarding /app/okx-onboarding
+#23 DONE 0.1s
+
+#18 [terminal frontend 6/6] RUN npm run build
+#18 0.517 
+#18 0.517 > okx-tradingterminal-ui@0.4.0 build
+#18 0.517 > tsc --noEmit && vite build
+#18 0.517 
+#18 1.694 vite v8.3.2 building client environment for production...
+#18 1.755 transforming...
+#18 3.087 ✓ 2833 modules transformed.
+#18 3.288 rendering chunks...
+#18 3.811 computing gzip size...
+#18 3.859 dist/index.html                            0.40 kB │ gzip:   0.29 kB
+#18 3.859 dist/assets/editor.worker-DWPaKKV_.js    303.93 kB
+#18 3.859 dist/assets/index-CDBivREE.css            42.39 kB │ gzip:   9.54 kB
+#18 3.859 dist/assets/Studio-7SA4PY0S.css          114.50 kB │ gzip:  16.47 kB
+#18 3.859 dist/assets/index-BrCOzvkU.js            548.18 kB │ gzip: 170.58 kB
+#18 3.859 dist/assets/Studio-CGzuG0Am.js         2,915.77 kB │ gzip: 761.77 kB
+#18 3.859 
+#18 3.862 [plugin builtin:vite-reporter] 
+#18 3.862 (!) Some chunks are larger than 500 kB after minification. Consider:
+#18 3.862 - Using dynamic import() to code-split the application
+#18 3.862 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+#18 3.862 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#18 3.865 ✓ built in 2.17s
+#18 DONE 4.0s
+
+#24 [terminal stage-3 7/7] COPY --from=frontend /build/dist /app/public
+#24 DONE 0.0s
+
+#25 [terminal] exporting to image
+#25 exporting layers 0.1s done
+#25 writing image sha256:cad7e26ae1bbb8343bbe2ab1b413c292a4ca2e48944d2436226a6e7d8831c6db done
+#25 naming to docker.io/library/okx-tradingterminal:0.4.0 done
+#25 DONE 0.1s
+
+#26 [terminal] resolving provenance for metadata file
+#26 DONE 0.0s
+ terminal  Built

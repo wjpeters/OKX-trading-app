@@ -1,0 +1,51 @@
+{
+  "checks": [
+    {
+      "type": "market",
+      "fieldVisible": true
+    },
+    {
+      "type": "limit",
+      "fieldVisible": true
+    },
+    {
+      "type": "post_only",
+      "fieldVisible": true
+    },
+    {
+      "type": "ioc",
+      "fieldVisible": true
+    },
+    {
+      "type": "fok",
+      "fieldVisible": true
+    },
+    {
+      "type": "trigger",
+      "fieldVisible": true
+    },
+    {
+      "type": "tp_sl",
+      "fieldVisible": true
+    },
+    {
+      "type": "trailing",
+      "fieldVisible": true
+    },
+    {
+      "type": "iceberg",
+      "fieldVisible": true
+    },
+    {
+      "type": "twap",
+      "fieldVisible": true
+    }
+  ],
+  "twapPreview": "OKX Demo-order controleren\nInstrument\nBTC-EUR\nRichting\nVerkopen\nHoeveelheid\n0,002 BTC\nOrdertype\ntwap\nGeschatte waarde\n\u20ac 152\nPrijsreferentie / limiet\n\u20ac 76.000\nGeldig\n0 seconden\n\nEen marktorder garandeert geen prijs; een triggerprijs is geen uitvoeringsprijs. Preview verzendt niets naar OKX.\n\nNog nodig om te verzenden\nOKX-rekening ontbreekt, is verouderd of nog niet gesynchroniseerd\nTerug naar order\nBevestigen en naar OKX Demo",
+  "blockedSubmit": true,
+  "scope": "temporary test database; preview only; no native submission",
+  "iceberg_condition_switch_reset": true,
+  "console_errors_final": [],
+  "mode_badge_visible_while_scrolling": true,
+  "screenshot": "native-orders-terminal.jpg"
+}
